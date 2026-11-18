@@ -40,6 +40,10 @@ BloxIndex
             50% { transform: translateY(4px); opacity: 1; filter: drop-shadow(0 0 10px #991b1b); }
             100% { transform: translateY(-3px); opacity: 0.8; filter: drop-shadow(0 0 6px #dc2626); }
         }
+        @keyframes goldShine {
+            0%, 100% { box-shadow: 0 0 8px rgba(250, 204, 21, 0.5); }
+            50% { box-shadow: 0 0 16px rgba(250, 204, 21, 0.9); }
+        }
 
         .fire-badge {
             display: inline-block;
@@ -48,6 +52,13 @@ BloxIndex
         .blood-badge {
             display: inline-block;
             animation: drip 1.2s infinite ease-in-out;
+        }
+        .trillionaire-badge {
+            background: linear-gradient(90deg, #f59e0b, #fde047, #d97706);
+            color: #000000;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            animation: goldShine 2s infinite ease-in-out;
         }
 
         /* 1 Billion: Fuego Encendido */
@@ -189,8 +200,11 @@ BloxIndex
                                 <span class="text-xs font-bold text-green-400 w-4" x-text="'#' + (idx + 1)"></span>
                                 <img :src="gainer.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
                                 <div>
-                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5 flex-wrap">
                                         <span x-text="gainer.name"></span>
+                                        <template x-if="isTrillionaire(gainer)">
+                                            <span class="trillionaire-badge text-[9px] px-1.5 py-0.5 rounded uppercase" x-text="getTrillionaireLabel(gainer)"></span>
+                                        </template>
                                         <template x-if="hasFire(gainer)">
                                             <span :class="getFireBadgeClass(gainer)" class="fire-badge text-xs" :title="getFireLabel(gainer)">🔥</span>
                                         </template>
@@ -221,8 +235,11 @@ BloxIndex
                                 <span class="text-xs font-bold text-red-400 w-4" x-text="'#' + (idx + 1)"></span>
                                 <img :src="loser.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
                                 <div>
-                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5 flex-wrap">
                                         <span x-text="loser.name"></span>
+                                        <template x-if="isTrillionaire(loser)">
+                                            <span class="trillionaire-badge text-[9px] px-1.5 py-0.5 rounded uppercase" x-text="getTrillionaireLabel(loser)"></span>
+                                        </template>
                                         <template x-if="isBloodActive(loser)">
                                             <span class="blood-badge text-xs">🩸</span>
                                         </template>
@@ -245,8 +262,13 @@ BloxIndex
             <div class="md:col-span-4 space-y-3">
                 <template x-for="person in top5People" :key="person.id">
                     <div @click="selectedTop5Person = person" :class="[selectedTop5Person?.id === person.id ? 'active-card' : 'card-bg', getContainerGlowClass(person)]" class="p-4 rounded-xl cursor-pointer hover:bg-neutral-800 transition relative">
-                        <div class="flex items-center justify-between">
-                            <div class="serif-font text-lg font-bold" x-text="person.id + '. ' + person.name"></div>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div class="serif-font text-lg font-bold" x-text="person.id + '. ' + person.name"></div>
+                                <template x-if="isTrillionaire(person)">
+                                    <span class="trillionaire-badge text-[9px] px-1.5 py-0.5 rounded uppercase" x-text="getTrillionaireLabel(person)"></span>
+                                </template>
+                            </div>
                             <template x-if="isBloodActive(person)">
                                 <span class="blood-badge text-base" title="Perdiendo capital">🩸</span>
                             </template>
@@ -277,7 +299,12 @@ BloxIndex
                                 </template>
                             </div>
                             <div>
-                                <h2 class="serif-font text-3xl font-bold" x-text="selectedTop5Person?.id + '. ' + selectedTop5Person?.name"></h2>
+                                <div class="flex items-center gap-2.5 flex-wrap">
+                                    <h2 class="serif-font text-3xl font-bold" x-text="selectedTop5Person?.id + '. ' + selectedTop5Person?.name"></h2>
+                                    <template x-if="isTrillionaire(selectedTop5Person)">
+                                        <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedTop5Person)"></span>
+                                    </template>
+                                </div>
                                 <div x-show="isBloodActive(selectedTop5Person)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-red-500" x-text="t('bloodMarketLabel')"></div>
                                 <div x-show="!isBloodActive(selectedTop5Person) && hasFire(selectedTop5Person)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedTop5Person)"></div>
                             </div>
@@ -386,7 +413,14 @@ BloxIndex
                     </template>
 
                     <img :src="item.img" class="w-32 h-32 rounded-lg object-cover mb-4 bg-black" alt="Avatar">
-                    <div class="serif-font text-lg font-bold" x-text="(currentFilter === 'women' || currentFilter === 'companies' || selectedCategory || searchQuery !== '' ? (index + 1) : item.id) + '. ' + item.name"></div>
+                    
+                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                        <div class="serif-font text-lg font-bold" x-text="(currentFilter === 'women' || currentFilter === 'companies' || selectedCategory || searchQuery !== '' ? (index + 1) : item.id) + '. ' + item.name"></div>
+                    </div>
+
+                    <template x-if="isTrillionaire(item)">
+                        <span class="trillionaire-badge text-[9px] px-2 py-0.5 rounded uppercase mt-1" x-text="'👑 ' + getTrillionaireLabel(item)"></span>
+                    </template>
                     
                     <div class="text-xs text-neutral-400 mt-1" x-show="currentFilter === 'companies'" x-text="t('ceoLabel') + ': ' + item.ceo"></div>
 
@@ -417,7 +451,12 @@ BloxIndex
                             </template>
                         </div>
                         <div>
-                            <h2 class="serif-font text-3xl font-bold" x-text="selectedPerson?.id ? (selectedPerson.id + '. ' + selectedPerson?.name) : selectedPerson?.name"></h2>
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <h2 class="serif-font text-3xl font-bold" x-text="selectedPerson?.id ? (selectedPerson.id + '. ' + selectedPerson?.name) : selectedPerson?.name"></h2>
+                                <template x-if="isTrillionaire(selectedPerson)">
+                                    <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedPerson)"></span>
+                                </template>
+                            </div>
                             <div x-show="isBloodActive(selectedPerson)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-red-500" x-text="t('bloodMarketLabel')"></div>
                             <div x-show="!isBloodActive(selectedPerson) && hasFire(selectedPerson)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedPerson)"></div>
                         </div>
@@ -607,7 +646,6 @@ BloxIndex
     <!-- Script Principal -->
     <script>
         const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
-        // Época base fija (UTC) para que TODOS los usuarios compartan el mismo ciclo y reloj global
         const GLOBAL_EPOCH_MS = Date.UTC(2026, 0, 1, 0, 0, 0);
 
         const BANNED_COMPANIES = ['apex dynamics', 'nova tech', 'stark industries', 'omnicorp global'];
@@ -695,6 +733,8 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Peak Rank",
                 peakNetWorth: "Peak Net Worth",
+                firstTrillionaire: "First Trillionaire",
+                trillionaire: "Trillionaire",
                 fire1: "Ignited Fire (+$1B/day)",
                 fire5: "Orange Fire (+$5B/day)",
                 fire10: "Yellow Fire (+$10B/day)",
@@ -766,6 +806,8 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Rango Máximo (Peak Rank)",
                 peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
+                firstTrillionaire: "First Trillionaire",
+                trillionaire: "Trillionaire",
                 fire1: "Fuego Encendido (+$1B/día)",
                 fire5: "Fuego Naranja (+$5B/día)",
                 fire10: "Fuego Amarillo (+$10B/día)",
@@ -837,6 +879,8 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Miglior Posizione",
                 peakNetWorth: "Patrimonio Massimo",
+                firstTrillionaire: "First Trillionaire",
+                trillionaire: "Trillionaire",
                 fire1: "Fuoco Acceso (+$1B/giorno)",
                 fire5: "Fuoco Arancione (+$5B/giorno)",
                 fire10: "Fuoco Giallo (+$10B/giorno)",
@@ -908,6 +952,8 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Melhor Posição",
                 peakNetWorth: "Patrimônio Máximo",
+                firstTrillionaire: "First Trillionaire",
+                trillionaire: "Trillionaire",
                 fire1: "Fogo Aceso (+$1B/dia)",
                 fire5: "Fogo Laranja (+$5B/dia)",
                 fire10: "Fogo Amarelo (+$10B/dia)",
@@ -979,6 +1025,8 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Höchster Rang",
                 peakNetWorth: "Höchstes Nettovermögen",
+                firstTrillionaire: "First Trillionaire",
+                trillionaire: "Trillionaire",
                 fire1: "Entfachtes Feuer (+$1B/Tag)",
                 fire5: "Oranges Feuer (+$5B/Tag)",
                 fire10: "Gelbes Feuer (+$10B/Tag)",
@@ -989,7 +1037,6 @@ BloxIndex
             }
         };
 
-        // Generador Pseudoaleatorio Determinista (Misma semilla = Mismo resultado en cualquier navegador del mundo)
         function deterministicRandom(seedStr) {
             let h = 2166136261 >>> 0;
             for (let i = 0; i < seedStr.length; i++) {
@@ -1147,6 +1194,7 @@ BloxIndex
                 currentUser: null,
                 people: [],
                 companies: [],
+                firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
                 timeRemainingMs: TWELVE_HOURS_MS,
@@ -1178,9 +1226,24 @@ BloxIndex
                     this.lang = newLang;
                     localStorage.setItem('empire_lang', newLang);
                 },
+                // Formato automático a Trillones ($1T, $1.2T) cuando supera los 1,000 Billones
                 formatWorth(val) {
                     if (val === undefined || val === null) return '$0B';
+                    if (val >= 1000) {
+                        let trillions = val / 1000;
+                        return trillions % 1 === 0 ? '$' + trillions + 'T' : '$' + trillions.toFixed(2) + 'T';
+                    }
                     return val % 1 === 0 ? '$' + val + 'B' : '$' + val.toFixed(1) + 'B';
+                },
+                isTrillionaire(item) {
+                    return item && (item.netWorthValue >= 1000 || (item.peakNetWorth && item.peakNetWorth >= 1000));
+                },
+                getTrillionaireLabel(item) {
+                    if (!this.isTrillionaire(item)) return '';
+                    if (this.firstTrillionaireName && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
+                        return this.t('firstTrillionaire');
+                    }
+                    return this.t('trillionaire');
                 },
                 hasDailyChange(item) {
                     return item && item.changeVal !== undefined && item.changeVal !== 0;
@@ -1190,11 +1253,14 @@ BloxIndex
                     let prevWorth = item.netWorthValue - item.changeVal;
                     let percentage = prevWorth > 0 ? (item.changeVal / prevWorth) * 100 : 0;
                     let sign = item.changeVal > 0 ? '+' : '-';
+                    let absChange = Math.abs(item.changeVal);
                     let valStr = '';
-                    if (Math.abs(item.changeVal) >= 1) {
-                        valStr = `$${Math.abs(item.changeVal).toFixed(1)}B`;
+                    if (absChange >= 1000) {
+                        valStr = `$${(absChange / 1000).toFixed(2)}T`;
+                    } else if (absChange >= 1) {
+                        valStr = `$${absChange.toFixed(1)}B`;
                     } else {
-                        valStr = `$${(Math.abs(item.changeVal) * 1000).toFixed(0)}M`;
+                        valStr = `$${(absChange * 1000).toFixed(0)}M`;
                     }
                     let symbol = item.changeVal > 0 ? '▲' : '▼';
                     let pctSign = percentage >= 0 ? '+' : '';
@@ -1203,8 +1269,6 @@ BloxIndex
                 isBloodActive(item) {
                     return item && item.changeVal !== undefined && item.changeVal <= -1.0;
                 },
-                // Niveles exactos solicitados:
-                // 1B: Encendido | 5B: Naranja | 10B: Amarillo | 15B: Rojo | 20B: Verde | 30B: Azul | 40-50B+: Morado
                 getFireTier(item) {
                     if (!item || item.changeVal === undefined || item.changeVal < 1.0) return 0;
                     const gain = item.changeVal;
@@ -1294,7 +1358,7 @@ BloxIndex
                             changeVal: company.changeVal,
                             positive: company.positive,
                             img: company.img,
-                            bio: [`Company founded and operated by CEO ${company.ceo}.`, `Current valuation: $${company.netWorthValue}B.`],
+                            bio: [`Company founded and operated by CEO ${company.ceo}.`, `Current valuation: ${this.formatWorth(company.netWorthValue)}.`],
                             country: 'Global',
                             source: 'User Enterprise',
                             gender: 'Company'
@@ -1404,13 +1468,11 @@ BloxIndex
                     localStorage.removeItem('empire_current_user');
                     alert(this.t('alertLogout'));
                 },
-                // Calcula el estado GLOBAL del mercado hasta el ciclo actual (idéntico para todos los visitantes)
                 syncGlobalMarketToCycle(targetCycle) {
-                    // Partimos siempre desde la base oficial para garantizar 100% igualdad entre todos los usuarios
                     let syncedPeople = getBasePeople();
                     let syncedCompanies = getBaseCompanies();
+                    let detectedFirstTrillionaire = null;
 
-                    // Incorporar empresas creadas por el usuario local si existen
                     try {
                         let savedComps = localStorage.getItem('empire_user_companies');
                         if (savedComps) {
@@ -1425,8 +1487,6 @@ BloxIndex
                         }
                     } catch (e) {}
 
-                    // Simulamos cada ciclo de 12 horas transcurrido de forma determinista
-                    // Usamos los últimos 30 ciclos como máximo para rendimiento instantáneo y consistencia total
                     const startCycle = Math.max(1, targetCycle - 30);
 
                     for (let cycle = startCycle; cycle <= targetCycle; cycle++) {
@@ -1457,16 +1517,12 @@ BloxIndex
                             let pctChange = 0;
 
                             if (r1 < 0.28) {
-                                // Sin cambio
                                 pctChange = 0;
                             } else if (r1 < 0.62) {
-                                // Subida moderada (+0.2% a +3%)
                                 pctChange = 0.002 + r2 * 0.028;
                             } else if (r1 < 0.74) {
-                                // Subida fuerte para activar fuegos de colores (+3% a +9%)
                                 pctChange = 0.03 + r2 * 0.06;
                             } else {
-                                // Bajada (-0.2% a -3.5%)
                                 pctChange = -(0.002 + r2 * 0.033);
                             }
 
@@ -1480,9 +1536,13 @@ BloxIndex
                             if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
                                 person.peakNetWorth = person.netWorthValue;
                             }
+
+                            // Detectar al primer jugador que rompa la barrera de 1,000B ($1T)
+                            if (!detectedFirstTrillionaire && person.netWorthValue >= 1000) {
+                                detectedFirstTrillionaire = person.name;
+                            }
                         });
 
-                        // Ordenar ranking global tras cada ciclo
                         syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
                         syncedPeople.forEach((p, idx) => {
                             p.id = idx + 1;
@@ -1492,7 +1552,11 @@ BloxIndex
                         });
                     }
 
-                    // Mantener bio/sector personalizado si el usuario actual editó el suyo
+                    // Si aún no hay un primero registrado históricamente pero alguien tiene >= 1000B, asignar al top más rico
+                    if (!detectedFirstTrillionaire && syncedPeople.length > 0 && syncedPeople[0].netWorthValue >= 1000) {
+                        detectedFirstTrillionaire = syncedPeople[0].name;
+                    }
+
                     if (this.currentUser) {
                         let match = syncedPeople.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
                         if (match) {
@@ -1500,7 +1564,6 @@ BloxIndex
                             match.source = this.currentUser.source;
                             this.currentUser = match;
                         } else {
-                            // Si era un usuario nuevo registrado localmente, reinsertarlo y ordenar
                             syncedPeople.push(this.currentUser);
                             syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
                             syncedPeople.forEach((p, idx) => p.id = idx + 1);
@@ -1509,11 +1572,11 @@ BloxIndex
 
                     syncedCompanies.sort((a, b) => b.netWorthValue - a.netWorthValue);
 
+                    this.firstTrillionaireName = detectedFirstTrillionaire;
                     this.people = syncedPeople;
                     this.companies = syncedCompanies;
                     this.lastSimulatedCycle = targetCycle;
 
-                    // Actualizar selecciones activas en pantalla
                     if (this.selectedTop5Person) {
                         let updatedTop = this.people.find(p => p.name === this.selectedTop5Person.name);
                         this.selectedTop5Person = updatedTop || this.people[0];
@@ -1540,7 +1603,6 @@ BloxIndex
                         this.nextUpdateTimestamp = nextCycleStart;
                         this.timeRemainingMs = Math.max(0, nextCycleStart - now);
 
-                        // Si entramos en un nuevo ciclo global de 12h, todo el mundo actualiza simultáneamente
                         if (currentCycle > this.lastSimulatedCycle) {
                             this.syncGlobalMarketToCycle(currentCycle);
                         }
@@ -1641,7 +1703,6 @@ BloxIndex
                         localStorage.removeItem('empire_current_user');
                     }
 
-                    // Calcular ciclo global exacto y sincronizar todo el ranking simultáneamente
                     let currentCycle = this.getCurrentGlobalCycle();
                     let nextCycleStart = GLOBAL_EPOCH_MS + (currentCycle + 1) * TWELVE_HOURS_MS;
                     this.nextUpdateTimestamp = nextCycleStart;
