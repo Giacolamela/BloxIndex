@@ -31,10 +31,9 @@ BloxIndex
             0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.92; }
             50% { transform: scale(1.18) rotate(2deg); opacity: 1; }
         }
-        @keyframes rainbowShift {
-            0% { filter: hue-rotate(0deg) drop-shadow(0 0 12px #ec4899); transform: scale(1.05) rotate(-3deg); }
-            50% { filter: hue-rotate(180deg) drop-shadow(0 0 18px #3b82f6); transform: scale(1.22) rotate(3deg); }
-            100% { filter: hue-rotate(360deg) drop-shadow(0 0 12px #ec4899); transform: scale(1.05) rotate(-3deg); }
+        @keyframes purplePulse {
+            0%, 100% { filter: hue-rotate(265deg) saturate(2.2) drop-shadow(0 0 14px #a855f7); transform: scale(1.08) rotate(-3deg); }
+            50% { filter: hue-rotate(280deg) saturate(2.6) drop-shadow(0 0 24px #c084fc); transform: scale(1.26) rotate(3deg); }
         }
         @keyframes drip {
             0% { transform: translateY(-3px); opacity: 0.8; filter: drop-shadow(0 0 6px #dc2626); }
@@ -51,22 +50,33 @@ BloxIndex
             animation: drip 1.2s infinite ease-in-out;
         }
 
-        .fire-tier-1 { filter: drop-shadow(0 0 6px #fb923c); }
-        .glow-tier-1 { box-shadow: 0 0 14px rgba(251, 146, 60, 0.25); border: 1px solid rgba(251, 146, 60, 0.4); }
-        .fire-tier-5 { filter: drop-shadow(0 0 10px #f97316); }
-        .glow-tier-5 { box-shadow: 0 0 20px rgba(249, 115, 22, 0.35); border: 1px solid rgba(249, 115, 22, 0.6); }
-        .fire-tier-10 { filter: hue-rotate(25deg) brightness(1.3) drop-shadow(0 0 12px #facc15); }
-        .glow-tier-10 { box-shadow: 0 0 22px rgba(250, 204, 21, 0.4); border: 1px solid rgba(250, 204, 21, 0.7); }
-        .fire-tier-15 { filter: hue-rotate(-25deg) saturate(1.8) drop-shadow(0 0 12px #ef4444); }
-        .glow-tier-15 { box-shadow: 0 0 24px rgba(239, 68, 68, 0.45); border: 1px solid rgba(239, 68, 68, 0.75); }
-        .fire-tier-20 { filter: hue-rotate(95deg) saturate(1.6) drop-shadow(0 0 12px #22c55e); }
-        .glow-tier-20 { box-shadow: 0 0 24px rgba(34, 197, 94, 0.45); border: 1px solid rgba(34, 197, 94, 0.75); }
-        .fire-tier-25 { filter: hue-rotate(195deg) saturate(1.8) drop-shadow(0 0 14px #3b82f6); }
-        .glow-tier-25 { box-shadow: 0 0 26px rgba(59, 130, 246, 0.5); border: 1px solid rgba(59, 130, 246, 0.8); }
-        .fire-tier-30 { filter: hue-rotate(265deg) saturate(1.8) drop-shadow(0 0 15px #a855f7); }
-        .glow-tier-30 { box-shadow: 0 0 28px rgba(168, 85, 247, 0.55); border: 1px solid rgba(168, 85, 247, 0.85); }
-        .fire-tier-50 { animation: rainbowShift 1.8s infinite linear; }
-        .glow-tier-50 { box-shadow: 0 0 32px rgba(236, 72, 153, 0.65), inset 0 0 16px rgba(168, 85, 247, 0.3); border: 1px solid #f472b6; }
+        /* 1 Billion: Fuego Encendido */
+        .fire-tier-1 { filter: drop-shadow(0 0 7px #fb923c) brightness(1.1); }
+        .glow-tier-1 { box-shadow: 0 0 14px rgba(251, 146, 60, 0.28); border: 1px solid rgba(251, 146, 60, 0.45); }
+        
+        /* 5 Billion: Fuego Naranja */
+        .fire-tier-5 { filter: saturate(1.6) drop-shadow(0 0 11px #f97316); }
+        .glow-tier-5 { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); border: 1px solid rgba(249, 115, 22, 0.65); }
+        
+        /* 10 Billion: Fuego Amarillo */
+        .fire-tier-10 { filter: hue-rotate(28deg) brightness(1.35) drop-shadow(0 0 13px #facc15); }
+        .glow-tier-10 { box-shadow: 0 0 22px rgba(250, 204, 21, 0.45); border: 1px solid rgba(250, 204, 21, 0.75); }
+        
+        /* 15 Billion: Fuego Rojo */
+        .fire-tier-15 { filter: hue-rotate(-25deg) saturate(2) drop-shadow(0 0 14px #ef4444); }
+        .glow-tier-15 { box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); border: 1px solid rgba(239, 68, 68, 0.8); }
+        
+        /* 20 Billion: Fuego Verde */
+        .fire-tier-20 { filter: hue-rotate(95deg) saturate(1.8) drop-shadow(0 0 14px #22c55e); }
+        .glow-tier-20 { box-shadow: 0 0 25px rgba(34, 197, 94, 0.5); border: 1px solid rgba(34, 197, 94, 0.8); }
+        
+        /* 30 Billion: Fuego Azul */
+        .fire-tier-30 { filter: hue-rotate(195deg) saturate(2) drop-shadow(0 0 16px #3b82f6); }
+        .glow-tier-30 { box-shadow: 0 0 28px rgba(59, 130, 246, 0.55); border: 1px solid rgba(59, 130, 246, 0.85); }
+        
+        /* 40-50 Billion: Fuego Morado */
+        .fire-tier-40 { animation: purplePulse 1.5s infinite ease-in-out; }
+        .glow-tier-40 { box-shadow: 0 0 32px rgba(168, 85, 247, 0.65), inset 0 0 16px rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; }
 
         .blood-glow {
             box-shadow: 0 0 22px rgba(220, 38, 38, 0.4);
@@ -179,7 +189,12 @@ BloxIndex
                                 <span class="text-xs font-bold text-green-400 w-4" x-text="'#' + (idx + 1)"></span>
                                 <img :src="gainer.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
                                 <div>
-                                    <div class="text-sm font-semibold text-white" x-text="gainer.name"></div>
+                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <span x-text="gainer.name"></span>
+                                        <template x-if="hasFire(gainer)">
+                                            <span :class="getFireBadgeClass(gainer)" class="fire-badge text-xs" :title="getFireLabel(gainer)">🔥</span>
+                                        </template>
+                                    </div>
                                     <div class="text-[11px] text-neutral-400" x-text="formatWorth(gainer.netWorthValue)"></div>
                                 </div>
                             </div>
@@ -206,7 +221,12 @@ BloxIndex
                                 <span class="text-xs font-bold text-red-400 w-4" x-text="'#' + (idx + 1)"></span>
                                 <img :src="loser.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
                                 <div>
-                                    <div class="text-sm font-semibold text-white" x-text="loser.name"></div>
+                                    <div class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <span x-text="loser.name"></span>
+                                        <template x-if="isBloodActive(loser)">
+                                            <span class="blood-badge text-xs">🩸</span>
+                                        </template>
+                                    </div>
                                     <div class="text-[11px] text-neutral-400" x-text="formatWorth(loser.netWorthValue)"></div>
                                 </div>
                             </div>
@@ -587,6 +607,8 @@ BloxIndex
     <!-- Script Principal -->
     <script>
         const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
+        // Época base fija (UTC) para que TODOS los usuarios compartan el mismo ciclo y reloj global
+        const GLOBAL_EPOCH_MS = Date.UTC(2026, 0, 1, 0, 0, 0);
 
         const BANNED_COMPANIES = ['apex dynamics', 'nova tech', 'stark industries', 'omnicorp global'];
 
@@ -612,7 +634,7 @@ BloxIndex
         const translations = {
             en: {
                 title: "BloxIndex",
-                nextUpdateLabel: "Top updates every 12h • Next update in:",
+                nextUpdateLabel: "Global Sync • Next update in:",
                 topGainersTitle: "Top 5 Biggest Gainers",
                 topLosersTitle: "Top 5 Biggest Losers",
                 lastCycleTag: "Last 12h Update",
@@ -678,13 +700,12 @@ BloxIndex
                 fire10: "Yellow Fire (+$10B/day)",
                 fire15: "Red Fire (+$15B/day)",
                 fire20: "Green Fire (+$20B/day)",
-                fire25: "Blue Fire (+$25B/day)",
-                fire30: "Purple Fire (+$30B/day)",
-                fire50: "Supreme Cosmic Fire (+$50B/day)"
+                fire30: "Blue Fire (+$30B/day)",
+                fire40: "Purple Fire (+$40B-$50B/day)"
             },
             es: {
                 title: "BloxIndex",
-                nextUpdateLabel: "El Top se actualiza cada 12h • Próxima en:",
+                nextUpdateLabel: "Sincronización Global • Próxima en:",
                 topGainersTitle: "Top 5 Mayores Ganadores",
                 topLosersTitle: "Top 5 Mayores Perdedores",
                 lastCycleTag: "Última Act. 12h",
@@ -750,13 +771,12 @@ BloxIndex
                 fire10: "Fuego Amarillo (+$10B/día)",
                 fire15: "Fuego Rojo (+$15B/día)",
                 fire20: "Fuego Verde (+$20B/día)",
-                fire25: "Fuego Azul (+$25B/día)",
-                fire30: "Fuego Morado (+$30B/día)",
-                fire50: "Fuego Supremo (+$50B/día)"
+                fire30: "Fuego Azul (+$30B/día)",
+                fire40: "Fuego Morado (+$40B-$50B/día)"
             },
             it: {
                 title: "BloxIndex",
-                nextUpdateLabel: "La classifica si aggiorna ogni 12h • Prossimo tra:",
+                nextUpdateLabel: "Sincronizzazione Globale • Prossimo tra:",
                 topGainersTitle: "Top 5 Maggiori Guadagni",
                 topLosersTitle: "Top 5 Maggiori Perdite",
                 lastCycleTag: "Ultimo Agg. 12h",
@@ -822,13 +842,12 @@ BloxIndex
                 fire10: "Fuoco Giallo (+$10B/giorno)",
                 fire15: "Fuoco Rosso (+$15B/giorno)",
                 fire20: "Fuoco Verde (+$20B/giorno)",
-                fire25: "Fuoco Blu (+$25B/giorno)",
-                fire30: "Fuoco Viola (+$30B/giorno)",
-                fire50: "Fuoco Cosmico Supremo (+$50B/giorno)"
+                fire30: "Fuoco Blu (+$30B/giorno)",
+                fire40: "Fuoco Viola (+$40B-$50B/giorno)"
             },
             pt: {
                 title: "BloxIndex",
-                nextUpdateLabel: "O Top atualiza a cada 12h • Próxima em:",
+                nextUpdateLabel: "Sincronização Global • Próxima em:",
                 topGainersTitle: "Top 5 Maiores Ganhadores",
                 topLosersTitle: "Top 5 Maiores Perdedores",
                 lastCycleTag: "Última Att. 12h",
@@ -894,13 +913,12 @@ BloxIndex
                 fire10: "Fogo Amarelo (+$10B/dia)",
                 fire15: "Fogo Vermelho (+$15B/dia)",
                 fire20: "Fogo Verde (+$20B/dia)",
-                fire25: "Fogo Azul (+$25B/dia)",
-                fire30: "Fogo Roxo (+$30B/dia)",
-                fire50: "Fogo Cósmico Supremo (+$50B/dia)"
+                fire30: "Fogo Azul (+$30B/dia)",
+                fire40: "Fogo Roxo (+$40B-$50B/dia)"
             },
             de: {
                 title: "BloxIndex",
-                nextUpdateLabel: "Top-Update alle 12 Std. • Nächstes in:",
+                nextUpdateLabel: "Globale Synchronisierung • Nächstes in:",
                 topGainersTitle: "Top 5 Größte Gewinner",
                 topLosersTitle: "Top 5 Größte Verlierer",
                 lastCycleTag: "Letztes 12h-Update",
@@ -966,11 +984,25 @@ BloxIndex
                 fire10: "Gelbes Feuer (+$10B/Tag)",
                 fire15: "Rotes Feuer (+$15B/Tag)",
                 fire20: "Grünes Feuer (+$20B/Tag)",
-                fire25: "Blaues Feuer (+$25B/Tag)",
-                fire30: "Violettes Feuer (+$30B/Tag)",
-                fire50: "Oberstes Kosmisches Feuer (+$50B/Tag)"
+                fire30: "Blaues Feuer (+$30B/Tag)",
+                fire40: "Violettes Feuer (+$40B-$50B/Tag)"
             }
         };
+
+        // Generador Pseudoaleatorio Determinista (Misma semilla = Mismo resultado en cualquier navegador del mundo)
+        function deterministicRandom(seedStr) {
+            let h = 2166136261 >>> 0;
+            for (let i = 0; i < seedStr.length; i++) {
+                h ^= seedStr.charCodeAt(i);
+                h = Math.imul(h, 16777619);
+            }
+            h += h << 13;
+            h ^= h >>> 7;
+            h += h << 3;
+            h ^= h >>> 17;
+            h += h << 5;
+            return (h >>> 0) / 4294967296;
+        }
 
         function getBasePeople() {
             return [
@@ -1115,6 +1147,7 @@ BloxIndex
                 currentUser: null,
                 people: [],
                 companies: [],
+                lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
                 timeRemainingMs: TWELVE_HOURS_MS,
                 timerInterval: null,
@@ -1170,12 +1203,13 @@ BloxIndex
                 isBloodActive(item) {
                     return item && item.changeVal !== undefined && item.changeVal <= -1.0;
                 },
+                // Niveles exactos solicitados:
+                // 1B: Encendido | 5B: Naranja | 10B: Amarillo | 15B: Rojo | 20B: Verde | 30B: Azul | 40-50B+: Morado
                 getFireTier(item) {
                     if (!item || item.changeVal === undefined || item.changeVal < 1.0) return 0;
                     const gain = item.changeVal;
-                    if (gain >= 50) return 50;
+                    if (gain >= 40) return 40;
                     if (gain >= 30) return 30;
-                    if (gain >= 25) return 25;
                     if (gain >= 20) return 20;
                     if (gain >= 15) return 15;
                     if (gain >= 10) return 10;
@@ -1284,7 +1318,7 @@ BloxIndex
                     this.editingCompany.img = newLogo;
                     
                     try {
-                        localStorage.setItem('empire_companies', JSON.stringify(this.companies));
+                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
                     } catch(e) {
                         console.error('Error updating company', e);
                     }
@@ -1334,7 +1368,7 @@ BloxIndex
                     this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
 
                     try {
-                        localStorage.setItem('empire_companies', JSON.stringify(this.companies));
+                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
                     } catch (e) {
                         console.error('Error saving company', e);
                     }
@@ -1357,7 +1391,6 @@ BloxIndex
                     }
                     
                     try {
-                        localStorage.setItem('empire_people', JSON.stringify(this.people));
                         localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                     } catch (e) {
                         console.error('Error saving profile changes', e);
@@ -1371,93 +1404,145 @@ BloxIndex
                     localStorage.removeItem('empire_current_user');
                     alert(this.t('alertLogout'));
                 },
-                triggerMarketUpdate() {
-                    this.companies.forEach(company => {
-                        let rand = Math.random();
-                        let pctChange = 0;
+                // Calcula el estado GLOBAL del mercado hasta el ciclo actual (idéntico para todos los visitantes)
+                syncGlobalMarketToCycle(targetCycle) {
+                    // Partimos siempre desde la base oficial para garantizar 100% igualdad entre todos los usuarios
+                    let syncedPeople = getBasePeople();
+                    let syncedCompanies = getBaseCompanies();
 
-                        if (rand < 0.30) {
-                            pctChange = 0;
-                        } else if (rand < 0.45) {
-                            pctChange = (Math.random() - 0.5) * 0.001;
-                        } else if (rand < 0.75) {
-                            pctChange = 0.001 + Math.random() * 0.025;
+                    // Incorporar empresas creadas por el usuario local si existen
+                    try {
+                        let savedComps = localStorage.getItem('empire_user_companies');
+                        if (savedComps) {
+                            let parsedComps = JSON.parse(savedComps);
+                            if (Array.isArray(parsedComps)) {
+                                parsedComps.forEach(c => {
+                                    if (!syncedCompanies.some(baseC => baseC.name.toLowerCase() === c.name.toLowerCase())) {
+                                        syncedCompanies.push(c);
+                                    }
+                                });
+                            }
+                        }
+                    } catch (e) {}
+
+                    // Simulamos cada ciclo de 12 horas transcurrido de forma determinista
+                    // Usamos los últimos 30 ciclos como máximo para rendimiento instantáneo y consistencia total
+                    const startCycle = Math.max(1, targetCycle - 30);
+
+                    for (let cycle = startCycle; cycle <= targetCycle; cycle++) {
+                        syncedCompanies.forEach(company => {
+                            let r1 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_a`);
+                            let r2 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_b`);
+                            let pctChange = 0;
+
+                            if (r1 < 0.25) {
+                                pctChange = 0;
+                            } else if (r1 < 0.70) {
+                                pctChange = 0.005 + r2 * 0.045;
+                            } else {
+                                pctChange = -(0.005 + r2 * 0.035);
+                            }
+
+                            let companyDelta = Number((company.netWorthValue * pctChange).toFixed(2));
+                            if (Math.abs(companyDelta) < 0.01) companyDelta = 0;
+
+                            company.netWorthValue = Math.max(5.0, Number((company.netWorthValue + companyDelta).toFixed(2)));
+                            company.changeVal = companyDelta;
+                            company.positive = companyDelta >= 0;
+                        });
+
+                        syncedPeople.forEach(person => {
+                            let r1 = deterministicRandom(`pers_${person.name.toLowerCase()}_c${cycle}_a`);
+                            let r2 = deterministicRandom(`pers_${person.name.toLowerCase()}_c${cycle}_b`);
+                            let pctChange = 0;
+
+                            if (r1 < 0.28) {
+                                // Sin cambio
+                                pctChange = 0;
+                            } else if (r1 < 0.62) {
+                                // Subida moderada (+0.2% a +3%)
+                                pctChange = 0.002 + r2 * 0.028;
+                            } else if (r1 < 0.74) {
+                                // Subida fuerte para activar fuegos de colores (+3% a +9%)
+                                pctChange = 0.03 + r2 * 0.06;
+                            } else {
+                                // Bajada (-0.2% a -3.5%)
+                                pctChange = -(0.002 + r2 * 0.033);
+                            }
+
+                            let delta = Number((person.netWorthValue * pctChange).toFixed(2));
+                            if (Math.abs(delta) < 0.01) delta = 0;
+
+                            person.netWorthValue = Math.max(10.0, Number((person.netWorthValue + delta).toFixed(2)));
+                            person.changeVal = delta;
+                            person.positive = delta >= 0;
+
+                            if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
+                                person.peakNetWorth = person.netWorthValue;
+                            }
+                        });
+
+                        // Ordenar ranking global tras cada ciclo
+                        syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                        syncedPeople.forEach((p, idx) => {
+                            p.id = idx + 1;
+                            if (!p.peakRank || p.id < p.peakRank) {
+                                p.peakRank = p.id;
+                            }
+                        });
+                    }
+
+                    // Mantener bio/sector personalizado si el usuario actual editó el suyo
+                    if (this.currentUser) {
+                        let match = syncedPeople.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
+                        if (match) {
+                            match.bio = this.currentUser.bio;
+                            match.source = this.currentUser.source;
+                            this.currentUser = match;
                         } else {
-                            pctChange = -(0.001 + Math.random() * 0.022);
+                            // Si era un usuario nuevo registrado localmente, reinsertarlo y ordenar
+                            syncedPeople.push(this.currentUser);
+                            syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                            syncedPeople.forEach((p, idx) => p.id = idx + 1);
                         }
+                    }
 
-                        let companyDelta = Number((company.netWorthValue * pctChange).toFixed(2));
-                        if (Math.abs(companyDelta) < 0.01) companyDelta = 0;
+                    syncedCompanies.sort((a, b) => b.netWorthValue - a.netWorthValue);
 
-                        company.netWorthValue = Math.max(5.0, Number((company.netWorthValue + companyDelta).toFixed(2)));
-                        company.changeVal = companyDelta;
-                        company.positive = companyDelta >= 0;
-                    });
+                    this.people = syncedPeople;
+                    this.companies = syncedCompanies;
+                    this.lastSimulatedCycle = targetCycle;
 
-                    this.people.forEach(person => {
-                        let rand = Math.random();
-                        let pctChange = 0;
-                        if (rand < 0.35) {
-                            pctChange = 0;
-                        } else if (rand < 0.70) {
-                            pctChange = 0.001 + Math.random() * 0.02;
-                        } else {
-                            pctChange = -(0.001 + Math.random() * 0.018);
-                        }
-
-                        let delta = Number((person.netWorthValue * pctChange).toFixed(2));
-                        if (Math.abs(delta) < 0.01) delta = 0;
-
-                        person.netWorthValue = Math.max(10.0, Number((person.netWorthValue + delta).toFixed(2)));
-                        person.changeVal = delta;
-                        person.positive = delta >= 0;
-
-                        if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
-                            person.peakNetWorth = person.netWorthValue;
-                        }
-                    });
-
-                    this.people.sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    this.people.forEach((p, idx) => {
-                        p.id = idx + 1;
-                        if (!p.peakRank || p.id < p.peakRank) {
-                            p.peakRank = p.id;
-                        }
-                    });
-
-                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
-
+                    // Actualizar selecciones activas en pantalla
                     if (this.selectedTop5Person) {
                         let updatedTop = this.people.find(p => p.name === this.selectedTop5Person.name);
-                        if (updatedTop) this.selectedTop5Person = updatedTop;
+                        this.selectedTop5Person = updatedTop || this.people[0];
+                    } else if (this.people.length > 0) {
+                        this.selectedTop5Person = this.people[0];
                     }
+
                     if (this.selectedPerson) {
                         let updatedSel = this.people.find(p => p.name === this.selectedPerson.name);
                         if (updatedSel) this.selectedPerson = updatedSel;
                     }
-                    if (this.currentUser) {
-                        let updatedUser = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
-                        if (updatedUser) {
-                            this.currentUser = updatedUser;
-                            localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                        }
-                    }
-
-                    this.nextUpdateTimestamp = Date.now() + TWELVE_HOURS_MS;
-                    this.timeRemainingMs = TWELVE_HOURS_MS;
-                    localStorage.setItem('empire_next_update', this.nextUpdateTimestamp.toString());
-                    localStorage.setItem('empire_people', JSON.stringify(this.people));
-                    localStorage.setItem('empire_companies', JSON.stringify(this.companies));
+                },
+                getCurrentGlobalCycle() {
+                    const elapsed = Math.max(0, Date.now() - GLOBAL_EPOCH_MS);
+                    return Math.floor(elapsed / TWELVE_HOURS_MS);
                 },
                 startCountdownLoop() {
                     if (this.timerInterval) clearInterval(this.timerInterval);
                     this.timerInterval = setInterval(() => {
                         let now = Date.now();
-                        let diff = this.nextUpdateTimestamp - now;
-                        if (diff <= 0) {
-                            this.triggerMarketUpdate();
-                        } else {
-                            this.timeRemainingMs = diff;
+                        let currentCycle = this.getCurrentGlobalCycle();
+                        let nextCycleStart = GLOBAL_EPOCH_MS + (currentCycle + 1) * TWELVE_HOURS_MS;
+                        
+                        this.nextUpdateTimestamp = nextCycleStart;
+                        this.timeRemainingMs = Math.max(0, nextCycleStart - now);
+
+                        // Si entramos en un nuevo ciclo global de 12h, todo el mundo actualiza simultáneamente
+                        if (currentCycle > this.lastSimulatedCycle) {
+                            this.syncGlobalMarketToCycle(currentCycle);
                         }
                     }, 1000);
                 },
@@ -1530,7 +1615,6 @@ BloxIndex
                     this.currentUser = targetUser;
                     
                     try {
-                        localStorage.setItem('empire_people', JSON.stringify(this.people));
                         localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                     } catch (err) {
                         console.error('Error guardando en localStorage', err);
@@ -1548,96 +1632,22 @@ BloxIndex
                         this.lang = savedLang;
                     }
 
-                    let baseList = getBasePeople();
-                    let baseComps = getBaseCompanies();
-
-                    try {
-                        let saved = localStorage.getItem('empire_people');
-                        if (saved) {
-                            let parsed = JSON.parse(saved);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                let uniqueMap = new Map();
-                                baseList.forEach(p => uniqueMap.set(p.name.toLowerCase(), p));
-                                parsed.forEach(p => {
-                                    let key = p.name.toLowerCase();
-                                    if (key !== 'omega ai' && !BANNED_COMPANIES.includes(key) && p.gender !== 'Company' && p.source !== 'User Enterprise') {
-                                        uniqueMap.set(key, p);
-                                    }
-                                });
-                                this.people = Array.from(uniqueMap.values());
-                            } else {
-                                this.people = baseList;
-                            }
-                        } else {
-                            this.people = baseList;
-                        }
-                    } catch(e) {
-                        this.people = baseList;
-                    }
-
-                    try {
-                        let savedComps = localStorage.getItem('empire_companies');
-                        if (savedComps) {
-                            let parsedComps = JSON.parse(savedComps);
-                            if (Array.isArray(parsedComps) && parsedComps.length > 0) {
-                                let filteredComps = parsedComps.filter(c => !BANNED_COMPANIES.includes(c.name.toLowerCase()));
-                                filteredComps.forEach(c => {
-                                    if (c.name.toLowerCase() === 'omega ai' && (!c.img || c.img.includes('rbxcdn'))) {
-                                        c.img = OMEGA_LOGO_SVG;
-                                    }
-                                });
-                                this.companies = filteredComps.length > 0 ? filteredComps : baseComps;
-                            } else {
-                                this.companies = baseComps;
-                            }
-                        } else {
-                            this.companies = baseComps;
-                        }
-                    } catch(e) {
-                        this.companies = baseComps;
-                    }
-
-                    this.people.sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    this.people.forEach((p, idx) => {
-                        p.id = idx + 1;
-                        if (!p.peakRank || p.id < p.peakRank) p.peakRank = p.id;
-                        if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = p.netWorthValue;
-                    });
-                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
-
-                    let savedNextUpdate = parseInt(localStorage.getItem('empire_next_update') || '0', 10);
-                    let now = Date.now();
-                    if (!savedNextUpdate || isNaN(savedNextUpdate)) {
-                        this.nextUpdateTimestamp = now + TWELVE_HOURS_MS;
-                        this.timeRemainingMs = TWELVE_HOURS_MS;
-                        localStorage.setItem('empire_next_update', this.nextUpdateTimestamp.toString());
-                    } else if (now >= savedNextUpdate) {
-                        this.triggerMarketUpdate();
-                    } else {
-                        this.nextUpdateTimestamp = savedNextUpdate;
-                        this.timeRemainingMs = savedNextUpdate - now;
-                    }
-
-                    localStorage.setItem('empire_people', JSON.stringify(this.people));
-                    localStorage.setItem('empire_companies', JSON.stringify(this.companies));
-
                     try {
                         let savedUser = localStorage.getItem('empire_current_user');
                         if (savedUser) {
-                            let parsedUser = JSON.parse(savedUser);
-                            let found = this.people.find(p => p.name.toLowerCase() === parsedUser.name.toLowerCase());
-                            if (found) {
-                                this.currentUser = found;
-                            }
+                            this.currentUser = JSON.parse(savedUser);
                         }
                     } catch(e) {
                         localStorage.removeItem('empire_current_user');
                     }
 
-                    if (!this.selectedTop5Person && this.people.length > 0) {
-                        this.selectedTop5Person = this.people[0];
-                    }
+                    // Calcular ciclo global exacto y sincronizar todo el ranking simultáneamente
+                    let currentCycle = this.getCurrentGlobalCycle();
+                    let nextCycleStart = GLOBAL_EPOCH_MS + (currentCycle + 1) * TWELVE_HOURS_MS;
+                    this.nextUpdateTimestamp = nextCycleStart;
+                    this.timeRemainingMs = Math.max(0, nextCycleStart - Date.now());
 
+                    this.syncGlobalMarketToCycle(currentCycle);
                     this.startCountdownLoop();
                 }
             }
