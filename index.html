@@ -468,7 +468,7 @@ BloxIndex
                     <img :src="item.img" class="w-32 h-32 rounded-xl object-cover mb-4 bg-black border border-neutral-800" alt="Avatar">
                     
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                        <!-- Numeración ordenada por el puesto actual en el Top (index + 1) -->
+                        <!-- Numeración basada estrictamente en el índice del bucle (1, 2, 3...) -->
                         <div class="serif-font text-lg font-bold" x-text="(index + 1) + '. ' + item.name"></div>
                     </div>
 
