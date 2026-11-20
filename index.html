@@ -61,21 +61,38 @@ BloxIndex
             animation: goldShine 2s infinite ease-in-out;
         }
 
+        /* 1 Billion: Fuego Encendido */
         .fire-tier-1 { filter: drop-shadow(0 0 7px #fb923c) brightness(1.1); }
         .glow-tier-1 { box-shadow: 0 0 14px rgba(251, 146, 60, 0.28); border: 1px solid rgba(251, 146, 60, 0.45); }
+        
+        /* 5 Billion: Fuego Naranja */
         .fire-tier-5 { filter: saturate(1.6) drop-shadow(0 0 11px #f97316); }
         .glow-tier-5 { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); border: 1px solid rgba(249, 115, 22, 0.65); }
+        
+        /* 10 Billion: Fuego Amarillo */
         .fire-tier-10 { filter: hue-rotate(28deg) brightness(1.35) drop-shadow(0 0 13px #facc15); }
         .glow-tier-10 { box-shadow: 0 0 22px rgba(250, 204, 21, 0.45); border: 1px solid rgba(250, 204, 21, 0.75); }
+        
+        /* 15 Billion: Fuego Rojo */
         .fire-tier-15 { filter: hue-rotate(-25deg) saturate(2) drop-shadow(0 0 14px #ef4444); }
         .glow-tier-15 { box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); border: 1px solid rgba(239, 68, 68, 0.8); }
+        
+        /* 20 Billion: Fuego Verde */
         .fire-tier-20 { filter: hue-rotate(95deg) saturate(1.8) drop-shadow(0 0 14px #22c55e); }
         .glow-tier-20 { box-shadow: 0 0 25px rgba(34, 197, 94, 0.5); border: 1px solid rgba(34, 197, 94, 0.8); }
+        
+        /* 30 Billion: Fuego Azul */
         .fire-tier-30 { filter: hue-rotate(195deg) saturate(2) drop-shadow(0 0 16px #3b82f6); }
         .glow-tier-30 { box-shadow: 0 0 28px rgba(59, 130, 246, 0.55); border: 1px solid rgba(59, 130, 246, 0.85); }
+        
+        /* 40-50 Billion: Fuego Morado */
         .fire-tier-40 { animation: purplePulse 1.5s infinite ease-in-out; }
         .glow-tier-40 { box-shadow: 0 0 32px rgba(168, 85, 247, 0.65), inset 0 0 16px rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; }
-        .blood-glow { box-shadow: 0 0 22px rgba(220, 38, 38, 0.4); border: 1px solid rgba(220, 38, 38, 0.7); }
+
+        .blood-glow {
+            box-shadow: 0 0 22px rgba(220, 38, 38, 0.4);
+            border: 1px solid rgba(220, 38, 38, 0.7);
+        }
     </style>
 </head>
 <body x-data="empireApp()" x-init="initEmpire()" class="min-h-screen px-6 py-4 flex flex-col">
@@ -96,10 +113,10 @@ BloxIndex
     <!-- Barra Superior de Navegación -->
     <header class="flex flex-col md:flex-row items-center justify-between text-sm font-medium border-b border-neutral-800 pb-3 mb-8 max-w-7xl mx-auto w-full gap-4 mt-4">
         <div class="flex items-center space-x-6 flex-wrap">
-            <button @click="currentFilter = 'top5'; selectedCategory = null; selectedPerson = null; selectedCompanyView = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompanyView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
-            <button @click="currentFilter = 'all'; selectedCategory = null; selectedPerson = null; selectedCompanyView = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompanyView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
-            <button @click="currentFilter = 'women'; selectedCategory = null; selectedPerson = null; selectedCompanyView = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'women' && !selectedPerson && !selectedCompanyView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
-            <button @click="currentFilter = 'companies'; selectedCategory = null; selectedPerson = null; selectedCompanyView = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompanyView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
+            <button @click="currentFilter = 'top5'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'top5' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
+            <button @click="currentFilter = 'all'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
+            <button @click="currentFilter = 'women'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'women' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
+            <button @click="currentFilter = 'companies'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'companies' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
             
             <div class="relative" @click.away="showCategoriesDropdown = false">
                 <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
@@ -108,7 +125,7 @@ BloxIndex
 
                 <div x-show="showCategoriesDropdown" class="absolute left-0 mt-2 w-64 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
                     <template x-for="cat in uniqueCategories" :key="cat">
-                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories'; selectedCompanyView = null;" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
+                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories'" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
                             <span x-text="cat"></span>
                             <span class="text-xs text-neutral-500" x-text="people.filter(p => p.source === cat).length"></span>
                         </button>
@@ -152,7 +169,7 @@ BloxIndex
                             ✏️ <span x-text="t('editBio')"></span>
                         </button>
                         <button @click="openCompanyModal(); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2">
-                            🏢 <span x-text="getUserCompany() ? t('manageCompany') : t('createCompanyMenu')"></span>
+                            🏢 <span x-text="t('createCompanyMenu')"></span>
                         </button>
                         <div class="border-t border-neutral-800 my-1"></div>
                         <button @click="logoutUser(); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-red-400 transition flex items-center gap-2">
@@ -165,7 +182,7 @@ BloxIndex
     </header>
 
     <!-- Contenido Principal -->
-    <main x-show="!selectedPerson && !selectedCompanyView" class="flex-grow max-w-7xl mx-auto w-full">
+    <main x-show="!selectedPerson" class="flex-grow max-w-7xl mx-auto w-full">
 
         <!-- Top 5 Ganadores y Perdedores -->
         <div x-show="searchQuery === '' && !selectedCategory && currentFilter !== 'companies'" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -416,7 +433,7 @@ BloxIndex
         <!-- Cuadrícula Leaderboard -->
         <div x-show="currentFilter !== 'top5' || searchQuery !== ''" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <template x-for="(item, index) in displayedPeople" :key="item.id + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
-                <div @click="currentFilter === 'companies' ? openCompanyDashboard(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
+                <div @click="currentFilter === 'companies' ? openCompanyProfile(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
                     
                     <template x-if="isBloodActive(item)">
                         <span class="blood-badge absolute top-3 right-3 text-base" title="Perdiendo capital">🩸</span>
@@ -435,7 +452,7 @@ BloxIndex
                         <span class="trillionaire-badge text-[9px] px-2 py-0.5 rounded uppercase mt-1" x-text="'👑 ' + getTrillionaireLabel(item)"></span>
                     </template>
                     
-                    <div class="text-xs text-neutral-400 mt-1" x-show="currentFilter === 'companies'" x-text="t('ceoLabel') + ': ' + item.ceo + ' (Lvl ' + (item.level || 1) + ')'"></div>
+                    <div class="text-xs text-neutral-400 mt-1" x-show="currentFilter === 'companies'" x-text="t('ceoLabel') + ': ' + item.ceo"></div>
 
                     <div class="flex items-center justify-center gap-2 mt-1 flex-wrap">
                         <div class="text-neutral-300 text-sm font-semibold" x-text="formatWorth(item.netWorthValue)"></div>
@@ -573,97 +590,6 @@ BloxIndex
         </div>
     </main>
 
-    <!-- Dashboard / Panel de Empresa Personalizado -->
-    <main x-show="selectedCompanyView" class="flex-grow max-w-5xl mx-auto w-full" style="display: none;">
-        <button @click="selectedCompanyView = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backButton')"></button>
-        
-        <div class="bg-[#121212] p-8 rounded-2xl border border-neutral-800/90 shadow-2xl space-y-6">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-neutral-800 pb-6">
-                <div class="flex items-center gap-5">
-                    <img :src="selectedCompanyView?.img" class="w-20 h-20 rounded-2xl object-cover bg-black border border-neutral-800" alt="Company Logo">
-                    <div>
-                        <div class="flex items-center gap-3">
-                            <h2 class="serif-font text-3xl font-bold text-white" x-text="selectedCompanyView?.name"></h2>
-                            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-xs px-2.5 py-1 rounded-full font-bold uppercase" x-text="'Lvl ' + (selectedCompanyView?.level || 1)"></span>
-                        </div>
-                        <div class="text-xs text-neutral-400 mt-1" x-text="t('ceoLabel') + ': ' + selectedCompanyView?.ceo"></div>
-                    </div>
-                </div>
-
-                <template x-if="currentUser && (currentUser.name.toLowerCase() === selectedCompanyView?.ceo.toLowerCase() || (selectedCompanyView?.members && selectedCompanyView.members.includes(currentUser.name)))">
-                    <div class="flex items-center gap-3">
-                        <template x-if="currentUser.name.toLowerCase() === selectedCompanyView?.ceo.toLowerCase()">
-                            <button @click="openEditCompanyModal(selectedCompanyView)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition" x-text="t('editCompanySettings')"></button>
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-black/40 border border-neutral-800 p-5 rounded-xl">
-                    <div class="text-[11px] text-neutral-400 uppercase tracking-wider mb-1" x-text="t('currentValuation')"></div>
-                    <div class="text-3xl font-bold text-white" x-text="formatWorth(selectedCompanyView?.netWorthValue)"></div>
-                </div>
-                <div class="bg-black/40 border border-neutral-800 p-5 rounded-xl">
-                    <div class="text-[11px] text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLevel')"></div>
-                    <div class="text-3xl font-bold text-blue-400" x-text="'Level ' + (selectedCompanyView?.level || 1)"></div>
-                </div>
-                <div class="bg-black/40 border border-neutral-800 p-5 rounded-xl">
-                    <div class="text-[11px] text-neutral-400 uppercase tracking-wider mb-1" x-text="t('teamMembersCount')"></div>
-                    <div class="text-3xl font-bold text-green-400" x-text="(selectedCompanyView?.members?.length || 1) + ' Members'"></div>
-                </div>
-            </div>
-
-            <!-- Biografía y Estadísticas de la Empresa (Visibles para CEO y Miembros) -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl space-y-4">
-                <h3 class="serif-font text-lg font-bold text-white" x-text="t('companyBioAndStatsTitle')"></h3>
-                <p class="text-xs text-neutral-400" x-text="selectedCompanyView?.bio || t('defaultCompanyBio')"></p>
-                <div class="grid grid-cols-2 gap-4 pt-2 text-xs text-neutral-300">
-                    <div><span class="text-neutral-500" x-text="t('companyCreationCycle')"></span>: Cycle #<span x-text="selectedCompanyView?.id || 1"></span></div>
-                    <div><span class="text-neutral-500" x-text="t('companyMarketPerformance')"></span>: <span :class="selectedCompanyView?.positive ? 'text-green-400' : 'text-red-400'" x-text="selectedCompanyView?.positive ? '▲ Gaining' : '▼ Dropping'"></span></div>
-                </div>
-            </div>
-
-            <!-- Botones de Mejora (Upgrade / Invest) -->
-            <template x-if="currentUser && currentUser.name.toLowerCase() === selectedCompanyView?.ceo.toLowerCase()">
-                <div class="card-bg border border-neutral-800 p-6 rounded-2xl space-y-4">
-                    <h3 class="serif-font text-lg font-bold text-white" x-text="t('upgradeCompanyTitle')"></h3>
-                    <p class="text-xs text-neutral-400" x-text="t('upgradeCompanyDesc')"></p>
-                    <div class="flex flex-wrap gap-4 pt-2">
-                        <button @click="upgradeCompany()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl text-xs font-bold transition flex items-center gap-2">
-                            🚀 <span x-text="t('upgradeButtonText') + ' ($5.0B Investment)'"></span>
-                        </button>
-                    </div>
-                </div>
-            </template>
-
-            <!-- Sección de Invitaciones de Miembros Reales -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl space-y-4">
-                <h3 class="serif-font text-lg font-bold text-white" x-text="t('teamMembersTitle')"></h3>
-                <div class="flex flex-wrap gap-2">
-                    <template x-for="mem in (selectedCompanyView?.members || [selectedCompanyView?.ceo])">
-                        <span class="bg-neutral-800 border border-neutral-700 text-neutral-200 px-3 py-1.5 rounded-lg text-xs font-medium" x-text="mem"></span>
-                    </template>
-                </div>
-
-                <template x-if="currentUser && currentUser.name.toLowerCase() === selectedCompanyView?.ceo.toLowerCase()">
-                    <div class="pt-4 border-t border-neutral-800 space-y-3">
-                        <label class="block text-xs text-neutral-400 uppercase tracking-wider" x-text="t('inviteMemberLabel')"></label>
-                        <div class="flex gap-3">
-                            <select x-model="selectedUserToInvite" class="bg-black border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 flex-grow">
-                                <option value="" disabled selected x-text="t('selectUserPlaceholder')"></option>
-                                <template x-for="p in people.filter(p => !selectedCompanyView.members.includes(p.name))" :key="p.name">
-                                    <option :value="p.name" x-text="p.name"></option>
-                                </template>
-                            </select>
-                            <button @click="inviteUserToCompany()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap" x-text="t('inviteButtonText')"></button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </main>
-
     <!-- Modales -->
     <div x-show="showRegisterModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
@@ -683,34 +609,6 @@ BloxIndex
                     <span x-show="!isRegistering" x-text="t('authButton')"></span>
                     <span x-show="isRegistering" x-text="t('verifying')"></span>
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Obligatorio de Creación de Empresa tras Iniciar Sesión por primera vez -->
-    <div x-show="showFirstTimeCompanyModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-8 rounded-2xl border border-blue-500/50 max-w-md w-full relative shadow-2xl">
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('firstTimeCompanyTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('firstTimeCompanyDesc')"></p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyNameLabel')"></label>
-                    <input type="text" x-model="newCompanyName" placeholder="e.g. Apex Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyInvestmentLabel')"></label>
-                    <input type="number" step="0.1" x-model.number="newCompanyInvestment" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLogoLabel')"></label>
-                    <input type="text" x-model="newCompanyLogo" placeholder="https://..." class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 mb-2">
-                    <label class="block text-[11px] text-blue-400 cursor-pointer hover:underline">
-                        📁 <span x-text="t('uploadFromFile')"></span>
-                        <input type="file" accept="image/*" @change="handleLogoFileUpload($event)" class="hidden">
-                    </label>
-                </div>
-                <button @click="createCompanyFromModal(true)" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('launchEmpireButton')"></button>
             </div>
         </div>
     </div>
@@ -753,23 +651,27 @@ BloxIndex
                     <input type="text" x-model="newCompanyName" placeholder="e.g. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
+                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('sourceWealth')"></label>
+                    <select x-model="newCompanySector" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <template x-for="cat in allSectors" :key="cat">
+                            <option :value="cat" x-text="cat"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyInvestmentLabel')"></label>
                     <input type="number" step="0.1" x-model.number="newCompanyInvestment" placeholder="e.g. 15.0 (Billions)" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLogoLabel')"></label>
-                    <input type="text" x-model="newCompanyLogo" placeholder="https://..." class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 mb-2">
-                    <label class="block text-[11px] text-blue-400 cursor-pointer hover:underline">
-                        📁 <span x-text="t('uploadFromFile')"></span>
-                        <input type="file" accept="image/*" @change="handleLogoFileUpload($event)" class="hidden">
-                    </label>
+                    <input type="text" x-model="newCompanyLogo" placeholder="https://..." class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                     <div class="flex items-center gap-2 mt-2">
                         <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
                             <img :src="preset" @click="newCompanyLogo = preset" :class="newCompanyLogo === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-9 h-9 rounded-lg cursor-pointer bg-black object-cover transition" title="Select emblem">
                         </template>
                     </div>
                 </div>
-                <button @click="createCompanyFromModal(false)" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('okayButton')"></button>
+                <button @click="createCompany()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('okayButton')"></button>
             </div>
         </div>
     </div>
@@ -787,13 +689,14 @@ BloxIndex
                 </div>
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLogoLabel')"></label>
-                    <input type="text" x-model="editCompanyLogoInput" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 mb-2">
-                    <label class="block text-[11px] text-blue-400 cursor-pointer hover:underline">
-                        📁 <span x-text="t('uploadFromFile')"></span>
-                        <input type="file" accept="image/*" @change="handleEditLogoFileUpload($event)" class="hidden">
-                    </label>
+                    <input type="text" x-model="editCompanyLogoInput" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <div class="flex items-center gap-2 mt-2">
+                        <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
+                            <img :src="preset" @click="editCompanyLogoInput = preset" :class="editCompanyLogoInput === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-9 h-9 rounded-lg cursor-pointer bg-black object-cover transition" title="Select emblem">
+                        </template>
+                    </div>
                 </div>
-                <button @click="saveCompanyChanges()" class="w-full bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('saveChangesButton')"></button>
+                <button @click="saveCompanyChanges()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('saveBioButton')"></button>
             </div>
         </div>
     </div>
@@ -863,7 +766,6 @@ BloxIndex
                 myProfile: "My Profile",
                 editBio: "Edit Profile & Role",
                 createCompanyMenu: "Create Company",
-                manageCompany: "Manage Company",
                 logout: "Logout",
                 editBioBtn: "✏️ Edit Profile",
                 editBioTitle: "Edit Profile & Wealth Sector",
@@ -876,7 +778,6 @@ BloxIndex
                 companyNameLabel: "Company Name",
                 companyInvestmentLabel: "Valuation Amount (in Billions $)",
                 companyLogoLabel: "Company Emblem / Logo URL",
-                uploadFromFile: "Upload image from computer files",
                 okayButton: "Okay",
                 modalTitle: "Login or Register",
                 modalDesc: "Enter your Roblox username. If they already exist in the Hall of Fame, you'll log right into their account!",
@@ -892,25 +793,6 @@ BloxIndex
                 peakRank: "Peak Rank",
                 peakNetWorth: "Peak Net Worth",
                 firstTrillionaire: "First Trillionaire",
-                firstTimeCompanyTitle: "Welcome! Launch Your Company",
-                firstTimeCompanyDesc: "Every registered CEO must establish a corporate entity to compete in the market. Create your company now!",
-                launchEmpireButton: "Launch Empire",
-                currentValuation: "Current Valuation",
-                companyLevel: "Company Level",
-                teamMembersCount: "Team Members",
-                upgradeCompanyTitle: "Company Upgrades & Expansion",
-                upgradeCompanyDesc: "Invest capital to level up your company. Upgrading boosts your earnings and market valuation, but costs capital!",
-                upgradeButtonText: "Upgrade Company",
-                teamMembersTitle: "Real Registered Team Members",
-                inviteMemberLabel: "Invite Real Registered User",
-                selectUserPlaceholder: "Select registered user...",
-                inviteButtonText: "Send Invite",
-                editCompanySettings: "⚙️ Company Settings",
-                companyBioAndStatsTitle: "Company Biography & Statistics",
-                defaultCompanyBio: "This enterprise is scaling rapidly within the global markets, managed by its executive team.",
-                companyCreationCycle: "Foundation Era",
-                companyMarketPerformance: "Market Trend",
-                saveChangesButton: "💾 Save Company Changes",
                 fire1: "Ignited Fire (+$1B/day)",
                 fire5: "Orange Fire (+$5B/day)",
                 fire10: "Yellow Fire (+$10B/day)",
@@ -957,7 +839,6 @@ BloxIndex
                 myProfile: "Mi Perfil",
                 editBio: "Editar Perfil y Trabajo",
                 createCompanyMenu: "Crear Empresa",
-                manageCompany: "Administrar Empresa",
                 logout: "Cerrar sesión",
                 editBioBtn: "✏️ Editar Perfil",
                 editBioTitle: "Editar Perfil y Trabajo / Sector",
@@ -970,7 +851,6 @@ BloxIndex
                 companyNameLabel: "Nombre de la Empresa",
                 companyInvestmentLabel: "Valoración Inicial (en Billones $)",
                 companyLogoLabel: "Emblema Corporativo / URL del Logo",
-                uploadFromFile: "Subir imagen desde archivos locales",
                 okayButton: "Okay",
                 modalTitle: "Iniciar Sesión o Registrarse",
                 modalDesc: "Introduce tu usuario de Roblox. ¡Si ya existe en el Salón de la Fama, iniciarás sesión directamente en tu cuenta!",
@@ -986,25 +866,6 @@ BloxIndex
                 peakRank: "Rango Máximo (Peak Rank)",
                 peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
                 firstTrillionaire: "First Trillionaire",
-                firstTimeCompanyTitle: "¡Bienvenido! Lanza tu Empresa",
-                firstTimeCompanyDesc: "Todo CEO registrado debe fundar una entidad corporativa para competir en el mercado. ¡Crea tu empresa ahora!",
-                launchEmpireButton: "Lanzar Imperio",
-                currentValuation: "Valoración Actual",
-                companyLevel: "Nivel de Empresa",
-                teamMembersCount: "Miembros del Equipo",
-                upgradeCompanyTitle: "Mejoras y Expansión de Empresa",
-                upgradeCompanyDesc: "Invierte capital para subir de nivel tu empresa. Las mejoras aumentan tus ingresos y valoración, ¡pero cuestan capital!",
-                upgradeButtonText: "Mejorar Empresa",
-                teamMembersTitle: "Miembros Reales Registrados",
-                inviteMemberLabel: "Invitar Usuario Real Registrado",
-                selectUserPlaceholder: "Seleccionar usuario registrado...",
-                inviteButtonText: "Enviar Invitación",
-                editCompanySettings: "⚙️ Configuración",
-                companyBioAndStatsTitle: "Biografía y Estadísticas de la Empresa",
-                defaultCompanyBio: "Esta empresa está escalando rápidamente dentro de los mercados globales, dirigida por su equipo ejecutivo.",
-                companyCreationCycle: "Era de Fundación",
-                companyMarketPerformance: "Tendencia de Mercado",
-                saveChangesButton: "💾 Guardar Cambios de Empresa",
                 fire1: "Fuego Encendido (+$1B/día)",
                 fire5: "Fuego Naranja (+$5B/día)",
                 fire10: "Fuego Amarillo (+$10B/día)",
@@ -1051,7 +912,6 @@ BloxIndex
                 myProfile: "Il Mio Profilo",
                 editBio: "Modifica Profilo e Ruolo",
                 createCompanyMenu: "Crea Azienda",
-                manageCompany: "Gestisci Azienda",
                 logout: "Disconnetti",
                 editBioBtn: "✏️ Modifica Profilo",
                 editBioTitle: "Modifica Profilo e Settore",
@@ -1064,7 +924,6 @@ BloxIndex
                 companyNameLabel: "Nome dell'Azienda",
                 companyInvestmentLabel: "Valutazione Iniziale (in Miliardi $)",
                 companyLogoLabel: "Emblema Aziendale / URL Logo",
-                uploadFromFile: "Carica immagine dai file locali",
                 okayButton: "Okay",
                 modalTitle: "Accedi o Registrati",
                 modalDesc: "Inserisci il tuo nome utente Roblox. Se esisti già nella Hall of Fame, accederai direttamente!",
@@ -1080,25 +939,6 @@ BloxIndex
                 peakRank: "Miglior Posizione",
                 peakNetWorth: "Patrimonio Massimo",
                 firstTrillionaire: "First Trillionaire",
-                firstTimeCompanyTitle: "Benvenuto! Fonda la tua Azienda",
-                firstTimeCompanyDesc: "Ogni CEO registrato deve fondare un'entità aziendale per competere nel mercato!",
-                launchEmpireButton: "Lancia Impero",
-                currentValuation: "Valutazione Attuale",
-                companyLevel: "Livello Aziendale",
-                teamMembersCount: "Membri del Team",
-                upgradeCompanyTitle: "Potenziamenti Aziendali",
-                upgradeCompanyDesc: "Investi capitale per salire di livello. I potenziamenti aumentano le entrate e il valore.",
-                upgradeButtonText: "Potenzia Azienda",
-                teamMembersTitle: "Membri Reali Registrati",
-                inviteMemberLabel: "Invita Utente Reale Registrato",
-                selectUserPlaceholder: "Seleziona utente registrato...",
-                inviteButtonText: "Invia Invito",
-                editCompanySettings: "⚙️ Impostazioni",
-                companyBioAndStatsTitle: "Biografia e Statistiche Aziendali",
-                defaultCompanyBio: "Questa azienda sta crescendo rapidamente nei mercati globali, gestita dal suo team.",
-                companyCreationCycle: "Epoca di Fondazione",
-                companyMarketPerformance: "Andamento di Mercato",
-                saveChangesButton: "💾 Salva Modifiche Aziendali",
                 fire1: "Fuoco Acceso (+$1B/giorno)",
                 fire5: "Fuoco Arancione (+$5B/giorno)",
                 fire10: "Fuoco Giallo (+$10B/giorno)",
@@ -1145,7 +985,6 @@ BloxIndex
                 myProfile: "Meu Perfil",
                 editBio: "Editar Perfil e Trabalho",
                 createCompanyMenu: "Criar Empresa",
-                manageCompany: "Gerenciar Empresa",
                 logout: "Sair",
                 editBioBtn: "✏️ Editar Perfil",
                 editBioTitle: "Editar Perfil e Setor de Riqueza",
@@ -1158,7 +997,6 @@ BloxIndex
                 companyNameLabel: "Nome da Empresa",
                 companyInvestmentLabel: "Avaliação Inicial (em Bilhões $)",
                 companyLogoLabel: "Emblema Corporativo / URL do Logo",
-                uploadFromFile: "Enviar imagem dos arquivos locais",
                 okayButton: "Okay",
                 modalTitle: "Entrar ou Registrar",
                 modalDesc: "Digite seu nome de usuário do Roblox. Se já existir no Hall da Fama, você entrará direto na sua conta!",
@@ -1174,25 +1012,6 @@ BloxIndex
                 peakRank: "Melhor Posição",
                 peakNetWorth: "Patrimônio Máximo",
                 firstTrillionaire: "First Trillionaire",
-                firstTimeCompanyTitle: "Bem-vindo! Lance sua Empresa",
-                firstTimeCompanyDesc: "Todo CEO registrado deve estabelecer uma entidade corporativa para competir!",
-                launchEmpireButton: "Lançar Império",
-                currentValuation: "Avaliação Atual",
-                companyLevel: "Nível da Empresa",
-                teamMembersCount: "Membros da Equipe",
-                upgradeCompanyTitle: "Melhorias da Empresa",
-                upgradeCompanyDesc: "Invista capital para subir de nível sua empresa e aumentar lucros.",
-                upgradeButtonText: "Melhorar Empresa",
-                teamMembersTitle: "Membros Reais Registrados",
-                inviteMemberLabel: "Convidar Usuário Real Registrado",
-                selectUserPlaceholder: "Selecionar usuário registrado...",
-                inviteButtonText: "Enviar Convite",
-                editCompanySettings: "⚙️ Configurações",
-                companyBioAndStatsTitle: "Biografia e Estatísticas da Empresa",
-                defaultCompanyBio: "Esta empresa está crescendo rapidamente nos mercados globais, gerida por sua equipe.",
-                companyCreationCycle: "Era de Fundação",
-                companyMarketPerformance: "Tendência de Mercado",
-                saveChangesButton: "💾 Salvar Alterações da Empresa",
                 fire1: "Fogo Aceso (+$1B/dia)",
                 fire5: "Fogo Laranja (+$5B/dia)",
                 fire10: "Fogo Amarelo (+$10B/dia)",
@@ -1239,7 +1058,6 @@ BloxIndex
                 myProfile: "Mein Profil",
                 editBio: "Profil & Rolle bearbeiten",
                 createCompanyMenu: "Unternehmen gründen",
-                manageCompany: "Unternehmen verwalten",
                 logout: "Abmelden",
                 editBioBtn: "✏️ Profil bearbeiten",
                 editBioTitle: "Profil & Vermögenssektor bearbeiten",
@@ -1252,7 +1070,6 @@ BloxIndex
                 companyNameLabel: "Unternehmensname",
                 companyInvestmentLabel: "Startbewertung (in Milliarden $)",
                 companyLogoLabel: "Firmenemblem / Logo-URL",
-                uploadFromFile: "Bild von lokalen Dateien hochladen",
                 okayButton: "Okay",
                 modalTitle: "Anmelden oder Registrieren",
                 modalDesc: "Gib deinen Roblox-Benutzernamen ein. Wenn du bereits existierst, wirst du direkt eingeloggt!",
@@ -1268,25 +1085,6 @@ BloxIndex
                 peakRank: "Höchster Rang",
                 peakNetWorth: "Höchstes Nettovermögen",
                 firstTrillionaire: "First Trillionaire",
-                firstTimeCompanyTitle: "Willkommen! Starte dein Unternehmen",
-                firstTimeCompanyDesc: "Jeder registrierte CEO muss ein Unternehmen gründen, um am Markt teilzunehmen!",
-                launchEmpireButton: "Imperium starten",
-                currentValuation: "Aktuelle Bewertung",
-                companyLevel: "Unternehmensstufe",
-                teamMembersCount: "Teammitglieder",
-                upgradeCompanyTitle: "Unternehmens-Upgrades",
-                upgradeCompanyDesc: "Investiere Kapital, um dein Unternehmen zu verbessern und Einnahmen zu steigern.",
-                upgradeButtonText: "Unternehmen verbessern",
-                teamMembersTitle: "Echte registrierte Teammitglieder",
-                inviteMemberLabel: "Echten registrierten Benutzer einladen",
-                selectUserPlaceholder: "Registrierten Benutzer auswählen...",
-                inviteButtonText: "Einladung senden",
-                editCompanySettings: "⚙️ Einstellungen",
-                companyBioAndStatsTitle: "Unternehmensbiografie & Statistiken",
-                defaultCompanyBio: "Dieses Unternehmen wächst rasant in den globalen Märkten unter Leitung seines Teams.",
-                companyCreationCycle: "Gründungsära",
-                companyMarketPerformance: "Markttrend",
-                saveChangesButton: "💾 Änderungen speichern",
                 fire1: "Entfachtes Feuer (+$1B/Tag)",
                 fire5: "Oranges Feuer (+$5B/Tag)",
                 fire10: "Gelbes Feuer (+$10B/Tag)",
@@ -1322,13 +1120,103 @@ BloxIndex
                 { id: 7, name: 'Chris', netWorthValue: 281.0, peakRank: 7, peakNetWorth: 281.0, changeVal: 2.1, changeText: '▲ +$2.1B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0FCE5CD735B26387DF6B820B78D194B4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chris commands market influence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
                 { id: 8, name: 'Yuki', netWorthValue: 254.9, peakRank: 8, peakNetWorth: 254.9, changeVal: 5.6, changeText: '▲ +$5.6B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-51FE1EF702BCEEC6A270D563818F51B6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yuki represents digital ecosystems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
                 { id: 9, name: 'Kasper', netWorthValue: 237.9, peakRank: 9, peakNetWorth: 237.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC06858A574D17A719A055CCFC355F2F-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kasper breaks into elite ranks.'], country: 'Global', source: 'Investors', gender: 'Man' },
-                { id: 10, name: 'Tito', netWorthValue: 209.3, peakRank: 10, peakNetWorth: 209.3, changeVal: 5.9, changeText: '▲ +$5.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-316103E68F90BEEDEA43FF58D66BC705-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tito commands a powerful portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' }
+                { id: 10, name: 'Tito', netWorthValue: 209.3, peakRank: 10, peakNetWorth: 209.3, changeVal: 5.9, changeText: '▲ +$5.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-316103E68F90BEEDEA43FF58D66BC705-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tito commands a powerful portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 11, name: 'Eclipse', netWorthValue: 201.3, peakRank: 11, peakNetWorth: 201.3, changeVal: 17.0, changeText: '▲ +$17.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-081A4015104BC6AD94B91FED5198EF9C-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Eclipse surges onto the leaderboard.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
+                { id: 12, name: 'CYUL', netWorthValue: 191.2, peakRank: 12, peakNetWorth: 191.2, changeVal: 8.4, changeText: '▲ +$8.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-21DC1F850EAA53DE027602AC2E2289BD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['CYUL solidifies a strong position.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 13, name: 'Acidic', netWorthValue: 185.0, peakRank: 13, peakNetWorth: 185.0, changeVal: -1.2, changeText: '▼ -$1.2B', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A93290ADDB12E46B76328E0D03E4C2B6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Acidic maintains a robust enterprise portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 14, name: 'Sabrina', netWorthValue: 177.9, peakRank: 14, peakNetWorth: 177.9, changeVal: -0.7, changeText: '▼ -$720M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8C32772581413C0CB9FB4273C52332EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sabrina commands notable influence.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 15, name: 'Philip', netWorthValue: 177.1, peakRank: 15, peakNetWorth: 177.1, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2188A5445A8636BDBD0BAEAD250D04DA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Philip drives continuous growth.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 16, name: 'Sully', netWorthValue: 175.0, peakRank: 16, peakNetWorth: 175.0, changeVal: 0.2, changeText: '▲ +$150M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3D6EC1601A5A57A9885D7D141835C0C9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sully secures his standing.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 17, name: 'Djedax', netWorthValue: 172.3, peakRank: 17, peakNetWorth: 172.3, changeVal: -0.8, changeText: '▼ -$760M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A9AD94640E88886A60E659FEED0449FD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Djedax maintains a solid presence.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 18, name: 'zthebee', netWorthValue: 169.8, peakRank: 18, peakNetWorth: 169.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E76C7C0D9069A9F25C41E827F4EA34DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['zthebee commands an impressive portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 19, name: 'KasokuVT', netWorthValue: 166.3, peakRank: 19, peakNetWorth: 166.3, changeVal: 0.2, changeText: '▲ +$221M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-67F4754D8B939E4C66227735E31D25EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['KasokuVT drives virtual networks.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 20, name: 'Epikical', netWorthValue: 165.9, peakRank: 20, peakNetWorth: 165.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B5C96CCE0839DBD41487306CA5EB11E8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Epikical closes out top tier.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 21, name: 't47co', netWorthValue: 161.2, peakRank: 21, peakNetWorth: 161.2, changeVal: 3.9, changeText: '▲ +$3.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-231A417BE4F33BA99FF848BDDB5D75AD-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['t47co expands rapidly.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 22, name: 'Jason', netWorthValue: 160.6, peakRank: 22, peakNetWorth: 160.6, changeVal: 1.1, changeText: '▲ +$1.1B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-973FC39AD12FA1DEFB76BAD748DD8C2B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jason secures steady financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 23, name: 'Newt', netWorthValue: 157.3, peakRank: 23, peakNetWorth: 157.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FAA36DF4B111CA9747F245A495E5C4CE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Newt maintains a powerful capital standing.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 24, name: 'Alonzo', netWorthValue: 154.3, peakRank: 24, peakNetWorth: 154.3, changeVal: 0.8, changeText: '▲ +$794M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F252E4A0826F8B0A3179A46930ED2940-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Alonzo drives ongoing expansion.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 25, name: 'blankmotive', netWorthValue: 151.4, peakRank: 25, peakNetWorth: 151.4, changeVal: -0.3, changeText: '▼ -$254M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3AA046E94E4D227C4F38F96933775F47-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['blankmotive manages a specialized tech portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 26, name: 'HeartEditor', netWorthValue: 148.3, peakRank: 26, peakNetWorth: 148.3, changeVal: 0.1, changeText: '▲ +$139M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C82500D180927161A920FEC291AFA52D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['HeartEditor oversees elite digital content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 27, name: 'Yamenxdroyal', netWorthValue: 144.0, peakRank: 27, peakNetWorth: 144.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC7B0E124FFB376E385CF57D89B0BDBD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yamenxdroyal holds strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 28, name: 'fairyqueen059', netWorthValue: 143.3, peakRank: 28, peakNetWorth: 143.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A68445B6F379F620FDB4E1236E7E453D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['fairyqueen059 builds value through luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 29, name: 'Thyff', netWorthValue: 141.7, peakRank: 29, peakNetWorth: 141.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C1D32763E81DACCDE42529DE7BAA3B36-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Thyff anchors robust investments.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 30, name: 'Cleo', netWorthValue: 140.8, peakRank: 30, peakNetWorth: 140.8, changeVal: 0.4, changeText: '▲ +$370M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4203CE0DDEA79F8CC6E0866E8EC26BE5-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Cleo drives consistent market growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 31, name: 'Devin', netWorthValue: 136.6, peakRank: 31, peakNetWorth: 136.6, changeVal: 2.8, changeText: '▲ +$2.8B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D174CE2D768F55799B74E5B7522A316-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Devin secures strong financial positioning.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 32, name: 'Adrian', netWorthValue: 134.8, peakRank: 32, peakNetWorth: 134.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AADB4313E80551C178724DFE28B80683-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Adrian manages diversified asset portfolios.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 33, name: 'Panther', netWorthValue: 133.1, peakRank: 33, peakNetWorth: 133.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D15AF34B997DC6C81DEF087E2CB3783-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Panther commands a stealthy portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Women' },
+                { id: 34, name: 'Yoyo', netWorthValue: 131.7, peakRank: 34, peakNetWorth: 131.7, changeVal: -0.6, changeText: '▼ -$584M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C9E1817C655EC32DE62656F1D610CAC0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yoyo oversees flexible digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 35, name: 'Khs1251', netWorthValue: 130.2, peakRank: 35, peakNetWorth: 130.2, changeVal: 4.9, changeText: '▲ +$4.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C442CDCFC46C92B91F026AC7D91E801-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Khs1251 accelerates through continuous tech innovations.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 36, name: 'logi', netWorthValue: 130.1, peakRank: 36, peakNetWorth: 130.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4DA54E16117FF4D95D21A801D801C3-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['logi maintains robust logistics networks.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 37, name: 'Hex', netWorthValue: 127.5, peakRank: 37, peakNetWorth: 127.5, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E9FBB219DE64D5FD43100AD60EDA0972-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hex expands market share through cryptographic protocols.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 38, name: 'James', netWorthValue: 126.3, peakRank: 38, peakNetWorth: 126.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-652E5D2B117E2C77BAC9650D141F470B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['James commands a diversified portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 39, name: 'freudi6n', netWorthValue: 124.9, peakRank: 39, peakNetWorth: 124.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8704721932065DE8A6E371F745D6FC53-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['freudi6n maintains a solid financial position.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 40, name: 'Vince', netWorthValue: 123.4, peakRank: 40, peakNetWorth: 123.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFACCB214D445D75B4485CB131EEED29-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Vince rounds out the top 40.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 41, name: 'kravings', netWorthValue: 122.0, peakRank: 41, peakNetWorth: 122.0, changeVal: -0.2, changeText: '▼ -$240M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AB3FF1B027150CF6E790A546718FB0BA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['kravings manages a dynamic digital asset portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 42, name: 'AceDipped', netWorthValue: 119.8, peakRank: 42, peakNetWorth: 119.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CB932DDC6A44439881618A5798DBD591-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['AceDipped secures a prominent place.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 43, name: 'Val', netWorthValue: 119.3, peakRank: 43, peakNetWorth: 119.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CDA8284C76572F98D79151E0A5E4BC0D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Val oversees high-value venture capital funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 44, name: 'JessieK', netWorthValue: 117.7, peakRank: 44, peakNetWorth: 117.7, changeVal: 0.5, changeText: '▲ +$484M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B9B196290D535D2DB2FE0BD36129FE23-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['JessieK drives steady portfolio growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 45, name: 'piz', netWorthValue: 117.7, peakRank: 45, peakNetWorth: 117.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C1346B68B8449A1631E2C18957EF9A2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['piz maintains substantial capital reserves.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 46, name: 'Protato', netWorthValue: 116.4, peakRank: 46, peakNetWorth: 116.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5B3E19BA7DA4D0A5174A18655F324A7F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Protato commands a thriving digital empire.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 47, name: '_M_', netWorthValue: 116.0, peakRank: 47, peakNetWorth: 116.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D5898C7230953EBD628A902C36CE135A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['_M_ secures a spot among global elite.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 48, name: 'Waffle Fox', netWorthValue: 115.4, peakRank: 48, peakNetWorth: 115.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Waffle Fox builds lasting wealth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 49, name: 'MisterYan', netWorthValue: 115.0, peakRank: 49, peakNetWorth: 115.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DA3ACBA42CFEFCFCA78BC8E4896579C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['MisterYan directs strategic global investments.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 50, name: 'Hum', netWorthValue: 113.8, peakRank: 50, peakNetWorth: 113.8, changeVal: 0.0, changeText: '▼ -$19M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2E6EE698A2CD0FFDEFE8000CEBDB7BAF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hum rounds out the Top 50 billionaires list.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 51, name: 'Overdrive', netWorthValue: 112.4, peakRank: 51, peakNetWorth: 112.4, changeVal: 4.3, changeText: '▲ +$4.3B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-88F0B9E3647A7BFFF677EA434192F16A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Overdrive accelerates market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 52, name: 'Chara', netWorthValue: 112.0, peakRank: 52, peakNetWorth: 112.0, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EBEE9636E7BF391B2E34CF04332B9986-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chara maintains stable corporate holdings.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 53, name: 'Maximus026', netWorthValue: 110.2, peakRank: 53, peakNetWorth: 110.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-020F1429C2BAA98DC7E55737E4D41F8F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Maximus026 commands a robust portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 54, name: 'Logan', netWorthValue: 109.6, peakRank: 54, peakNetWorth: 109.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E67A365BC09CE1367DC088D6A457A83-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Logan secures consistent financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 55, name: 'Amber', netWorthValue: 109.2, peakRank: 55, peakNetWorth: 109.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0F3FE493D59B04E21D13D1D5A125A309-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Amber builds significant value through retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 56, name: 'Serene', netWorthValue: 107.8, peakRank: 56, peakNetWorth: 107.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E797C5C1AB752F57CB61859F7ED2AF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Serene manages a tranquil portfolio.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 57, name: 'RICODUDE', netWorthValue: 107.4, peakRank: 57, peakNetWorth: 107.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D8B9FDDF4720970EBABE757868710CB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['RICODUDE maintains a strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 58, name: 'Clutch', netWorthValue: 106.6, peakRank: 58, peakNetWorth: 106.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-74A5A17710CCEFDBB8A3C988AEE7ED42-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Clutch commands robust capital reserves.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 59, name: 'Arctic', netWorthValue: 106.1, peakRank: 59, peakNetWorth: 106.1, changeVal: 1.3, changeText: '▲ +$1.3B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FBE4F6A75ED050DFAB8E80BA93374C50-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Arctic expands rapidly through sustainable energy.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 60, name: 'Dani', netWorthValue: 106.0, peakRank: 60, peakNetWorth: 106.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-31FA129C7D748D1125F76F60A4F5450E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Dani rounds out the leaderboard.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 61, name: 'Tubularlly', netWorthValue: 105.2, peakRank: 61, peakNetWorth: 105.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EAF2E2CC19D7B4BA26CDCD8F637194CD-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tubularlly expands her digital ecosystem.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 62, name: 'John', netWorthValue: 104.8, peakRank: 62, peakNetWorth: 104.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EDCA09DAB8940AA7580CE0590F01854B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['John manages reliable enterprise resources.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 63, name: 'XxAmanitaxX', netWorthValue: 104.0, peakRank: 63, peakNetWorth: 104.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-29FA52EB1A45D1D4696CCC2351E95F0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['XxAmanitaxX directs niche luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 64, name: 'Xcnar', netWorthValue: 103.2, peakRank: 64, peakNetWorth: 103.2, changeVal: 0.2, changeText: '▲ +$227M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-121DB50D2B060316660AC2E03D6ED3DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xcnar accelerates through tactical tech.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 65, name: 'Midas', netWorthValue: 103.0, peakRank: 65, peakNetWorth: 103.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-35C9E4976701F2852F62FD5E8A3B5BAE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Midas anchors powerful precious asset funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 66, name: 'jay', netWorthValue: 102.1, peakRank: 66, peakNetWorth: 102.1, changeVal: 0.0, changeText: '▼ -$10K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6204A9AA64534DCDE79A3AEC0441C63A-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['jay oversees agile tech initiatives.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 67, name: 'Oscar', netWorthValue: 102.0, peakRank: 67, peakNetWorth: 102.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CE21BCFBE627761B69CEC5CCEAA466D2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Oscar maintains steady capital streams.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 68, name: 'camilorobloxenero', netWorthValue: 101.1, peakRank: 68, peakNetWorth: 101.1, changeVal: 0.0, changeText: '▲ +$100K', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-94E115BA27CF6FC09ACC663B1DFBE2A4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['camilorobloxenero drives creative community platforms.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 69, name: 'LucasDaUltimate', netWorthValue: 100.8, peakRank: 69, peakNetWorth: 100.8, changeVal: 0.0, changeText: '▲ +$9K', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D5B260C493CEC04E4D9FCE4CF33F3E9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LucasDaUltimate builds resilient digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 70, name: 'Kai', netWorthValue: 100.2, peakRank: 70, peakNetWorth: 100.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D9B22F44D7F74AE93CE6FE713857278B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kai commands influence through lifestyle branding.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 71, name: 'Solia', netWorthValue: 99.7, peakRank: 71, peakNetWorth: 99.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D51BE89A3350B28C33B33CC752B0C31A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Solia curates elegant artistic ventures.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 72, name: 'Saleh', netWorthValue: 98.1, peakRank: 72, peakNetWorth: 98.1, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E722677A06F551DDB46C949425FEA532-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Saleh directs expanding international real estate.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 73, name: 'Blez', netWorthValue: 97.7, peakRank: 73, peakNetWorth: 97.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-66D1316DD1A7303F74F19BB5B625EB02-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Blez maintains stable digital ventures.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 74, name: 'SisterAlex', netWorthValue: 97.4, peakRank: 74, peakNetWorth: 97.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7059BBDE99888783DF44F89D15D3E8C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['SisterAlex shapes contemporary lifestyle media.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 75, name: 'Heather', netWorthValue: 96.4, peakRank: 75, peakNetWorth: 96.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A92AD7C72D5751CDFEF7352B92D4E965-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Heather focuses on high-end fashion lines.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 76, name: 'Joke', netWorthValue: 95.0, peakRank: 76, peakNetWorth: 95.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DE0FAF32CAD79354ECAF3BE37A252CC2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Joke builds value through viral entertainment.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 77, name: 'Mobin', netWorthValue: 93.3, peakRank: 77, peakNetWorth: 93.3, changeVal: 2.0, changeText: '▲ +$2.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-97FFCE65DCD1EFA6BC190A1F33342CF8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Mobin surges with investments in cloud systems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 78, name: 'Aero Vista', netWorthValue: 92.0, peakRank: 78, peakNetWorth: 92.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFFAE7651EB13D85A43B9A994B16EB5B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Aero Vista specializes in aerospace engineering.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 79, name: 'Unknown', netWorthValue: 91.3, peakRank: 79, peakNetWorth: 91.3, changeVal: -0.7, changeText: '▼ -$663M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Unknown operates discreetly across alternatives.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 80, name: 'Pengu', netWorthValue: 90.5, peakRank: 80, peakNetWorth: 90.5, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4E9A225D3F1D0F47C4AE2525688655-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Pengu commands solid holdings in logistics.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 81, name: 'Xofer', netWorthValue: 90.2, peakRank: 81, peakNetWorth: 90.2, changeVal: -0.3, changeText: '▼ -$300M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4CEF45A75689FA4E010BFD959845618D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xofer manages diversified software solutions.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 82, name: 'Bubbles', netWorthValue: 88.0, peakRank: 82, peakNetWorth: 88.0, changeVal: -0.1, changeText: '▼ -$100M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C0D9EECCB7FBB4844B7D88455A28C128-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Bubbles oversees creative consumer brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 83, name: 'Ken', netWorthValue: 87.2, peakRank: 83, peakNetWorth: 87.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8DF46166C54030469FE52075355ABFF1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Ken anchors reliable industrial assets.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 84, name: 'Duncan', netWorthValue: 85.0, peakRank: 84, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B98AD8D4FE8D6F1DAD6A082B76174CC9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Duncan directs specialized luxury retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 85, name: 'Froggie', netWorthValue: 85.0, peakRank: 85, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-086D595BDC53ADF5E22CADA773E769D7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Froggie maintains vibrant interactive entertainment.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 86, name: 'Geo', netWorthValue: 83.0, peakRank: 86, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E57CB6F6A4230FBCA60B133C433FD0D4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Geo maps out global real estate developments.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 87, name: 'Peach', netWorthValue: 83.0, peakRank: 87, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D6BF6FEEFCF5EFBC6A104EA0EF72337-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Peach curates boutique digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 88, name: 'paul', netWorthValue: 82.3, peakRank: 88, peakNetWorth: 82.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F00FFCD2314992C0F30357D8E9F171C6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['paul secures core enterprise value.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 89, name: 'Darius', netWorthValue: 82.0, peakRank: 89, peakNetWorth: 82.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D0FA2B1BDB662EA0C0ED161225541F3-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Darius drives solid financial returns.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 90, name: 'Jacobs', netWorthValue: 80.6, peakRank: 90, peakNetWorth: 80.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E80ED2011C3E401CCEDF97E7E71E0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jacobs manages stable multi-industry holdings.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 91, name: 'Five', netWorthValue: 80.3, peakRank: 91, peakNetWorth: 80.3, changeVal: 0.0, changeText: '▲ +$20M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C9AA2CA5C92DF7160C0DCDA987FA950-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Five advances algorithmic numerical trading.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 92, name: 'Shadow', netWorthValue: 79.7, peakRank: 92, peakNetWorth: 79.7, changeVal: 0.0, changeText: '▲ +$7M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E98D08A7DDA8D60141A1A8D98A9FEEB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Shadow maintains a private secure portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 93, name: 'Rasger', netWorthValue: 77.8, peakRank: 93, peakNetWorth: 77.8, changeVal: 1.0, changeText: '▲ +$1.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1790F2FEFE2FF16B4BEAA2899F902A32-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Rasger expands rapidly through tech scaling.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 94, name: 'LePittCanard', netWorthValue: 77.7, peakRank: 94, peakNetWorth: 77.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0500A84157F24F9B473900BDC67371A7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LePittCanard oversees specialty media collections.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 95, name: 'Sab', netWorthValue: 76.9, peakRank: 95, peakNetWorth: 76.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D601D7FCD9FA11FEC0851C6AF98CE6C6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sab manages diversified digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 96, name: 'xiiiannex', netWorthValue: 76.4, peakRank: 96, peakNetWorth: 76.4, changeVal: 0.7, changeText: '▲ +$700M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['xiiiannex grows fast through interactive content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 97, name: 'Lunar', netWorthValue: 76.0, peakRank: 97, peakNetWorth: 76.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D0D9E7CD5FC44C543015024242EC12A0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Lunar commands strategic stakes in tech.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 98, name: 'Tendo', netWorthValue: 75.4, peakRank: 98, peakNetWorth: 75.4, changeVal: 0.2, changeText: '▲ +$248M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BCE2F9C690C407A37BC96F996C03B91E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tendo accelerates market reach.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 99, name: 'Luke', netWorthValue: 75.0, peakRank: 99, peakNetWorth: 75.0, changeVal: 0.0, changeText: '▲ +$8M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A1A6775CBDCC7613205369F5D1FB4B1E-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Luke builds steady capital reserves.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 100, name: 'dgx', netWorthValue: 73.7, peakRank: 100, peakNetWorth: 73.7, changeVal: 0.1, changeText: '▲ +$100M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2F98487E4C47E68E5B440F33F2FE64C2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['dgx closes the top 100 with resilient networks.'], country: 'Global', source: 'Technology & AI', gender: 'Man' }
             ];
         }
 
         function getBaseCompanies() {
             return [
-                { id: 1, name: 'Omega AI', netWorthValue: 14.5, changeVal: -0.5, positive: false, history: [], img: OMEGA_LOGO_SVG, ceo: 'Giacolamela', level: 1, members: ['Giacolamela'], bio: 'Omega AI pioneering machine learning ecosystems globally.' }
+                { id: 1, name: 'Omega AI', netWorthValue: 14.5, changeVal: -0.5, positive: false, history: [], img: OMEGA_LOGO_SVG, ceo: 'Giacolamela' }
             ];
         }
 
@@ -1340,14 +1228,12 @@ BloxIndex
                 selectedCategory: null,
                 selectedPerson: null,
                 selectedTop5Person: null,
-                selectedCompanyView: null,
                 showRegisterModal: false,
                 showCategoriesDropdown: false,
                 showUserMenu: false,
                 showBioModal: false,
                 showCompanyModal: false,
                 showEditCompanyModal: false,
-                showFirstTimeCompanyModal: false,
                 editingCompany: null,
                 editCompanyNameInput: '',
                 editCompanyLogoInput: '',
@@ -1357,7 +1243,6 @@ BloxIndex
                 newCompanySector: 'Technology & AI',
                 newCompanyInvestment: 15.0,
                 newCompanyLogo: '',
-                selectedUserToInvite: '',
                 presetCompanyLogos: PRESET_COMPANY_LOGOS,
                 allSectors: AVAILABLE_SECTORS,
                 searchQuery: '',
@@ -1537,21 +1422,29 @@ BloxIndex
                 },
                 openProfile(person) {
                     this.selectedPerson = person;
-                    this.selectedCompanyView = null;
                 },
-                getUserCompany() {
-                    if (!this.currentUser) return null;
-                    return this.companies.find(c => c.ceo.toLowerCase() === this.currentUser.name.toLowerCase() || (c.members && c.members.includes(this.currentUser.name)));
-                },
-                openCompanyDashboard(company) {
-                    this.selectedCompanyView = company;
-                    this.selectedPerson = null;
-                },
-                openEditCompanyModal(company) {
-                    this.editingCompany = company;
-                    this.editCompanyNameInput = company.name;
-                    this.editCompanyLogoInput = company.img;
-                    this.showEditCompanyModal = true;
+                openCompanyProfile(company) {
+                    if (this.currentUser && this.currentUser.name.toLowerCase() === company.ceo.toLowerCase()) {
+                        this.editingCompany = company;
+                        this.editCompanyNameInput = company.name;
+                        this.editCompanyLogoInput = company.img;
+                        this.showEditCompanyModal = true;
+                    } else {
+                        this.selectedPerson = {
+                            name: company.name,
+                            netWorthValue: company.netWorthValue,
+                            peakNetWorth: company.netWorthValue,
+                            peakRank: 1,
+                            changeVal: company.changeVal,
+                            positive: company.positive,
+                            history: company.history || [company.netWorthValue],
+                            img: company.img,
+                            bio: [`Company founded and operated by CEO ${company.ceo}.`, `Current valuation: ${this.formatWorth(company.netWorthValue)}.`],
+                            country: 'Global',
+                            source: 'User Enterprise',
+                            gender: 'Company'
+                        };
+                    }
                 },
                 saveCompanyChanges() {
                     if (!this.editingCompany) return;
@@ -1576,7 +1469,7 @@ BloxIndex
                     }
                     this.showEditCompanyModal = false;
                     this.editingCompany = null;
-                    alert('Company details and changes saved successfully!');
+                    alert('Company details updated successfully!');
                 },
                 openBioEditor(person) {
                     if (!person) person = this.currentUser;
@@ -1593,49 +1486,28 @@ BloxIndex
                     this.newCompanyLogo = OMEGA_LOGO_SVG;
                     this.showCompanyModal = true;
                 },
-                handleLogoFileUpload(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.newCompanyLogo = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                },
-                handleEditLogoFileUpload(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.editCompanyLogoInput = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                },
-                createCompanyFromModal(isFirstTime) {
+                createCompany() {
                     if (!this.newCompanyName || !this.newCompanyName.trim()) {
                         alert('Please enter a company name.');
                         return;
                     }
                     let compName = this.newCompanyName.trim();
                     if (BANNED_COMPANIES.includes(compName.toLowerCase())) {
-                        alert('That company name is not allowed.');
+                        alert('That company name is removed.');
                         return;
                     }
-                    let investment = Number((parseFloat(this.newCompanyInvestment) || 15.0).toFixed(1));
+                    let investment = Number((parseFloat(this.newCompanyInvestment) || 10.0).toFixed(1));
                     let logoUrl = this.newCompanyLogo.trim() || OMEGA_LOGO_SVG;
 
                     let newCompanyEntry = {
                         id: this.companies.length + 1,
                         name: compName,
                         netWorthValue: investment,
-                        changeVal: 2.0,
+                        changeVal: 1.0,
                         positive: true,
-                        history: [investment - 2.0, investment],
+                        history: [investment - 1.0, investment],
                         img: logoUrl,
-                        ceo: this.currentUser.name,
-                        level: 1,
-                        members: [this.currentUser.name],
-                        bio: `Company founded by CEO ${this.currentUser.name}. Scaling successfully in global markets.`
+                        ceo: this.currentUser.name
                     };
 
                     this.companies.push(newCompanyEntry);
@@ -1648,37 +1520,7 @@ BloxIndex
                     }
 
                     this.showCompanyModal = false;
-                    this.showFirstTimeCompanyModal = false;
-                    alert(`Company "${compName}" successfully launched!`);
-                },
-                upgradeCompany() {
-                    if (!this.selectedCompanyView) return;
-                    let comp = this.selectedCompanyView;
-                    comp.level = (comp.level || 1) + 1;
-                    comp.netWorthValue = Number((comp.netWorthValue + 12.5).toFixed(1));
-                    comp.changeVal = Number((comp.changeVal + 3.0).toFixed(1));
-                    comp.positive = true;
-                    if (!comp.history) comp.history = [];
-                    comp.history.push(comp.netWorthValue);
-
-                    try {
-                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
-                    } catch(e) {}
-                    alert(`Company upgraded to Level ${comp.level}! Valuation increased.`);
-                },
-                inviteUserToCompany() {
-                    if (!this.selectedCompanyView || !this.selectedUserToInvite) return;
-                    if (!this.selectedCompanyView.members) {
-                        this.selectedCompanyView.members = [this.selectedCompanyView.ceo];
-                    }
-                    if (!this.selectedCompanyView.members.includes(this.selectedUserToInvite)) {
-                        this.selectedCompanyView.members.push(this.selectedUserToInvite);
-                        try {
-                            localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
-                        } catch(e) {}
-                        alert(`${this.selectedUserToInvite} has been successfully invited and joined the company team!`);
-                    }
-                    this.selectedUserToInvite = '';
+                    alert(`Company "${compName}" successfully created by ${this.currentUser.name}!`);
                 },
                 saveUserBio() {
                     if (!this.currentUser) return;
@@ -1731,8 +1573,6 @@ BloxIndex
                         p.history = [p.netWorthValue];
                     });
                     syncedCompanies.forEach(c => {
-                        if (!c.members) c.members = [c.ceo];
-                        if (!c.level) c.level = 1;
                         c.history = [c.netWorthValue];
                     });
 
@@ -1842,11 +1682,6 @@ BloxIndex
                         let updatedSel = this.people.find(p => p.name === this.selectedPerson.name);
                         if (updatedSel) this.selectedPerson = updatedSel;
                     }
-
-                    if (this.selectedCompanyView) {
-                        let updatedComp = this.companies.find(c => c.name === this.selectedCompanyView.name);
-                        if (updatedComp) this.selectedCompanyView = updatedComp;
-                    }
                 },
                 getCurrentGlobalCycle() {
                     const elapsed = Math.max(0, Date.now() - GLOBAL_EPOCH_MS);
@@ -1907,14 +1742,6 @@ BloxIndex
                         this.regUsername = '';
                         this.regPassword = '';
                         alert(`${this.t('alertLogin')} ${existingPerson.name}!`);
-
-                        let userComp = this.getUserCompany();
-                        if (!userComp) {
-                            this.newCompanyName = `${cleanUsername} Corp`;
-                            this.newCompanyInvestment = 15.0;
-                            this.newCompanyLogo = OMEGA_LOGO_SVG;
-                            this.showFirstTimeCompanyModal = true;
-                        }
                         return;
                     }
 
@@ -1978,11 +1805,6 @@ BloxIndex
                     this.regUsername = '';
                     this.regPassword = '';
                     alert(`${this.t('alertRegister')} ${cleanUsername}.`);
-
-                    this.newCompanyName = `${cleanUsername} Corp`;
-                    this.newCompanyInvestment = 15.0;
-                    this.newCompanyLogo = OMEGA_LOGO_SVG;
-                    this.showFirstTimeCompanyModal = true;
                 },
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
