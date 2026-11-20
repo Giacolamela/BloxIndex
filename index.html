@@ -1,6 +1,6 @@
 BloxIndex
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@ BloxIndex
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
             background-color: #000000;
@@ -61,31 +61,19 @@ BloxIndex
             animation: goldShine 2s infinite ease-in-out;
         }
 
-        /* 1 Billion: Fuego Encendido */
+        /* Tiers de Fuego */
         .fire-tier-1 { filter: drop-shadow(0 0 7px #fb923c) brightness(1.1); }
         .glow-tier-1 { box-shadow: 0 0 14px rgba(251, 146, 60, 0.28); border: 1px solid rgba(251, 146, 60, 0.45); }
-        
-        /* 5 Billion: Fuego Naranja */
         .fire-tier-5 { filter: saturate(1.6) drop-shadow(0 0 11px #f97316); }
         .glow-tier-5 { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); border: 1px solid rgba(249, 115, 22, 0.65); }
-        
-        /* 10 Billion: Fuego Amarillo */
         .fire-tier-10 { filter: hue-rotate(28deg) brightness(1.35) drop-shadow(0 0 13px #facc15); }
         .glow-tier-10 { box-shadow: 0 0 22px rgba(250, 204, 21, 0.45); border: 1px solid rgba(250, 204, 21, 0.75); }
-        
-        /* 15 Billion: Fuego Rojo */
         .fire-tier-15 { filter: hue-rotate(-25deg) saturate(2) drop-shadow(0 0 14px #ef4444); }
         .glow-tier-15 { box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); border: 1px solid rgba(239, 68, 68, 0.8); }
-        
-        /* 20 Billion: Fuego Verde */
         .fire-tier-20 { filter: hue-rotate(95deg) saturate(1.8) drop-shadow(0 0 14px #22c55e); }
         .glow-tier-20 { box-shadow: 0 0 25px rgba(34, 197, 94, 0.5); border: 1px solid rgba(34, 197, 94, 0.8); }
-        
-        /* 30 Billion: Fuego Azul */
         .fire-tier-30 { filter: hue-rotate(195deg) saturate(2) drop-shadow(0 0 16px #3b82f6); }
         .glow-tier-30 { box-shadow: 0 0 28px rgba(59, 130, 246, 0.55); border: 1px solid rgba(59, 130, 246, 0.85); }
-        
-        /* 40-50 Billion: Fuego Morado */
         .fire-tier-40 { animation: purplePulse 1.5s infinite ease-in-out; }
         .glow-tier-40 { box-shadow: 0 0 32px rgba(168, 85, 247, 0.65), inset 0 0 16px rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; }
 
@@ -95,7 +83,22 @@ BloxIndex
         }
     </style>
 </head>
-<body x-data="empireApp()" x-init="initEmpire()" class="min-h-screen px-6 py-4 flex flex-col">
+<body x-data="empireApp()" x-init="initEmpire()" class="min-h-screen px-4 sm:px-6 py-4 flex flex-col">
+
+    <!-- Notificación Toast Flotante -->
+    <div x-show="toastMessage" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         class="fixed bottom-6 right-6 z-50 max-w-sm bg-neutral-900 border border-neutral-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3"
+         style="display: none;">
+        <span class="text-lg" x-text="toastIcon"></span>
+        <span class="text-xs font-medium" x-text="toastMessage"></span>
+        <button @click="toastMessage = ''" class="text-neutral-400 hover:text-white ml-2 text-base">×</button>
+    </div>
 
     <!-- Título Principal -->
     <div class="max-w-7xl mx-auto w-full pt-4 pb-2 text-center">
@@ -113,13 +116,13 @@ BloxIndex
     <!-- Barra Superior de Navegación -->
     <header class="flex flex-col md:flex-row items-center justify-between text-sm font-medium border-b border-neutral-800 pb-3 mb-8 max-w-7xl mx-auto w-full gap-4 mt-4">
         <div class="flex items-center space-x-6 flex-wrap">
-            <button @click="currentFilter = 'top5'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'top5' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
-            <button @click="currentFilter = 'all'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
-            <button @click="currentFilter = 'women'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'women' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
-            <button @click="currentFilter = 'companies'; selectedCategory = null; selectedPerson = null; showCategoriesDropdown = false; searchQuery = ''" :class="currentFilter === 'companies' && !selectedPerson ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
+            <button @click="resetViews('top5')" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
+            <button @click="resetViews('all')" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
+            <button @click="resetViews('women')" :class="currentFilter === 'women' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
+            <button @click="resetViews('companies')" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
             
             <div class="relative" @click.away="showCategoriesDropdown = false">
-                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
+                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'; selectedPerson = null; selectedCompany = null;" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
                     <span x-text="t('categories')"></span> <span class="text-xs">▾</span>
                 </button>
 
@@ -135,24 +138,36 @@ BloxIndex
         </div>
 
         <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+            <!-- Selector de Idioma -->
             <div class="relative">
                 <select x-model="lang" @change="changeLanguage(lang)" class="bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 cursor-pointer">
-                    <option value="en">🇬🇧 English</option>
                     <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇬🇧 English</option>
                     <option value="it">🇮🇹 Italiano</option>
                     <option value="pt">🇵🇹 Português</option>
                     <option value="de">🇩🇪 Deutsch</option>
                 </select>
             </div>
 
+            <!-- Buscador -->
             <div class="relative w-full md:w-48">
                 <input type="text" x-model="searchQuery" :placeholder="t('searchPlaceholder')" class="w-full bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600">
             </div>
 
+            <!-- Botón Invitaciones Pendientes si el usuario tiene -->
+            <template x-if="currentUser && pendingInvitesForCurrentUser.length > 0">
+                <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                    <span>📩</span>
+                    <span x-text="pendingInvitesForCurrentUser.length"></span>
+                </button>
+            </template>
+
+            <!-- Botón Registro / Login -->
             <template x-if="!currentUser">
                 <button @click="showRegisterModal = true" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap" x-text="t('registerLogin')"></button>
             </template>
 
+            <!-- Menú de Usuario -->
             <template x-if="currentUser">
                 <div class="relative" @click.away="showUserMenu = false">
                     <div @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
@@ -161,16 +176,29 @@ BloxIndex
                         <span class="text-xs text-neutral-400">▾</span>
                     </div>
 
-                    <div x-show="showUserMenu" class="absolute right-0 mt-2 w-52 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
+                    <div x-show="showUserMenu" class="absolute right-0 mt-2 w-56 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
                         <button @click="openProfile(currentUser); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center gap-2">
                             👤 <span x-text="t('myProfile')"></span>
                         </button>
                         <button @click="openBioEditor(currentUser); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center gap-2">
                             ✏️ <span x-text="t('editBio')"></span>
                         </button>
-                        <button @click="openCompanyModal(); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2">
-                            🏢 <span x-text="t('createCompanyMenu')"></span>
-                        </button>
+                        <template x-if="userOwnedCompany">
+                            <button @click="openCompanyDashboard(userOwnedCompany); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2 font-semibold">
+                                🏢 <span x-text="t('manageMyCompany') + ' (' + userOwnedCompany.name + ')'"></span>
+                            </button>
+                        </template>
+                        <template x-if="!userOwnedCompany">
+                            <button @click="openCompanyModal(false); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2 font-semibold">
+                                🏢 <span x-text="t('createCompanyMenu')"></span>
+                            </button>
+                        </template>
+                        <template x-if="pendingInvitesForCurrentUser.length > 0">
+                            <button @click="showInvitesModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
+                                <span class="flex items-center gap-2">📩 <span x-text="t('invitesMenu')"></span></span>
+                                <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length"></span>
+                            </button>
+                        </template>
                         <div class="border-t border-neutral-800 my-1"></div>
                         <button @click="logoutUser(); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-red-400 transition flex items-center gap-2">
                             🚪 <span x-text="t('logout')"></span>
@@ -181,8 +209,8 @@ BloxIndex
         </div>
     </header>
 
-    <!-- Contenido Principal -->
-    <main x-show="!selectedPerson" class="flex-grow max-w-7xl mx-auto w-full">
+    <!-- Contenido Principal (Rankings) -->
+    <main x-show="!selectedPerson && !selectedCompany" class="flex-grow max-w-7xl mx-auto w-full">
 
         <!-- Top 5 Ganadores y Perdedores -->
         <div x-show="searchQuery === '' && !selectedCategory && currentFilter !== 'companies'" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -257,7 +285,7 @@ BloxIndex
             </div>
         </div>
         
-        <!-- Vista Top 5 con Gráfica Estilo Mercado Real -->
+        <!-- Vista Top 5 con Gráfica -->
         <div x-show="currentFilter === 'top5' && searchQuery === ''" class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div class="md:col-span-4 space-y-3">
                 <template x-for="person in top5People" :key="person.id">
@@ -314,14 +342,12 @@ BloxIndex
                         </template>
                     </div>
 
-                    <!-- Pestañas Estilo Píldora -->
                     <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
                         <button @click="top5Tab = 'wealth'" :class="top5Tab === 'wealth' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('wealthHistory')"></button>
                         <button @click="top5Tab = 'biography'" :class="top5Tab === 'biography' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('biography')"></button>
                         <button @click="top5Tab = 'stats'" :class="top5Tab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('stats')"></button>
                     </div>
 
-                    <!-- Contenido Pestaña Wealth History -->
                     <div x-show="top5Tab === 'wealth'">
                         <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
                         <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedTop5Person?.netWorthValue)"></div>
@@ -339,7 +365,6 @@ BloxIndex
                             <span :class="selectedTop5Person?.positive ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'" class="text-[11px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider" x-text="selectedTop5Person?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
                         </div>
 
-                        <!-- Gráfica Estilo Mercado Real con Color Dinámico -->
                         <div class="relative mt-2 pt-2">
                             <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
                                 <defs>
@@ -349,29 +374,9 @@ BloxIndex
                                     </radialGradient>
                                 </defs>
                                 <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-top5-' + selectedTop5Person?.id + ')'" rx="12"></rect>
-                                
-                                <polyline 
-                                    :points="getChartData(selectedTop5Person).pointsStr" 
-                                    fill="none" 
-                                    :stroke="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" 
-                                    stroke-width="2.6" 
-                                    stroke-linecap="round" 
-                                    stroke-linejoin="round"
-                                ></polyline>
-
-                                <circle 
-                                    :cx="getChartData(selectedTop5Person).lastX" 
-                                    :cy="getChartData(selectedTop5Person).lastY" 
-                                    r="12" 
-                                    :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" 
-                                    fill-opacity="0.18"
-                                ></circle>
-                                <circle 
-                                    :cx="getChartData(selectedTop5Person).lastX" 
-                                    :cy="getChartData(selectedTop5Person).lastY" 
-                                    r="4.5" 
-                                    :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'"
-                                ></circle>
+                                <polyline :points="getChartData(selectedTop5Person).pointsStr" fill="none" :stroke="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                <circle :cx="getChartData(selectedTop5Person).lastX" :cy="getChartData(selectedTop5Person).lastY" r="12" :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" fill-opacity="0.18"></circle>
+                                <circle :cx="getChartData(selectedTop5Person).lastX" :cy="getChartData(selectedTop5Person).lastY" r="4.5" :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'"></circle>
                             </svg>
                         </div>
                     </div>
@@ -411,11 +416,24 @@ BloxIndex
         </div>
 
         <!-- Encabezado del Leaderboard -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h1 class="serif-font text-3xl font-normal" x-text="searchQuery !== '' ? t('searchResults') + ': ' + searchQuery : (selectedCategory ? t('category') + ': ' + selectedCategory : (currentFilter === 'women' ? t('womenTitle') : (currentFilter === 'companies' ? t('companiesTitle') : t('leaderboardTitle'))))"></h1>
-            <template x-if="selectedCategory || searchQuery !== ''">
-                <button @click="selectedCategory = null; searchQuery = ''; currentFilter = 'all'" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition" x-text="t('clearFilters')"></button>
-            </template>
+            
+            <div class="flex items-center gap-3">
+                <template x-if="currentFilter === 'companies' && currentUser && !userOwnedCompany">
+                    <button @click="openCompanyModal(false)" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <span>🏢</span> <span x-text="t('createCompanyMenu')"></span>
+                    </button>
+                </template>
+                <template x-if="currentFilter === 'companies' && userOwnedCompany">
+                    <button @click="openCompanyDashboard(userOwnedCompany)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <span>⚙️</span> <span x-text="t('manageMyCompany')"></span>
+                    </button>
+                </template>
+                <template x-if="selectedCategory || searchQuery !== ''">
+                    <button @click="selectedCategory = null; searchQuery = ''; currentFilter = 'all'" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition" x-text="t('clearFilters')"></button>
+                </template>
+            </div>
         </div>
 
         <div x-show="currentFilter === 'companies' && displayedPeople.length === 0" class="text-center py-16 card-bg rounded-2xl border border-neutral-800">
@@ -423,18 +441,23 @@ BloxIndex
             <h3 class="serif-font text-xl font-bold text-white mb-2" x-text="t('noCompaniesTitle')"></h3>
             <p class="text-xs text-neutral-400 max-w-md mx-auto mb-6" x-text="t('noCompaniesDesc')"></p>
             <template x-if="currentUser">
-                <button @click="openCompanyModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition" x-text="t('createCompanyMenu')"></button>
+                <button @click="openCompanyModal(false)" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition" x-text="t('createCompanyMenu')"></button>
             </template>
             <template x-if="!currentUser">
                 <button @click="showRegisterModal = true" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition" x-text="t('registerLogin')"></button>
             </template>
         </div>
 
-        <!-- Cuadrícula Leaderboard -->
+        <!-- Cuadrícula Leaderboard (Personas y Empresas) -->
         <div x-show="currentFilter !== 'top5' || searchQuery !== ''" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <template x-for="(item, index) in displayedPeople" :key="item.id + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
-                <div @click="currentFilter === 'companies' ? openCompanyProfile(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
+                <div @click="currentFilter === 'companies' ? openCompanyDashboard(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
                     
+                    <!-- Badge de Nivel si es empresa -->
+                    <template x-if="currentFilter === 'companies'">
+                        <span class="absolute top-3 left-3 bg-blue-600/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="'LVL ' + (item.level || 1)"></span>
+                    </template>
+
                     <template x-if="isBloodActive(item)">
                         <span class="blood-badge absolute top-3 right-3 text-base" title="Perdiendo capital">🩸</span>
                     </template>
@@ -442,7 +465,7 @@ BloxIndex
                         <span :class="getFireBadgeClass(item)" class="fire-badge absolute top-3 right-3 text-base" :title="getFireLabel(item)">🔥</span>
                     </template>
 
-                    <img :src="item.img" class="w-32 h-32 rounded-lg object-cover mb-4 bg-black" alt="Avatar">
+                    <img :src="item.img" class="w-32 h-32 rounded-xl object-cover mb-4 bg-black border border-neutral-800" alt="Avatar">
                     
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
                         <div class="serif-font text-lg font-bold" x-text="(currentFilter === 'women' || currentFilter === 'companies' || selectedCategory || searchQuery !== '' ? (index + 1) : item.id) + '. ' + item.name"></div>
@@ -453,8 +476,9 @@ BloxIndex
                     </template>
                     
                     <div class="text-xs text-neutral-400 mt-1" x-show="currentFilter === 'companies'" x-text="t('ceoLabel') + ': ' + item.ceo"></div>
+                    <div class="text-[11px] text-neutral-500 mt-0.5" x-show="currentFilter === 'companies' && item.members && item.members.length > 0" x-text="'👥 ' + item.members.length + ' ' + t('membersCount')"></div>
 
-                    <div class="flex items-center justify-center gap-2 mt-1 flex-wrap">
+                    <div class="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
                         <div class="text-neutral-300 text-sm font-semibold" x-text="formatWorth(item.netWorthValue)"></div>
                         <div x-show="hasDailyChange(item)" :class="item.positive ? 'text-green-400' : 'text-red-400'" class="text-xs font-semibold" x-text="formatDailyChange(item)"></div>
                     </div>
@@ -463,13 +487,13 @@ BloxIndex
         </div>
     </main>
 
-    <!-- Vista Detallada de Perfil -->
+    <!-- Vista Detallada de Perfil de Usuario -->
     <main x-show="selectedPerson" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ profileTab: 'wealth' }" style="display: none;">
         <button @click="selectedPerson = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backButton')"></button>
         
         <div :class="getContainerGlowClass(selectedPerson)" class="bg-[#121212] p-8 rounded-2xl border border-neutral-800/90 flex flex-col justify-between shadow-2xl">
             <div>
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
                     <div class="flex items-center gap-4">
                         <div class="relative">
                             <img :src="selectedPerson?.img" class="w-16 h-16 rounded-xl object-cover bg-black" alt="Avatar">
@@ -496,7 +520,6 @@ BloxIndex
                     </template>
                 </div>
 
-                <!-- Pestañas Estilo Píldora -->
                 <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
                     <button @click="profileTab = 'wealth'" :class="profileTab === 'wealth' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('wealthHistory')"></button>
                     <button @click="profileTab = 'biography'" :class="profileTab === 'biography' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('biography')"></button>
@@ -512,14 +535,6 @@ BloxIndex
                         <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
                     </div>
 
-                    <div class="mb-2 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-bold text-neutral-300 uppercase tracking-wider" x-text="t('wealthHistory')"></div>
-                            <div class="text-xs text-neutral-500 mt-0.5" x-text="t('chartSubLabel')"></div>
-                        </div>
-                        <span :class="selectedPerson?.positive ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'" class="text-[11px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider" x-text="selectedPerson?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
-                    </div>
-
                     <div class="relative mt-2 pt-2">
                         <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
                             <defs>
@@ -529,29 +544,9 @@ BloxIndex
                                 </radialGradient>
                             </defs>
                             <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-prof-' + (selectedPerson?.id || 999) + ')'" rx="12"></rect>
-                            
-                            <polyline 
-                                :points="getChartData(selectedPerson).pointsStr" 
-                                fill="none" 
-                                :stroke="selectedPerson?.positive ? '#22c55e' : '#ef4444'" 
-                                stroke-width="2.6" 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round"
-                            ></polyline>
-
-                            <circle 
-                                :cx="getChartData(selectedPerson).lastX" 
-                                :cy="getChartData(selectedPerson).lastY" 
-                                r="12" 
-                                :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'" 
-                                fill-opacity="0.18"
-                            ></circle>
-                            <circle 
-                                :cx="getChartData(selectedPerson).lastX" 
-                                :cy="getChartData(selectedPerson).lastY" 
-                                r="4.5" 
-                                :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'"
-                            ></circle>
+                            <polyline :points="getChartData(selectedPerson).pointsStr" fill="none" :stroke="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            <circle :cx="getChartData(selectedPerson).lastX" :cy="getChartData(selectedPerson).lastY" r="12" :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'" fill-opacity="0.18"></circle>
+                            <circle :cx="getChartData(selectedPerson).lastX" :cy="getChartData(selectedPerson).lastY" r="4.5" :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'"></circle>
                         </svg>
                     </div>
                 </div>
@@ -590,7 +585,239 @@ BloxIndex
         </div>
     </main>
 
-    <!-- Modales -->
+    <!-- NUEVA VISTA DETALLADA Y PANEL DE GESTIÓN DE EMPRESA (COMPANY DASHBOARD) -->
+    <main x-show="selectedCompany" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ compTab: 'overview' }" style="display: none;">
+        <button @click="selectedCompany = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backToCompanies')"></button>
+        
+        <div :class="getContainerGlowClass(selectedCompany)" class="bg-[#121212] p-6 sm:p-8 rounded-2xl border border-neutral-800/90 flex flex-col justify-between shadow-2xl">
+            <!-- Cabecera de la Empresa -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <img :src="selectedCompany?.img" class="w-20 h-20 rounded-2xl object-cover bg-black border border-neutral-700" alt="Company Logo">
+                        <span class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg" x-text="'LVL ' + (selectedCompany?.level || 1)"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h2 class="serif-font text-2xl md:text-3xl font-bold" x-text="selectedCompany?.name"></h2>
+                            <template x-if="isTrillionaire(selectedCompany)">
+                                <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase">👑 TRILLION CORP</span>
+                            </template>
+                        </div>
+                        <div class="text-xs text-neutral-400 mt-1 flex items-center gap-3 flex-wrap">
+                            <span>👑 CEO: <strong class="text-white" x-text="selectedCompany?.ceo"></strong></span>
+                            <span>•</span>
+                            <span>🏷️ <span x-text="selectedCompany?.sector || 'Corporate'"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Editar Empresa (Solo visible para el dueño) -->
+                <template x-if="isCompanyOwner(selectedCompany)">
+                    <button @click="openEditCompanyModal(selectedCompany)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 self-start sm:self-center">
+                        <span>✏️</span> <span x-text="t('editCompanyBtn')"></span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- Pestañas de la Empresa -->
+            <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80 overflow-x-auto max-w-full">
+                <button @click="compTab = 'overview'" :class="compTab === 'overview' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap" x-text="t('wealthHistory')"></button>
+                <button @click="compTab = 'upgrades'" :class="compTab === 'upgrades' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap flex items-center gap-1.5">
+                    <span>⚡</span> <span x-text="t('upgradesTab')"></span>
+                </button>
+                <button @click="compTab = 'team'" :class="compTab === 'team' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap flex items-center gap-1.5">
+                    <span>👥</span> <span x-text="t('teamTab')"></span>
+                </button>
+                <button @click="compTab = 'stats'" :class="compTab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap" x-text="t('stats')"></button>
+            </div>
+
+            <!-- TAB 1: Valoración y Gráfica -->
+            <div x-show="compTab === 'overview'">
+                <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('companyValuationLabel')"></div>
+                <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedCompany?.netWorthValue)"></div>
+                
+                <div class="flex items-center gap-3 text-sm font-semibold mb-7 flex-wrap">
+                    <span :class="selectedCompany?.positive ? 'text-green-400' : 'text-red-500'" x-text="formatDailyChange(selectedCompany)"></span>
+                    <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] px-2.5 py-0.5 rounded-full" x-text="'📈 ' + t('growthBonusLabel') + ': +' + getCompanyGrowthMultiplier(selectedCompany) + '%'"></span>
+                </div>
+
+                <div class="relative mt-2 pt-2">
+                    <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
+                        <defs>
+                            <radialGradient :id="'radial-glow-comp-' + (selectedCompany?.id || 888)" cx="65%" cy="55%" r="50%">
+                                <stop offset="0%" :stop-color="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0.22"/>
+                                <stop offset="100%" :stop-color="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-comp-' + (selectedCompany?.id || 888) + ')'" rx="12"></rect>
+                        <polyline :points="getChartData(selectedCompany).pointsStr" fill="none" :stroke="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        <circle :cx="getChartData(selectedCompany).lastX" :cy="getChartData(selectedCompany).lastY" r="12" :fill="selectedCompany?.positive ? '#22c55e' : '#ef4444'" fill-opacity="0.18"></circle>
+                        <circle :cx="getChartData(selectedCompany).lastX" :cy="getChartData(selectedCompany).lastY" r="4.5" :fill="selectedCompany?.positive ? '#22c55e' : '#ef4444'"></circle>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- TAB 2: Mejoras de Empresa (Gastar dinero personal -> Subir Nivel y Ganancias) -->
+            <div x-show="compTab === 'upgrades'">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-neutral-900/80 border border-neutral-800 p-4 rounded-xl mb-6 gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-white" x-text="t('upgradeHeaderTitle')"></h3>
+                        <p class="text-xs text-neutral-400 mt-0.5" x-text="t('upgradeHeaderDesc')"></p>
+                    </div>
+                    <template x-if="currentUser">
+                        <div class="bg-black/60 border border-neutral-700 px-3.5 py-2 rounded-lg text-right">
+                            <div class="text-[10px] text-neutral-400 uppercase" x-text="t('yourPersonalBalance')"></div>
+                            <div class="text-sm font-bold text-green-400" x-text="formatWorth(currentUser.netWorthValue)"></div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <template x-for="upg in companyUpgradesList" :key="upg.id">
+                        <div class="card-bg border border-neutral-800 p-5 rounded-xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl" x-text="upg.icon"></span>
+                                    <span class="bg-neutral-800 text-neutral-300 text-xs font-bold px-2.5 py-1 rounded-md" x-text="'Nivel ' + getUpgradeLevel(selectedCompany, upg.id)"></span>
+                                </div>
+                                <h4 class="font-bold text-base text-white" x-text="t(upg.titleKey)"></h4>
+                                <p class="text-xs text-neutral-400 mt-1" x-text="t(upg.descKey)"></p>
+                                <div class="mt-3 text-xs text-emerald-400 font-medium" x-text="'+' + upg.bonusPct + '% ' + t('profitPerLevel')"></div>
+                            </div>
+
+                            <div class="mt-5 pt-3 border-t border-neutral-800/80 flex items-center justify-between">
+                                <div>
+                                    <div class="text-[10px] text-neutral-500 uppercase" x-text="t('upgradeCostLabel')"></div>
+                                    <div class="text-sm font-bold text-amber-400" x-text="formatWorth(getUpgradeCost(selectedCompany, upg))"></div>
+                                </div>
+
+                                <template x-if="isCompanyOwner(selectedCompany)">
+                                    <button @click="buyCompanyUpgrade(selectedCompany, upg)" 
+                                            :disabled="!currentUser || currentUser.netWorthValue < getUpgradeCost(selectedCompany, upg)"
+                                            :class="currentUser && currentUser.netWorthValue >= getUpgradeCost(selectedCompany, upg) ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-neutral-800 text-neutral-500 cursor-not-allowed'"
+                                            class="px-4 py-2 rounded-lg text-xs font-semibold transition">
+                                        <span x-text="t('upgradeBtn')"></span>
+                                    </button>
+                                </template>
+                                <template x-if="!isCompanyOwner(selectedCompany)">
+                                    <span class="text-[11px] text-neutral-500 italic" x-text="t('ownerOnlyAction')"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- TAB 3: Equipo e Invitación de Usuarios Reales Registrados -->
+            <div x-show="compTab === 'team'">
+                <!-- Formulario de invitación (Solo dueño) -->
+                <template x-if="isCompanyOwner(selectedCompany)">
+                    <div class="bg-neutral-900/90 border border-neutral-800 p-5 rounded-xl mb-6">
+                        <h3 class="text-sm font-bold text-white mb-1" x-text="t('inviteRealUserTitle')"></h3>
+                        <p class="text-xs text-neutral-400 mb-4" x-text="t('inviteRealUserDesc')"></p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-grow">
+                                <input type="text" x-model="inviteUsernameInput" :placeholder="t('inviteInputPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                
+                                <!-- Lista rápida de usuarios reales registrados en esta sesión/página -->
+                                <div x-show="realRegisteredUsersList.length > 0" class="mt-2 flex flex-wrap gap-1.5 items-center">
+                                    <span class="text-[10px] text-neutral-500" x-text="t('registeredPlayersLabel') + ':'"></span>
+                                    <template x-for="rUser in realRegisteredUsersList" :key="rUser.name">
+                                        <button type="button" @click="inviteUsernameInput = rUser.name" class="text-[11px] bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2 py-0.5 rounded-md transition flex items-center gap-1">
+                                            <img :src="rUser.img" class="w-3.5 h-3.5 rounded-full">
+                                            <span x-text="rUser.name"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                            <button @click="sendCompanyInvite(selectedCompany)" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap self-start">
+                                📩 <span x-text="t('sendInviteBtn')"></span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Lista de Miembros Actuales -->
+                <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3" x-text="t('companyMembersTitle')"></h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <!-- CEO -->
+                    <div class="card-bg border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img :src="getUserAvatarByName(selectedCompany?.ceo)" class="w-10 h-10 rounded-lg object-cover bg-black">
+                            <div>
+                                <div class="text-sm font-bold text-white" x-text="selectedCompany?.ceo"></div>
+                                <div class="text-[11px] text-amber-400 font-semibold">👑 CEO / Fundador</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Socios Invitados -->
+                    <template x-for="member in (selectedCompany?.members || [])" :key="member">
+                        <div class="card-bg border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img :src="getUserAvatarByName(member)" class="w-10 h-10 rounded-lg object-cover bg-black">
+                                <div>
+                                    <div class="text-sm font-bold text-white" x-text="member"></div>
+                                    <div class="text-[11px] text-blue-400" x-text="t('memberRoleLabel')"></div>
+                                </div>
+                            </div>
+                            <template x-if="isCompanyOwner(selectedCompany)">
+                                <button @click="removeCompanyMember(selectedCompany, member)" class="text-xs text-red-400 hover:text-red-300 px-2 py-1">✕</button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Invitaciones Pendientes Enviadas -->
+                <template x-if="selectedCompany?.pendingInvites && selectedCompany.pendingInvites.length > 0">
+                    <div>
+                        <h4 class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2" x-text="t('pendingInvitesTitle')"></h4>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="inv in selectedCompany.pendingInvites" :key="inv">
+                                <span class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-lg flex items-center gap-2">
+                                    <span>⏳</span>
+                                    <span x-text="inv"></span>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- TAB 4: Estadísticas de la Empresa (Incluye Nivel de Empresa) -->
+            <div x-show="compTab === 'stats'" class="space-y-4 text-sm">
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('companyLevelStat')"></span>
+                    <span class="font-bold text-blue-400 text-base" x-text="'Nivel ' + (selectedCompany?.level || 1)"></span>
+                </div>
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('companyRankStat')"></span>
+                    <span class="font-bold text-amber-400" x-text="'#' + getCompanyRank(selectedCompany)"></span>
+                </div>
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('ceoLabel')"></span>
+                    <span class="font-semibold text-white" x-text="selectedCompany?.ceo"></span>
+                </div>
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('growthBonusLabel')"></span>
+                    <span class="font-bold text-green-400" x-text="'+' + getCompanyGrowthMultiplier(selectedCompany) + '% por ciclo'"></span>
+                </div>
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('totalMembersStat')"></span>
+                    <span class="font-medium" x-text="1 + (selectedCompany?.members?.length || 0)"></span>
+                </div>
+                <div class="flex justify-between border-b border-neutral-800 pb-3">
+                    <span class="text-neutral-400" x-text="t('sourceWealth')"></span>
+                    <span class="font-medium" x-text="selectedCompany?.sector || 'Corporate'"></span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL 1: Registro / Login Roblox -->
     <div x-show="showRegisterModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
             <button @click="showRegisterModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -599,11 +826,11 @@ BloxIndex
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('robloxUser')"></label>
-                    <input type="text" x-model="regUsername" placeholder="e.g. Giacolamela" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="ej. Giacolamela" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('password')"></label>
-                    <input type="password" x-model="regPassword" placeholder="••••••••" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="password" x-model="regPassword" @keydown.enter="handleAuthUser()" placeholder="••••••••" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <button @click="handleAuthUser()" :disabled="isRegistering" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center">
                     <span x-show="!isRegistering" x-text="t('authButton')"></span>
@@ -613,6 +840,7 @@ BloxIndex
         </div>
     </div>
 
+    <!-- MODAL 2: Editar Biografía y Rol -->
     <div x-show="showBioModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-lg w-full relative">
             <button @click="showBioModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -639,17 +867,22 @@ BloxIndex
         </div>
     </div>
 
-    <div x-show="showCompanyModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
+    <!-- MODAL 3: Crear Empresa (Con subida desde archivos y apertura automática tras login) -->
+    <div x-show="showCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4 py-6 overflow-y-auto" style="display: none;">
+        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-700 max-w-md w-full relative shadow-2xl my-auto">
             <button @click="showCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
+            
+            <div x-show="isAutoCompanyPrompt" class="inline-block bg-blue-600/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-2" x-text="t('welcomeCompanyBadge')"></div>
+            
             <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('createCompanyTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('createCompanyDesc')"></p>
+            <p class="text-xs text-neutral-400 mb-5" x-text="t('createCompanyDesc')"></p>
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyNameLabel')"></label>
-                    <input type="text" x-model="newCompanyName" placeholder="e.g. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="text" x-model="newCompanyName" placeholder="ej. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
+
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('sourceWealth')"></label>
                     <select x-model="newCompanySector" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -658,26 +891,48 @@ BloxIndex
                         </template>
                     </select>
                 </div>
+
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyInvestmentLabel')"></label>
-                    <input type="number" step="0.1" x-model.number="newCompanyInvestment" placeholder="e.g. 15.0 (Billions)" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="number" step="0.5" min="1" x-model.number="newCompanyInvestment" placeholder="15.0" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <p class="text-[11px] text-neutral-500 mt-1" x-text="t('investmentDeductNote')"></p>
                 </div>
+
+                <!-- Logo desde Archivo Local o URL/Preset -->
                 <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLogoLabel')"></label>
-                    <input type="text" x-model="newCompanyLogo" placeholder="https://..." class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1.5" x-text="t('companyLogoLabel')"></label>
+                    
+                    <div class="flex items-center gap-3 mb-2">
+                        <img :src="newCompanyLogo || presetCompanyLogos[0]" class="w-14 h-14 rounded-xl object-cover bg-black border border-neutral-700 shrink-0" alt="Preview">
+                        <div class="flex-grow">
+                            <label class="cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-neutral-600 inline-flex items-center gap-2 transition w-full justify-center">
+                                <span>📁</span>
+                                <span x-text="t('uploadFromDeviceBtn')"></span>
+                                <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'create')" class="hidden">
+                            </label>
+                            <input type="text" x-model="newCompanyLogo" placeholder="O pega una URL de imagen..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
                     <div class="flex items-center gap-2 mt-2">
+                        <span class="text-[10px] text-neutral-500">Emblemas:</span>
                         <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
-                            <img :src="preset" @click="newCompanyLogo = preset" :class="newCompanyLogo === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-9 h-9 rounded-lg cursor-pointer bg-black object-cover transition" title="Select emblem">
+                            <img :src="preset" @click="newCompanyLogo = preset" :class="newCompanyLogo === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-8 h-8 rounded-lg cursor-pointer bg-black object-cover transition">
                         </template>
                     </div>
                 </div>
-                <button @click="createCompany()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('okayButton')"></button>
+
+                <div class="flex gap-2 pt-2">
+                    <button x-show="isAutoCompanyPrompt" @click="showCompanyModal = false" class="w-1/3 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-3 py-2.5 rounded-lg text-xs font-semibold transition" x-text="t('laterButton')"></button>
+                    <button @click="createCompany()" class="flex-grow bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('launchCompanyBtn')"></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div x-show="showEditCompanyModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
+    <!-- MODAL 4: Editar Empresa (Nombre y Logo desde archivos en cualquier momento) -->
+    <div x-show="showEditCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
+        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
             <button @click="showEditCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
             <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('editCompanyTitle')"></h2>
             <p class="text-xs text-neutral-400 mb-6" x-text="t('editCompanyDesc')"></p>
@@ -688,11 +943,21 @@ BloxIndex
                     <input type="text" x-model="editCompanyNameInput" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyLogoLabel')"></label>
-                    <input type="text" x-model="editCompanyLogoInput" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1.5" x-text="t('companyLogoLabel')"></label>
+                    <div class="flex items-center gap-3 mb-2">
+                        <img :src="editCompanyLogoInput || presetCompanyLogos[0]" class="w-14 h-14 rounded-xl object-cover bg-black border border-neutral-700 shrink-0" alt="Preview">
+                        <div class="flex-grow">
+                            <label class="cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-neutral-600 inline-flex items-center gap-2 transition w-full justify-center">
+                                <span>📁</span>
+                                <span x-text="t('uploadFromDeviceBtn')"></span>
+                                <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'edit')" class="hidden">
+                            </label>
+                            <input type="text" x-model="editCompanyLogoInput" placeholder="O pega una URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2 mt-2">
                         <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
-                            <img :src="preset" @click="editCompanyLogoInput = preset" :class="editCompanyLogoInput === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-9 h-9 rounded-lg cursor-pointer bg-black object-cover transition" title="Select emblem">
+                            <img :src="preset" @click="editCompanyLogoInput = preset" :class="editCompanyLogoInput === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-8 h-8 rounded-lg cursor-pointer bg-black object-cover transition">
                         </template>
                     </div>
                 </div>
@@ -701,11 +966,37 @@ BloxIndex
         </div>
     </div>
 
+    <!-- MODAL 5: Invitaciones de Empresas Recibidas -->
+    <div x-show="showInvitesModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
+        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
+            <button @click="showInvitesModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
+            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('invitesModalTitle')"></h2>
+            <p class="text-xs text-neutral-400 mb-5" x-text="t('invitesModalDesc')"></p>
+
+            <div class="space-y-3">
+                <template x-for="comp in pendingInvitesForCurrentUser" :key="comp.name">
+                    <div class="bg-black/60 border border-neutral-800 p-4 rounded-xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <img :src="comp.img" class="w-11 h-11 rounded-lg object-cover bg-black">
+                            <div>
+                                <div class="text-sm font-bold text-white" x-text="comp.name"></div>
+                                <div class="text-[11px] text-neutral-400" x-text="'CEO: ' + comp.ceo + ' • LVL ' + (comp.level || 1)"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button @click="respondToInvite(comp, true)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
+                            <button @click="respondToInvite(comp, false)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Principal -->
     <script>
         const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
         const GLOBAL_EPOCH_MS = Date.UTC(2026, 0, 1, 0, 0, 0);
-
         const BANNED_COMPANIES = ['apex dynamics', 'nova tech', 'stark industries', 'omnicorp global'];
 
         const AVAILABLE_SECTORS = [
@@ -728,6 +1019,116 @@ BloxIndex
         ];
 
         const translations = {
+            es: {
+                title: "BloxIndex",
+                nextUpdateLabel: "Sincronización Global • Próxima en:",
+                topGainersTitle: "Top 5 Mayores Ganadores",
+                topLosersTitle: "Top 5 Mayores Perdedores",
+                lastCycleTag: "Última Act. 12h",
+                chartSubLabel: "Seguimiento en tiempo real por cada ciclo de 12 horas",
+                top5: "Top 5",
+                top: "Top",
+                women: "Mujeres",
+                companiesTab: "Empresas",
+                categories: "Categorías",
+                searchPlaceholder: "Buscar jugador o empresa...",
+                registerLogin: "Registrarse / Ingresar",
+                wealthHistory: "Historial de Riqueza",
+                biography: "Biografía",
+                stats: "Estadísticas",
+                currentNetWorth: "PATRIMONIO NETO ACTUAL",
+                gaining: "SUBIENDO",
+                dropping: "BAJANDO",
+                sourceWealth: "Trabajo / Sector",
+                gender: "Género",
+                region: "Región",
+                searchResults: "Resultados de búsqueda para",
+                category: "Categoría",
+                womenTitle: "Ranking de Mujeres Multimillonarias",
+                leaderboardTitle: "Ranking de Multimillonarios",
+                companiesTitle: "Top Empresas Creadas por Usuarios",
+                ceoLabel: "CEO / Dueño",
+                membersCount: "socios",
+                noCompaniesTitle: "Aún no hay empresas creadas",
+                noCompaniesDesc: "¡Ingresa con tu cuenta de Roblox para fundar tu propia empresa y competir en el Top!",
+                clearFilters: "Limpiar Filtros",
+                backButton: "← Volver al Ranking",
+                backToCompanies: "← Volver al Top de Empresas",
+                myProfile: "Mi Perfil",
+                editBio: "Editar Perfil y Trabajo",
+                createCompanyMenu: "Crear mi Empresa",
+                manageMyCompany: "Gestionar mi Empresa",
+                invitesMenu: "Invitaciones",
+                logout: "Cerrar sesión",
+                editBioBtn: "✏️ Editar Perfil",
+                editBioTitle: "Editar Perfil y Trabajo / Sector",
+                editBioDesc: "Elige tu trabajo o sector principal y actualiza tu biografía.",
+                saveBioButton: "Guardar Cambios",
+                welcomeCompanyBadge: "¡Bienvenido! Funda tu Imperio",
+                createCompanyTitle: "Crea tu Empresa",
+                createCompanyDesc: "Como nuevo miembro en BloxIndex, funda tu empresa oficial. Sube tu propio logo desde tus archivos y escala en el Top de Empresas.",
+                editCompanyTitle: "Editar Empresa",
+                editCompanyDesc: "Cambia el nombre o sube un nuevo logo desde tus archivos cuando quieras.",
+                editCompanyBtn: "Editar Nombre / Logo",
+                companyNameLabel: "Nombre de la Empresa",
+                companyInvestmentLabel: "Capital Inicial (en Billones $)",
+                investmentDeductNote: "Se invertirá desde tu patrimonio personal para fundar la empresa.",
+                companyLogoLabel: "Logo de la Empresa (Desde tus archivos o URL)",
+                uploadFromDeviceBtn: "Subir desde Archivos",
+                launchCompanyBtn: "Fundar Empresa",
+                laterButton: "Más tarde",
+                modalTitle: "Iniciar Sesión o Registrarse",
+                modalDesc: "Introduce tu usuario de Roblox. ¡Si aún no tienes empresa, podrás crearla al instante!",
+                robloxUser: "Usuario de Roblox",
+                password: "Contraseña",
+                authButton: "Ingresar / Registrarse",
+                verifying: "Verificando cuenta...",
+                bloodMarketLabel: "🩸 Sangre en el mercado (-$1B+ hoy)",
+                peakRank: "Rango Máximo (Peak Rank)",
+                peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
+                firstTrillionaire: "First Trillionaire",
+                fire1: "Fuego Encendido (+$1B/día)",
+                fire5: "Fuego Naranja (+$5B/día)",
+                fire10: "Fuego Amarillo (+$10B/día)",
+                fire15: "Fuego Rojo (+$15B/día)",
+                fire20: "Fuego Verde (+$20B/día)",
+                fire30: "Fuego Azul (+$30B/día)",
+                fire40: "Fuego Morado (+$40B-$50B/día)",
+                // Nuevas traducciones de Empresa
+                upgradesTab: "Mejoras y Nivel",
+                teamTab: "Equipo e Invitar",
+                companyValuationLabel: "VALORACIÓN DE LA EMPRESA",
+                growthBonusLabel: "Bono de Crecimiento",
+                upgradeHeaderTitle: "Invertir y Mejorar la Empresa",
+                upgradeHeaderDesc: "Gasta dinero de tu patrimonio personal para subir el nivel de la empresa y multiplicar sus ganancias en cada ciclo.",
+                yourPersonalBalance: "Tu Dinero Disponible",
+                upgradeCostLabel: "Costo de Mejora",
+                upgradeBtn: "Invertir y Mejorar",
+                ownerOnlyAction: "Solo el CEO puede mejorar",
+                profitPerLevel: "ganancia por nivel",
+                upgTechTitle: "Infraestructura Tech & IA",
+                upgTechDesc: "Automatiza procesos y aumenta la rentabilidad base de la compañía.",
+                upgMarketTitle: "Marketing Global",
+                upgMarketDesc: "Expande la marca a millones de usuarios en Roblox.",
+                upgExpansionTitle: "Sucursales Internacionales",
+                upgExpansionDesc: "Abre sedes corporativas para multiplicar ingresos por ciclo.",
+                upgRdTitle: "Investigación y Desarrollo",
+                upgRdDesc: "Innovaciones exclusivas que disparan el valor de las acciones.",
+                inviteRealUserTitle: "Invitar Usuarios Reales a la Empresa",
+                inviteRealUserDesc: "Escribe el nombre de usuario de Roblox de alguien que haya ingresado en esta página para invitarlo como socio.",
+                inviteInputPlaceholder: "Nombre de usuario registrado...",
+                registeredPlayersLabel: "Usuarios activos en la web",
+                sendInviteBtn: "Enviar Invitación",
+                companyMembersTitle: "Directiva y Socios Actuales",
+                memberRoleLabel: "Socio Corporativo",
+                pendingInvitesTitle: "Invitaciones Pendientes de Aceptar",
+                companyLevelStat: "Nivel de la Empresa",
+                companyRankStat: "Posición en el Top Empresas",
+                totalMembersStat: "Total de Miembros Reales",
+                invitesModalTitle: "Invitaciones de Empresas",
+                invitesModalDesc: "Otros jugadores reales te han invitado a unirte a sus empresas:",
+                acceptBtn: "Unirse"
+            },
             en: {
                 title: "BloxIndex",
                 nextUpdateLabel: "Global Sync • Next update in:",
@@ -746,11 +1147,9 @@ BloxIndex
                 biography: "Biography",
                 stats: "Stats",
                 currentNetWorth: "CURRENT NET WORTH",
-                today: "TODAY",
-                trendLabel: "12H CYCLE NET WORTH PERFORMANCE",
                 gaining: "GAINING VALUE",
                 dropping: "LOSING VALUE",
-                sourceWealth: "Source of Wealth / Role",
+                sourceWealth: "Source of Wealth / Sector",
                 gender: "Gender",
                 region: "Region",
                 searchResults: "Search Results for",
@@ -759,36 +1158,41 @@ BloxIndex
                 leaderboardTitle: "The Billionaires Leaderboard",
                 companiesTitle: "Top User Companies Leaderboard",
                 ceoLabel: "CEO / Owner",
+                membersCount: "partners",
                 noCompaniesTitle: "No user companies created yet",
-                noCompaniesDesc: "Register an account or log in, then click 'Create Company' in your user menu to launch your business empire!",
+                noCompaniesDesc: "Log in with your Roblox account to launch your business empire!",
                 clearFilters: "Clear Filters",
                 backButton: "← Back to Leaderboard",
+                backToCompanies: "← Back to Companies Top",
                 myProfile: "My Profile",
                 editBio: "Edit Profile & Role",
-                createCompanyMenu: "Create Company",
+                createCompanyMenu: "Create my Company",
+                manageMyCompany: "Manage my Company",
+                invitesMenu: "Invitations",
                 logout: "Logout",
                 editBioBtn: "✏️ Edit Profile",
                 editBioTitle: "Edit Profile & Wealth Sector",
-                editBioDesc: "Choose your main role/sector (Tycoons, Investors, etc.) and update your public biography.",
+                editBioDesc: "Choose your main role/sector and update your public biography.",
                 saveBioButton: "Save Changes",
-                createCompanyTitle: "Create a New Company",
-                createCompanyDesc: "Launch a new business empire. Its valuation tracks independently in the Companies leaderboard!",
+                welcomeCompanyBadge: "Welcome! Launch Your Empire",
+                createCompanyTitle: "Create Your Company",
+                createCompanyDesc: "Launch your official company. Upload your logo directly from your files and climb the Companies Leaderboard!",
                 editCompanyTitle: "Edit Company Settings",
-                editCompanyDesc: "Change your company's name or pick a new emblem logo whenever you want.",
+                editCompanyDesc: "Change your company's name or upload a new logo from your files anytime.",
+                editCompanyBtn: "Edit Name / Logo",
                 companyNameLabel: "Company Name",
-                companyInvestmentLabel: "Valuation Amount (in Billions $)",
-                companyLogoLabel: "Company Emblem / Logo URL",
-                okayButton: "Okay",
+                companyInvestmentLabel: "Initial Capital (in Billions $)",
+                investmentDeductNote: "Deducted from your personal net worth to fund the company.",
+                companyLogoLabel: "Company Logo (From files or URL)",
+                uploadFromDeviceBtn: "Browse Files",
+                launchCompanyBtn: "Launch Company",
+                laterButton: "Later",
                 modalTitle: "Login or Register",
-                modalDesc: "Enter your Roblox username. If they already exist in the Hall of Fame, you'll log right into their account!",
+                modalDesc: "Enter your Roblox username. You will be prompted to create your company right after!",
                 robloxUser: "Roblox Username",
                 password: "Password",
                 authButton: "Login / Register",
                 verifying: "Verifying account...",
-                alertLogin: "Welcome back",
-                alertRegister: "Account created successfully! Welcome to the ranking",
-                alertLogout: "You have successfully logged out.",
-                alertErrorUser: "Please enter a Roblox username.",
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Peak Rank",
                 peakNetWorth: "Peak Net Worth",
@@ -799,299 +1203,40 @@ BloxIndex
                 fire15: "Red Fire (+$15B/day)",
                 fire20: "Green Fire (+$20B/day)",
                 fire30: "Blue Fire (+$30B/day)",
-                fire40: "Purple Fire (+$40B-$50B/day)"
-            },
-            es: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Sincronización Global • Próxima en:",
-                topGainersTitle: "Top 5 Mayores Ganadores",
-                topLosersTitle: "Top 5 Mayores Perdedores",
-                lastCycleTag: "Última Act. 12h",
-                chartSubLabel: "Seguimiento en tiempo real por cada ciclo de 12 horas",
-                top5: "Top 5",
-                top: "Top",
-                women: "Mujeres",
-                companiesTab: "Companies",
-                categories: "Categorías",
-                searchPlaceholder: "Buscar jugador o empresa...",
-                registerLogin: "Registrarse / Ingresar",
-                wealthHistory: "Historial de Riqueza",
-                biography: "Biografía",
-                stats: "Estadísticas",
-                currentNetWorth: "PATRIMONIO NETO ACTUAL",
-                today: "HOY",
-                trendLabel: "RENDIMIENTO POR ACTUALIZACIÓN",
-                gaining: "SUBIENDO",
-                dropping: "BAJANDO",
-                sourceWealth: "Trabajo / Fuente de Riqueza",
-                gender: "Género",
-                region: "Región",
-                searchResults: "Resultados de búsqueda para",
-                category: "Categoría",
-                womenTitle: "Ranking de Mujeres Multimillonarias",
-                leaderboardTitle: "Ranking de Multimillonarios",
-                companiesTitle: "Ranking de Compañías Creadas por Usuarios",
-                ceoLabel: "CEO / Dueño",
-                noCompaniesTitle: "Aún no hay empresas creadas por usuarios",
-                noCompaniesDesc: "¡Regístrate o inicia sesión, luego haz clic en 'Crear Empresa' en tu menú de usuario para lanzar tu imperio empresarial!",
-                clearFilters: "Limpiar Filtros",
-                backButton: "← Volver al Ranking",
-                myProfile: "Mi Perfil",
-                editBio: "Editar Perfil y Trabajo",
-                createCompanyMenu: "Crear Empresa",
-                logout: "Cerrar sesión",
-                editBioBtn: "✏️ Editar Perfil",
-                editBioTitle: "Editar Perfil y Trabajo / Sector",
-                editBioDesc: "Elige tu trabajo o sector principal (Tycoons, Investors, etc.) y actualiza tu biografía.",
-                saveBioButton: "Guardar Cambios",
-                createCompanyTitle: "Crear una Nueva Empresa",
-                createCompanyDesc: "Lanza una nueva compañía. ¡Su valoración evoluciona de forma independiente en el ranking de empresas!",
-                editCompanyTitle: "Editar Empresa",
-                editCompanyDesc: "Cambia el nombre de tu empresa o elige un nuevo emblema cuando quieras.",
-                companyNameLabel: "Nombre de la Empresa",
-                companyInvestmentLabel: "Valoración Inicial (en Billones $)",
-                companyLogoLabel: "Emblema Corporativo / URL del Logo",
-                okayButton: "Okay",
-                modalTitle: "Iniciar Sesión o Registrarse",
-                modalDesc: "Introduce tu usuario de Roblox. ¡Si ya existe en el Salón de la Fama, iniciarás sesión directamente en tu cuenta!",
-                robloxUser: "Usuario de Roblox",
-                password: "Contraseña",
-                authButton: "Ingresar / Registrarse",
-                verifying: "Verificando cuenta...",
-                alertLogin: "¡Bienvenido de nuevo",
-                alertRegister: "¡Cuenta creada con éxito! Bienvenido al ranking",
-                alertLogout: "Has cerrado sesión correctamente.",
-                alertErrorUser: "Por favor, introduce un nombre de usuario de Roblox.",
-                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
-                peakRank: "Rango Máximo (Peak Rank)",
-                peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Fuego Encendido (+$1B/día)",
-                fire5: "Fuego Naranja (+$5B/día)",
-                fire10: "Fuego Amarillo (+$10B/día)",
-                fire15: "Fuego Rojo (+$15B/día)",
-                fire20: "Fuego Verde (+$20B/día)",
-                fire30: "Fuego Azul (+$30B/día)",
-                fire40: "Fuego Morado (+$40B-$50B/día)"
-            },
-            it: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Sincronizzazione Globale • Prossimo tra:",
-                topGainersTitle: "Top 5 Maggiori Guadagni",
-                topLosersTitle: "Top 5 Maggiori Perdite",
-                lastCycleTag: "Ultimo Agg. 12h",
-                chartSubLabel: "Monitoraggio per ogni ciclo globale di 12 ore",
-                top5: "Top 5",
-                top: "Top",
-                women: "Donne",
-                companiesTab: "Aziende",
-                categories: "Categorie",
-                searchPlaceholder: "Cerca giocatore o azienda...",
-                registerLogin: "Registrati / Accedi",
-                wealthHistory: "Storico Patrimonio",
-                biography: "Biografia",
-                stats: "Statistiche",
-                currentNetWorth: "PATRIMONIO NETTO ATTUALE",
-                today: "OGGI",
-                trendLabel: "ANDAMENTO PATRIMONIO",
-                gaining: "IN SALITA",
-                dropping: "IN CALO",
-                sourceWealth: "Ruolo / Fonte di Ricchezza",
-                gender: "Genere",
-                region: "Regione",
-                searchResults: "Risultati di ricerca per",
-                category: "Categoria",
-                womenTitle: "Classifica Miliardarie Donne",
-                leaderboardTitle: "Classifica dei Miliardari",
-                companiesTitle: "Classifica Aziende Create dagli Utenti",
-                ceoLabel: "CEO / Proprietario",
-                noCompaniesTitle: "Nessuna azienda creata ancora",
-                noCompaniesDesc: "Registrati o accedi, poi clicca su 'Crea Azienda' nel menu utente per lanciare il tuo impero!",
-                clearFilters: "Cancella Filtri",
-                backButton: "← Torna alla Classifica",
-                myProfile: "Il Mio Profilo",
-                editBio: "Modifica Profilo e Ruolo",
-                createCompanyMenu: "Crea Azienda",
-                logout: "Disconnetti",
-                editBioBtn: "✏️ Modifica Profilo",
-                editBioTitle: "Modifica Profilo e Settore",
-                editBioDesc: "Scegli il tuo ruolo principale (Tycoons, Investors, ecc.) e aggiorna la biografia.",
-                saveBioButton: "Salva Modifiche",
-                createCompanyTitle: "Crea una Nuova Azienda",
-                createCompanyDesc: "Lancia una nuova azienda. La sua valutazione cresce indipendentemente nella classifica Aziende!",
-                editCompanyTitle: "Modifica Azienda",
-                editCompanyDesc: "Cambia il nome della tua azienda o scegli un nuovo emblema quando vuoi.",
-                companyNameLabel: "Nome dell'Azienda",
-                companyInvestmentLabel: "Valutazione Iniziale (in Miliardi $)",
-                companyLogoLabel: "Emblema Aziendale / URL Logo",
-                okayButton: "Okay",
-                modalTitle: "Accedi o Registrati",
-                modalDesc: "Inserisci il tuo nome utente Roblox. Se esisti già nella Hall of Fame, accederai direttamente!",
-                robloxUser: "Nome Utente Roblox",
-                password: "Password",
-                authButton: "Accedi / Registrati",
-                verifying: "Verifica account...",
-                alertLogin: "Bentornato",
-                alertRegister: "Account creato con successo! Benvenuto nella classifica",
-                alertLogout: "Disconnessione effettuata con successo.",
-                alertErrorUser: "Inserisci un nome utente Roblox.",
-                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
-                peakRank: "Miglior Posizione",
-                peakNetWorth: "Patrimonio Massimo",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Fuoco Acceso (+$1B/giorno)",
-                fire5: "Fuoco Arancione (+$5B/giorno)",
-                fire10: "Fuoco Giallo (+$10B/giorno)",
-                fire15: "Fuoco Rosso (+$15B/giorno)",
-                fire20: "Fuoco Verde (+$20B/giorno)",
-                fire30: "Fuoco Blu (+$30B/giorno)",
-                fire40: "Fuoco Viola (+$40B-$50B/giorno)"
-            },
-            pt: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Sincronização Global • Próxima em:",
-                topGainersTitle: "Top 5 Maiores Ganhadores",
-                topLosersTitle: "Top 5 Maiores Perdedores",
-                lastCycleTag: "Última Att. 12h",
-                chartSubLabel: "Acompanhado a cada ciclo global de 12 horas",
-                top5: "Top 5",
-                top: "Top",
-                women: "Mulheres",
-                companiesTab: "Empresas",
-                categories: "Categorias",
-                searchPlaceholder: "Pesquisar jogador ou empresa...",
-                registerLogin: "Registrar / Entrar",
-                wealthHistory: "Histórico de Riqueza",
-                biography: "Biografia",
-                stats: "Estatísticas",
-                currentNetWorth: "PATRIMÔNIO LÍQUIDO ATUAL",
-                today: "HOJE",
-                trendLabel: "DESEMPENHO DE PATRIMÔNIO",
-                gaining: "SUBINDO",
-                dropping: "CAINDO",
-                sourceWealth: "Trabalho / Fonte de Riqueza",
-                gender: "Gênero",
-                region: "Região",
-                searchResults: "Resultados da pesquisa para",
-                category: "Categoria",
-                womenTitle: "Ranking de Mulheres Bilionárias",
-                leaderboardTitle: "Ranking dos Bilionários",
-                companiesTitle: "Ranking de Empresas Criadas por Usuários",
-                ceoLabel: "CEO / Dono",
-                noCompaniesTitle: "Nenhuma empresa criada ainda",
-                noCompaniesDesc: "Registre uma conta ou faça login e clique em 'Criar Empresa' no seu menu para lançar seu império!",
-                clearFilters: "Limpar Filtros",
-                backButton: "← Voltar ao Ranking",
-                myProfile: "Meu Perfil",
-                editBio: "Editar Perfil e Trabalho",
-                createCompanyMenu: "Criar Empresa",
-                logout: "Sair",
-                editBioBtn: "✏️ Editar Perfil",
-                editBioTitle: "Editar Perfil e Setor de Riqueza",
-                editBioDesc: "Escolha seu papel principal (Tycoons, Investors, etc.) e atualize sua biografia.",
-                saveBioButton: "Salvar Alterações",
-                createCompanyTitle: "Criar uma Nova Empresa",
-                createCompanyDesc: "Lance um novo império empresarial. Sua avaliação evolui de forma independente no ranking de Empresas!",
-                editCompanyTitle: "Editar Empresa",
-                editCompanyDesc: "Mude o nome da sua empresa ou escolha un novo emblema quando quiser.",
-                companyNameLabel: "Nome da Empresa",
-                companyInvestmentLabel: "Avaliação Inicial (em Bilhões $)",
-                companyLogoLabel: "Emblema Corporativo / URL do Logo",
-                okayButton: "Okay",
-                modalTitle: "Entrar ou Registrar",
-                modalDesc: "Digite seu nome de usuário do Roblox. Se já existir no Hall da Fama, você entrará direto na sua conta!",
-                robloxUser: "Usuário do Roblox",
-                password: "Senha",
-                authButton: "Entrar / Registrar",
-                verifying: "Verificando conta...",
-                alertLogin: "Bem-vindo de volta",
-                alertRegister: "Conta criada com sucesso! Bem-vindo ao ranking",
-                alertLogout: "Você saiu da conta com sucesso.",
-                alertErrorUser: "Por favor, insira um nome de usuário do Roblox.",
-                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
-                peakRank: "Melhor Posição",
-                peakNetWorth: "Patrimônio Máximo",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Fogo Aceso (+$1B/dia)",
-                fire5: "Fogo Laranja (+$5B/dia)",
-                fire10: "Fogo Amarelo (+$10B/dia)",
-                fire15: "Fogo Vermelho (+$15B/dia)",
-                fire20: "Fogo Verde (+$20B/dia)",
-                fire30: "Fogo Azul (+$30B/dia)",
-                fire40: "Fogo Roxo (+$40B-$50B/dia)"
-            },
-            de: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Globale Synchronisierung • Nächstes in:",
-                topGainersTitle: "Top 5 Größte Gewinner",
-                topLosersTitle: "Top 5 Größte Verlierer",
-                lastCycleTag: "Letztes 12h-Update",
-                chartSubLabel: "Verfolgt über jeden globalen 12-Stunden-Zyklus",
-                top5: "Top 5",
-                top: "Top",
-                women: "Frauen",
-                companiesTab: "Unternehmen",
-                categories: "Kategorien",
-                searchPlaceholder: "Spieler oder Firma suchen...",
-                registerLogin: "Registrieren / Login",
-                wealthHistory: "Vermögensverlauf",
-                biography: "Biografie",
-                stats: "Statistiken",
-                currentNetWorth: "AKTUELLES NETTOVERMÖGEN",
-                today: "HEUTE",
-                trendLabel: "VERMÖGENSENTWICKLUNG",
-                gaining: "STEIGEND",
-                dropping: "FALLEND",
-                sourceWealth: "Rolle / Vermögensquelle",
-                gender: "Geschlecht",
-                region: "Region",
-                searchResults: "Suchergebnisse für",
-                category: "Kategorie",
-                womenTitle: "Milliardärinnen-Rangliste",
-                leaderboardTitle: "Die Milliardärs-Rangliste",
-                companiesTitle: "Top-Benutzerunternehmen Rangliste",
-                ceoLabel: "CEO / Eigentümer",
-                noCompaniesTitle: "Noch keine Unternehmen erstellt",
-                noCompaniesDesc: "Registriere dich oder melde dich an und klicke im Benutzermenü auf 'Unternehmen gründen'!",
-                clearFilters: "Filter zurücksetzen",
-                backButton: "← Zurück zur Rangliste",
-                myProfile: "Mein Profil",
-                editBio: "Profil & Rolle bearbeiten",
-                createCompanyMenu: "Unternehmen gründen",
-                logout: "Abmelden",
-                editBioBtn: "✏️ Profil bearbeiten",
-                editBioTitle: "Profil & Vermögenssektor bearbeiten",
-                editBioDesc: "Wähle deine Hauptrolle (Tycoons, Investors usw.) und aktualisiere deine Biografie.",
-                saveBioButton: "Änderungen speichern",
-                createCompanyTitle: "Neues Unternehmen gründen",
-                createCompanyDesc: "Starte ein neues Unternehmen. Die Bewertung entwickelt sich unabhängig in der Unternehmens-Rangliste!",
-                editCompanyTitle: "Unternehmen bearbeiten",
-                editCompanyDesc: "Ändere den Namen deines Unternehmens oder wähle jederzeit ein neues Emblem.",
-                companyNameLabel: "Unternehmensname",
-                companyInvestmentLabel: "Startbewertung (in Milliarden $)",
-                companyLogoLabel: "Firmenemblem / Logo-URL",
-                okayButton: "Okay",
-                modalTitle: "Anmelden oder Registrieren",
-                modalDesc: "Gib deinen Roblox-Benutzernamen ein. Wenn du bereits existierst, wirst du direkt eingeloggt!",
-                robloxUser: "Roblox-Benutzername",
-                password: "Passwort",
-                authButton: "Login / Registrieren",
-                verifying: "Konto wird überprüft...",
-                alertLogin: "Willkommen zurück",
-                alertRegister: "Konto erfolgreich erstellt! Willkommen in der Rangliste",
-                alertLogout: "Du hast dich erfolgreich abgemeldet.",
-                alertErrorUser: "Bitte gib einen Roblox-Benutzernamen ein.",
-                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
-                peakRank: "Höchster Rang",
-                peakNetWorth: "Höchstes Nettovermögen",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Entfachtes Feuer (+$1B/Tag)",
-                fire5: "Oranges Feuer (+$5B/Tag)",
-                fire10: "Gelbes Feuer (+$10B/Tag)",
-                fire15: "Rotes Feuer (+$15B/Tag)",
-                fire20: "Grünes Feuer (+$20B/Tag)",
-                fire30: "Blaues Feuer (+$30B/Tag)",
-                fire40: "Violettes Feuer (+$40B-$50B/Tag)"
+                fire40: "Purple Fire (+$40B-$50B/day)",
+                upgradesTab: "Upgrades & Level",
+                teamTab: "Team & Invite",
+                companyValuationLabel: "COMPANY VALUATION",
+                growthBonusLabel: "Growth Bonus",
+                upgradeHeaderTitle: "Invest & Upgrade Company",
+                upgradeHeaderDesc: "Spend personal money to level up your company and earn higher profits every cycle.",
+                yourPersonalBalance: "Your Available Money",
+                upgradeCostLabel: "Upgrade Cost",
+                upgradeBtn: "Invest & Upgrade",
+                ownerOnlyAction: "CEO only",
+                profitPerLevel: "profit per level",
+                upgTechTitle: "AI & Tech Infrastructure",
+                upgTechDesc: "Automate operations and boost base company returns.",
+                upgMarketTitle: "Global Marketing",
+                upgMarketDesc: "Expand brand reach across millions of Roblox players.",
+                upgExpansionTitle: "Global Branches",
+                upgExpansionDesc: "Open international offices to multiply cycle revenue.",
+                upgRdTitle: "Research & Development",
+                upgRdDesc: "Breakthrough innovations that skyrocket stock value.",
+                inviteRealUserTitle: "Invite Real Users to Company",
+                inviteRealUserDesc: "Enter the Roblox username of someone who logged into this page to invite them.",
+                inviteInputPlaceholder: "Registered username...",
+                registeredPlayersLabel: "Active web users",
+                sendInviteBtn: "Send Invite",
+                companyMembersTitle: "Current Board & Partners",
+                memberRoleLabel: "Corporate Partner",
+                pendingInvitesTitle: "Pending Invitations",
+                companyLevelStat: "Company Level",
+                companyRankStat: "Companies Top Rank",
+                totalMembersStat: "Total Real Members",
+                invitesModalTitle: "Company Invitations",
+                invitesModalDesc: "Real players invited you to join their companies:",
+                acceptBtn: "Join"
             }
         };
 
@@ -1216,24 +1361,40 @@ BloxIndex
 
         function getBaseCompanies() {
             return [
-                { id: 1, name: 'Omega AI', netWorthValue: 14.5, changeVal: -0.5, positive: false, history: [], img: OMEGA_LOGO_SVG, ceo: 'Giacolamela' }
+                {
+                    id: 1,
+                    name: 'Omega AI',
+                    netWorthValue: 14.5,
+                    changeVal: 1.2,
+                    positive: true,
+                    history: [13.3, 14.5],
+                    img: OMEGA_LOGO_SVG,
+                    ceo: 'Giacolamela',
+                    sector: 'Technology & AI',
+                    level: 2,
+                    upgrades: { tech: 1, marketing: 0, expansion: 0, rd: 0 },
+                    members: [],
+                    pendingInvites: []
+                }
             ];
         }
 
         function empireApp() {
             return {
-                lang: 'en',
+                lang: 'es',
                 currentFilter: 'all',
-                activeTab: 'wealth',
                 selectedCategory: null,
                 selectedPerson: null,
+                selectedCompany: null,
                 selectedTop5Person: null,
                 showRegisterModal: false,
                 showCategoriesDropdown: false,
                 showUserMenu: false,
                 showBioModal: false,
                 showCompanyModal: false,
+                isAutoCompanyPrompt: false,
                 showEditCompanyModal: false,
+                showInvitesModal: false,
                 editingCompany: null,
                 editCompanyNameInput: '',
                 editCompanyLogoInput: '',
@@ -1243,6 +1404,7 @@ BloxIndex
                 newCompanySector: 'Technology & AI',
                 newCompanyInvestment: 15.0,
                 newCompanyLogo: '',
+                inviteUsernameInput: '',
                 presetCompanyLogos: PRESET_COMPANY_LOGOS,
                 allSectors: AVAILABLE_SECTORS,
                 searchQuery: '',
@@ -1250,6 +1412,7 @@ BloxIndex
                 regPassword: '',
                 isRegistering: false,
                 currentUser: null,
+                registeredUsers: [],
                 people: [],
                 companies: [],
                 firstTrillionaireName: null,
@@ -1257,9 +1420,39 @@ BloxIndex
                 nextUpdateTimestamp: 0,
                 timeRemainingMs: TWELVE_HOURS_MS,
                 timerInterval: null,
-                t(key) {
-                    return translations[this.lang]?.[key] || translations['en'][key] || key;
+                toastMessage: '',
+                toastIcon: 'ℹ️',
+                toastTimeout: null,
+
+                companyUpgradesList: [
+                    { id: 'tech', icon: '🤖', titleKey: 'upgTechTitle', descKey: 'upgTechDesc', baseCost: 5.0, bonusPct: 1.5 },
+                    { id: 'marketing', icon: '📢', titleKey: 'upgMarketTitle', descKey: 'upgMarketDesc', baseCost: 4.0, bonusPct: 1.2 },
+                    { id: 'expansion', icon: '🌐', titleKey: 'upgExpansionTitle', descKey: 'upgExpansionDesc', baseCost: 8.0, bonusPct: 2.2 },
+                    { id: 'rd', icon: '🧬', titleKey: 'upgRdTitle', descKey: 'upgRdDesc', baseCost: 12.0, bonusPct: 3.0 }
+                ],
+
+                notify(msg, icon = '✨') {
+                    this.toastMessage = msg;
+                    this.toastIcon = icon;
+                    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+                    this.toastTimeout = setTimeout(() => {
+                        this.toastMessage = '';
+                    }, 4500);
                 },
+
+                t(key) {
+                    return translations[this.lang]?.[key] || translations['es'][key] || translations['en'][key] || key;
+                },
+
+                resetViews(filterName) {
+                    this.currentFilter = filterName;
+                    this.selectedCategory = null;
+                    this.selectedPerson = null;
+                    this.selectedCompany = null;
+                    this.showCategoriesDropdown = false;
+                    this.searchQuery = '';
+                },
+
                 get formattedCountdown() {
                     let totalSeconds = Math.max(0, Math.floor(this.timeRemainingMs / 1000));
                     let hours = Math.floor(totalSeconds / 3600);
@@ -1268,22 +1461,86 @@ BloxIndex
                     const pad = (n) => String(n).padStart(2, '0');
                     return `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
                 },
+
                 get top5Gainers() {
                     return [...this.people]
                         .filter(p => p.changeVal > 0)
                         .sort((a, b) => b.changeVal - a.changeVal)
                         .slice(0, 5);
                 },
+
                 get top5Losers() {
                     return [...this.people]
                         .filter(p => p.changeVal < 0)
                         .sort((a, b) => a.changeVal - b.changeVal)
                         .slice(0, 5);
                 },
+
+                get userOwnedCompany() {
+                    if (!this.currentUser) return null;
+                    return this.companies.find(c => c.ceo.toLowerCase() === this.currentUser.name.toLowerCase()) || null;
+                },
+
+                get pendingInvitesForCurrentUser() {
+                    if (!this.currentUser) return [];
+                    const uLower = this.currentUser.name.toLowerCase();
+                    return this.companies.filter(c => 
+                        Array.isArray(c.pendingInvites) && 
+                        c.pendingInvites.some(inv => inv.toLowerCase() === uLower)
+                    );
+                },
+
+                get realRegisteredUsersList() {
+                    if (!this.currentUser) return this.registeredUsers;
+                    return this.registeredUsers.filter(u => u.name.toLowerCase() !== this.currentUser.name.toLowerCase());
+                },
+
+                isCompanyOwner(comp) {
+                    if (!comp || !this.currentUser) return false;
+                    return comp.ceo.toLowerCase() === this.currentUser.name.toLowerCase();
+                },
+
+                getCompanyRank(comp) {
+                    if (!comp) return 1;
+                    let sorted = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    let idx = sorted.findIndex(c => c.name.toLowerCase() === comp.name.toLowerCase());
+                    return idx >= 0 ? idx + 1 : 1;
+                },
+
+                getUpgradeLevel(comp, upgId) {
+                    if (!comp || !comp.upgrades) return 0;
+                    return comp.upgrades[upgId] || 0;
+                },
+
+                getUpgradeCost(comp, upg) {
+                    const lvl = this.getUpgradeLevel(comp, upg.id);
+                    return Number((upg.baseCost * Math.pow(1.45, lvl)).toFixed(1));
+                },
+
+                getCompanyGrowthMultiplier(comp) {
+                    if (!comp || !comp.upgrades) return "0.0";
+                    let totalBonus = 0;
+                    this.companyUpgradesList.forEach(upg => {
+                        totalBonus += (comp.upgrades[upg.id] || 0) * upg.bonusPct;
+                    });
+                    return totalBonus.toFixed(1);
+                },
+
+                getUserAvatarByName(username) {
+                    if (!username) return PRESET_COMPANY_LOGOS[0];
+                    const lower = username.toLowerCase();
+                    const reg = this.registeredUsers.find(u => u.name.toLowerCase() === lower);
+                    if (reg && reg.img) return reg.img;
+                    const pers = this.people.find(p => p.name.toLowerCase() === lower);
+                    if (pers && pers.img) return pers.img;
+                    return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
+                },
+
                 changeLanguage(newLang) {
                     this.lang = newLang;
                     localStorage.setItem('empire_lang', newLang);
                 },
+
                 formatWorth(val) {
                     if (val === undefined || val === null) return '$0B';
                     if (val >= 1000) {
@@ -1292,9 +1549,11 @@ BloxIndex
                     }
                     return val % 1 === 0 ? '$' + val.toFixed(0) + 'B' : '$' + val.toFixed(1) + 'B';
                 },
+
                 isTrillionaire(item) {
                     return item && item.netWorthValue >= 1000;
                 },
+
                 getTrillionaireLabel(item) {
                     if (!this.isTrillionaire(item)) return '';
                     if (this.firstTrillionaireName && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
@@ -1302,9 +1561,11 @@ BloxIndex
                     }
                     return '';
                 },
+
                 hasDailyChange(item) {
                     return item && item.changeVal !== undefined && item.changeVal !== 0;
                 },
+
                 formatDailyChange(item) {
                     if (!this.hasDailyChange(item)) return '▲ +$0B (0.0%)';
                     let prevWorth = item.netWorthValue - item.changeVal;
@@ -1323,9 +1584,11 @@ BloxIndex
                     let pctSign = percentage >= 0 ? '+' : '';
                     return `${symbol} ${sign}${valStr} (${pctSign}${percentage.toFixed(1)}%)`;
                 },
+
                 isBloodActive(item) {
                     return item && item.changeVal !== undefined && item.changeVal <= -1.0;
                 },
+
                 getFireTier(item) {
                     if (!item || item.changeVal === undefined || item.changeVal < 1.0) return 0;
                     const gain = item.changeVal;
@@ -1337,22 +1600,27 @@ BloxIndex
                     if (gain >= 5) return 5;
                     return 1;
                 },
+
                 hasFire(item) {
                     return this.getFireTier(item) > 0;
                 },
+
                 getFireBadgeClass(item) {
                     const tier = this.getFireTier(item);
                     return tier > 0 ? `fire-tier-${tier}` : '';
                 },
+
                 getContainerGlowClass(item) {
                     if (this.isBloodActive(item)) return 'blood-glow';
                     const tier = this.getFireTier(item);
                     return tier > 0 ? `glow-tier-${tier}` : '';
                 },
+
                 getFireLabel(item) {
                     const tier = this.getFireTier(item);
                     return tier > 0 ? this.t(`fire${tier}`) : '';
                 },
+
                 getChartData(item) {
                     if (!item) return { pointsStr: '10,85 440,85', lastX: 440, lastY: 85 };
                     let vals = (item.history && item.history.length >= 2) ? [...item.history] : [item.netWorthValue - (item.changeVal || 0), item.netWorthValue];
@@ -1390,13 +1658,16 @@ BloxIndex
                         lastY: last.y
                     };
                 },
+
                 get top5People() {
                     return this.people.slice(0, 5);
                 },
+
                 get uniqueCategories() {
                     let combined = new Set([...AVAILABLE_SECTORS, ...this.people.map(p => p.source)]);
                     return Array.from(combined).sort();
                 },
+
                 get displayedPeople() {
                     if (this.currentFilter === 'companies') {
                         let list = this.companies;
@@ -1404,7 +1675,7 @@ BloxIndex
                             let q = this.searchQuery.toLowerCase();
                             list = list.filter(c => c.name.toLowerCase().includes(q) || c.ceo.toLowerCase().includes(q));
                         }
-                        return list.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                        return [...list].sort((a, b) => b.netWorthValue - a.netWorthValue);
                     }
 
                     let list = this.people;
@@ -1418,43 +1689,68 @@ BloxIndex
                             list = list.filter(p => p.source === this.selectedCategory);
                         }
                     }
-                    return list.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    return [...list].sort((a, b) => b.netWorthValue - a.netWorthValue);
                 },
+
                 openProfile(person) {
+                    this.selectedCompany = null;
                     this.selectedPerson = person;
                 },
-                openCompanyProfile(company) {
-                    if (this.currentUser && this.currentUser.name.toLowerCase() === company.ceo.toLowerCase()) {
-                        this.editingCompany = company;
-                        this.editCompanyNameInput = company.name;
-                        this.editCompanyLogoInput = company.img;
-                        this.showEditCompanyModal = true;
-                    } else {
-                        this.selectedPerson = {
-                            name: company.name,
-                            netWorthValue: company.netWorthValue,
-                            peakNetWorth: company.netWorthValue,
-                            peakRank: 1,
-                            changeVal: company.changeVal,
-                            positive: company.positive,
-                            history: company.history || [company.netWorthValue],
-                            img: company.img,
-                            bio: [`Company founded and operated by CEO ${company.ceo}.`, `Current valuation: ${this.formatWorth(company.netWorthValue)}.`],
-                            country: 'Global',
-                            source: 'User Enterprise',
-                            gender: 'Company'
-                        };
+
+                openCompanyDashboard(company) {
+                    this.selectedPerson = null;
+                    if (!company.upgrades) company.upgrades = { tech: 0, marketing: 0, expansion: 0, rd: 0 };
+                    if (!company.level) company.level = 1;
+                    if (!company.members) company.members = [];
+                    if (!company.pendingInvites) company.pendingInvites = [];
+                    this.selectedCompany = company;
+                },
+
+                openEditCompanyModal(company) {
+                    this.editingCompany = company;
+                    this.editCompanyNameInput = company.name;
+                    this.editCompanyLogoInput = company.img;
+                    this.showEditCompanyModal = true;
+                },
+
+                // Subir imagen desde archivos locales (FileReader -> DataURL)
+                handleLogoFileUpload(event, mode) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) {
+                        this.notify('Por favor selecciona un archivo de imagen válido.', '⚠️');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (mode === 'create') {
+                            this.newCompanyLogo = e.target.result;
+                        } else {
+                            this.editCompanyLogoInput = e.target.result;
+                        }
+                        this.notify('Imagen cargada correctamente desde tus archivos.', '🖼️');
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                saveCompaniesToStorage() {
+                    try {
+                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
+                    } catch (e) {
+                        console.error('Error guardando empresas (posible límite de almacenamiento por imagen muy pesada)', e);
+                        this.notify('Aviso: La imagen es muy grande para guardar en caché local, usa una más ligera si no persiste.', '⚠️');
                     }
                 },
+
                 saveCompanyChanges() {
                     if (!this.editingCompany) return;
                     let newName = this.editCompanyNameInput.trim();
                     if (!newName) {
-                        alert('Company name cannot be empty.');
+                        this.notify('El nombre de la empresa no puede estar vacío.', '⚠️');
                         return;
                     }
                     if (BANNED_COMPANIES.includes(newName.toLowerCase())) {
-                        alert('That company name is not allowed.');
+                        this.notify('Ese nombre de empresa no está permitido.', '🚫');
                         return;
                     }
                     let newLogo = this.editCompanyLogoInput.trim() || OMEGA_LOGO_SVG;
@@ -1462,15 +1758,12 @@ BloxIndex
                     this.editingCompany.name = newName;
                     this.editingCompany.img = newLogo;
                     
-                    try {
-                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
-                    } catch(e) {
-                        console.error('Error updating company', e);
-                    }
+                    this.saveCompaniesToStorage();
                     this.showEditCompanyModal = false;
                     this.editingCompany = null;
-                    alert('Company details updated successfully!');
+                    this.notify('¡Nombre y logo de la empresa actualizados!', '✅');
                 },
+
                 openBioEditor(person) {
                     if (!person) person = this.currentUser;
                     if (!person) return;
@@ -1478,25 +1771,49 @@ BloxIndex
                     this.tempSource = person.source || 'Tycoons';
                     this.showBioModal = true;
                 },
-                openCompanyModal() {
+
+                openCompanyModal(isAuto = false) {
                     if (!this.currentUser) return;
+                    this.isAutoCompanyPrompt = isAuto;
                     this.newCompanyName = '';
                     this.newCompanySector = 'Technology & AI';
-                    this.newCompanyInvestment = 15.0;
+                    this.newCompanyInvestment = Math.min(15.0, Math.max(5.0, Number((this.currentUser.netWorthValue * 0.15).toFixed(1))));
                     this.newCompanyLogo = OMEGA_LOGO_SVG;
                     this.showCompanyModal = true;
                 },
+
                 createCompany() {
+                    if (!this.currentUser) return;
                     if (!this.newCompanyName || !this.newCompanyName.trim()) {
-                        alert('Please enter a company name.');
+                        this.notify('Por favor, escribe un nombre para tu empresa.', '⚠️');
                         return;
                     }
                     let compName = this.newCompanyName.trim();
                     if (BANNED_COMPANIES.includes(compName.toLowerCase())) {
-                        alert('That company name is removed.');
+                        this.notify('Ese nombre de empresa está restringido.', '🚫');
                         return;
                     }
+                    if (this.companies.some(c => c.name.toLowerCase() === compName.toLowerCase())) {
+                        this.notify('Ya existe una empresa con ese nombre en el ranking.', '⚠️');
+                        return;
+                    }
+
                     let investment = Number((parseFloat(this.newCompanyInvestment) || 10.0).toFixed(1));
+                    if (investment <= 0) investment = 5.0;
+
+                    if (this.currentUser.netWorthValue < investment) {
+                        this.notify('No tienes suficiente patrimonio personal para esa inversión inicial.', '💸');
+                        return;
+                    }
+
+                    // Descontar inversión del patrimonio personal del usuario
+                    this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - investment).toFixed(1));
+                    let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
+                    if (personInList) {
+                        personInList.netWorthValue = this.currentUser.netWorthValue;
+                    }
+                    localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
+
                     let logoUrl = this.newCompanyLogo.trim() || OMEGA_LOGO_SVG;
 
                     let newCompanyEntry = {
@@ -1505,23 +1822,126 @@ BloxIndex
                         netWorthValue: investment,
                         changeVal: 1.0,
                         positive: true,
-                        history: [investment - 1.0, investment],
+                        history: [Number((investment * 0.9).toFixed(1)), investment],
                         img: logoUrl,
-                        ceo: this.currentUser.name
+                        ceo: this.currentUser.name,
+                        sector: this.newCompanySector,
+                        level: 1,
+                        upgrades: { tech: 0, marketing: 0, expansion: 0, rd: 0 },
+                        members: [],
+                        pendingInvites: []
                     };
 
                     this.companies.push(newCompanyEntry);
                     this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
-
-                    try {
-                        localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
-                    } catch (e) {
-                        console.error('Error saving company', e);
-                    }
+                    this.saveCompaniesToStorage();
 
                     this.showCompanyModal = false;
-                    alert(`Company "${compName}" successfully created by ${this.currentUser.name}!`);
+                    this.currentFilter = 'companies';
+                    this.openCompanyDashboard(newCompanyEntry);
+                    this.notify(`¡Empresa "${compName}" fundada y añadida al Top de Empresas!`, '🏢');
                 },
+
+                // Comprar mejora de empresa (Gasta dinero personal, sube nivel y valor)
+                buyCompanyUpgrade(company, upg) {
+                    if (!this.isCompanyOwner(company) || !this.currentUser) return;
+                    const cost = this.getUpgradeCost(company, upg);
+                    if (this.currentUser.netWorthValue < cost) {
+                        this.notify('No tienes suficiente dinero personal para esta mejora.', '💸');
+                        return;
+                    }
+
+                    // El usuario pierde dinero personal al invertirlo
+                    this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - cost).toFixed(1));
+                    let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
+                    if (personInList) {
+                        personInList.netWorthValue = this.currentUser.netWorthValue;
+                    }
+                    localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
+
+                    // Sube el nivel de la mejora, el nivel general de la empresa y su valoración
+                    if (!company.upgrades) company.upgrades = { tech: 0, marketing: 0, expansion: 0, rd: 0 };
+                    company.upgrades[upg.id] = (company.upgrades[upg.id] || 0) + 1;
+                    company.level = (company.level || 1) + 1;
+
+                    // La valoración de la empresa sube por la inversión + rentabilidad inmediata
+                    const addedValue = Number((cost * 1.15).toFixed(1));
+                    company.netWorthValue = Number((company.netWorthValue + addedValue).toFixed(1));
+                    company.changeVal = Number(((company.changeVal || 0) + addedValue).toFixed(1));
+                    company.positive = true;
+                    company.history.push(company.netWorthValue);
+
+                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    this.saveCompaniesToStorage();
+                    this.notify(`¡${company.name} subió a Nivel ${company.level}! Ganancias potenciadas.`, '🚀');
+                },
+
+                // Invitar usuarios reales que hayan entrado en la página
+                sendCompanyInvite(company) {
+                    if (!this.isCompanyOwner(company)) return;
+                    const targetName = this.inviteUsernameInput.trim();
+                    if (!targetName) {
+                        this.notify('Escribe el nombre de usuario de Roblox que deseas invitar.', '⚠️');
+                        return;
+                    }
+                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
+                        this.notify('Ya eres el CEO de esta empresa.', '👑');
+                        return;
+                    }
+
+                    // Verificar que sea un usuario real que haya entrado a la página
+                    const realUser = this.registeredUsers.find(u => u.name.toLowerCase() === targetName.toLowerCase());
+                    if (!realUser) {
+                        this.notify(`"${targetName}" aún no ha ingresado a esta página con su cuenta.`, '🔍');
+                        return;
+                    }
+
+                    if (!company.members) company.members = [];
+                    if (!company.pendingInvites) company.pendingInvites = [];
+
+                    if (company.members.some(m => m.toLowerCase() === realUser.name.toLowerCase())) {
+                        this.notify(`${realUser.name} ya es miembro de tu empresa.`, 'ℹ️');
+                        return;
+                    }
+                    if (company.pendingInvites.some(i => i.toLowerCase() === realUser.name.toLowerCase())) {
+                        this.notify(`Ya enviaste una invitación a ${realUser.name}.`, '⏳');
+                        return;
+                    }
+
+                    company.pendingInvites.push(realUser.name);
+                    this.inviteUsernameInput = '';
+                    this.saveCompaniesToStorage();
+                    this.notify(`¡Invitación enviada a ${realUser.name}!`, '📩');
+                },
+
+                respondToInvite(company, accept) {
+                    if (!this.currentUser) return;
+                    const uLower = this.currentUser.name.toLowerCase();
+                    company.pendingInvites = (company.pendingInvites || []).filter(i => i.toLowerCase() !== uLower);
+
+                    if (accept) {
+                        if (!company.members) company.members = [];
+                        if (!company.members.some(m => m.toLowerCase() === uLower)) {
+                            company.members.push(this.currentUser.name);
+                        }
+                        this.notify(`¡Te has unido oficialmente a ${company.name}!`, '🤝');
+                    } else {
+                        this.notify(`Has rechazado la invitación de ${company.name}.`, '❌');
+                    }
+
+                    this.saveCompaniesToStorage();
+                    if (this.pendingInvitesForCurrentUser.length === 0) {
+                        this.showInvitesModal = false;
+                    }
+                },
+
+                removeCompanyMember(company, memberName) {
+                    if (!this.isCompanyOwner(company)) return;
+                    company.members = (company.members || []).filter(m => m !== memberName);
+                    this.saveCompaniesToStorage();
+                    this.notify(`${memberName} fue removido de la empresa.`, '👋');
+                },
+
                 saveUserBio() {
                     if (!this.currentUser) return;
                     let lines = this.tempBioText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -1538,18 +1958,33 @@ BloxIndex
                     
                     try {
                         localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                    } catch (e) {
-                        console.error('Error saving profile changes', e);
-                    }
+                    } catch (e) {}
                     
                     this.showBioModal = false;
-                    alert('Profile and role updated successfully!');
+                    this.notify('¡Perfil y sector actualizados!', '✅');
                 },
+
                 logoutUser() {
                     this.currentUser = null;
+                    this.selectedCompany = null;
                     localStorage.removeItem('empire_current_user');
-                    alert(this.t('alertLogout'));
+                    this.notify('Has cerrado sesión correctamente.', '🚪');
                 },
+
+                registerRealUserRecord(userObj) {
+                    if (!userObj || !userObj.name) return;
+                    const idx = this.registeredUsers.findIndex(u => u.name.toLowerCase() === userObj.name.toLowerCase());
+                    const record = { name: userObj.name, img: userObj.img, lastSeen: Date.now() };
+                    if (idx >= 0) {
+                        this.registeredUsers[idx] = record;
+                    } else {
+                        this.registeredUsers.push(record);
+                    }
+                    try {
+                        localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
+                    } catch (e) {}
+                },
+
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
                     let syncedCompanies = getBaseCompanies();
@@ -1561,7 +1996,10 @@ BloxIndex
                             let parsedComps = JSON.parse(savedComps);
                             if (Array.isArray(parsedComps)) {
                                 parsedComps.forEach(c => {
-                                    if (!syncedCompanies.some(baseC => baseC.name.toLowerCase() === c.name.toLowerCase())) {
+                                    let existingIdx = syncedCompanies.findIndex(baseC => baseC.name.toLowerCase() === c.name.toLowerCase());
+                                    if (existingIdx >= 0) {
+                                        syncedCompanies[existingIdx] = { ...syncedCompanies[existingIdx], ...c };
+                                    } else {
                                         syncedCompanies.push(c);
                                     }
                                 });
@@ -1573,7 +2011,7 @@ BloxIndex
                         p.history = [p.netWorthValue];
                     });
                     syncedCompanies.forEach(c => {
-                        c.history = [c.netWorthValue];
+                        if (!c.history || c.history.length === 0) c.history = [c.netWorthValue];
                     });
 
                     const startCycle = Math.max(1, targetCycle - 32);
@@ -1582,14 +2020,17 @@ BloxIndex
                         syncedCompanies.forEach(company => {
                             let r1 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_a`);
                             let r2 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_b`);
+                            
+                            // Bono extra de rendimiento según el Nivel de la Empresa y sus mejoras
+                            let levelBonus = ((company.level || 1) - 1) * 0.008;
                             let pctChange = 0;
 
-                            if (r1 < 0.25) {
-                                pctChange = 0;
-                            } else if (r1 < 0.70) {
-                                pctChange = 0.005 + r2 * 0.045;
+                            if (r1 < 0.22) {
+                                pctChange = levelBonus * 0.5;
+                            } else if (r1 < 0.72) {
+                                pctChange = 0.005 + r2 * 0.045 + levelBonus;
                             } else {
-                                pctChange = -(0.005 + r2 * 0.035);
+                                pctChange = -(0.005 + r2 * 0.032) + (levelBonus * 0.4);
                             }
 
                             let companyDelta = Number((company.netWorthValue * pctChange).toFixed(1));
@@ -1682,11 +2123,18 @@ BloxIndex
                         let updatedSel = this.people.find(p => p.name === this.selectedPerson.name);
                         if (updatedSel) this.selectedPerson = updatedSel;
                     }
+
+                    if (this.selectedCompany) {
+                        let updatedComp = this.companies.find(c => c.name === this.selectedCompany.name);
+                        if (updatedComp) this.selectedCompany = updatedComp;
+                    }
                 },
+
                 getCurrentGlobalCycle() {
                     const elapsed = Math.max(0, Date.now() - GLOBAL_EPOCH_MS);
                     return Math.floor(elapsed / TWELVE_HOURS_MS);
                 },
+
                 startCountdownLoop() {
                     if (this.timerInterval) clearInterval(this.timerInterval);
                     this.timerInterval = setInterval(() => {
@@ -1702,6 +2150,7 @@ BloxIndex
                         }
                     }, 1000);
                 },
+
                 async refreshRobloxProfile(userObj) {
                     try {
                         let userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(userObj.name)}&limit=5`);
@@ -1716,13 +2165,12 @@ BloxIndex
                                 userObj.name = matchedUser.name;
                             }
                         }
-                    } catch (e) {
-                        console.log('No se pudo actualizar el perfil de Roblox automáticamente:', e);
-                    }
+                    } catch (e) {}
                 },
+
                 async handleAuthUser() {
                     if (!this.regUsername || !this.regUsername.trim()) {
-                        alert(this.t('alertErrorUser'));
+                        this.notify('Por favor, introduce un nombre de usuario de Roblox.', '⚠️');
                         return;
                     }
                     
@@ -1736,12 +2184,18 @@ BloxIndex
                     if (existingPerson) {
                         await this.refreshRobloxProfile(existingPerson);
                         this.currentUser = existingPerson;
+                        this.registerRealUserRecord(this.currentUser);
                         localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                         this.isRegistering = false;
                         this.showRegisterModal = false;
                         this.regUsername = '';
                         this.regPassword = '';
-                        alert(`${this.t('alertLogin')} ${existingPerson.name}!`);
+                        this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}!`, '👋');
+
+                        // Si aún no tiene empresa, abrir automáticamente el creador de empresa
+                        if (!this.userOwnedCompany) {
+                            setTimeout(() => this.openCompanyModal(true), 450);
+                        }
                         return;
                     }
 
@@ -1760,9 +2214,7 @@ BloxIndex
                                 cleanUsername = matchedUser.name;
                             }
                         }
-                    } catch (e) {
-                        console.log('Error conectando con Roblox API:', e);
-                    }
+                    } catch (e) {}
 
                     let targetUser = {
                         id: this.people.length + 1,
@@ -1774,7 +2226,7 @@ BloxIndex
                         positive: true,
                         history: [98.5, 100.0],
                         img: avatarUrl,
-                        bio: [`${cleanUsername} successfully registered into BloxIndex.`],
+                        bio: [`${cleanUsername} se unió oficialmente a BloxIndex.`],
                         country: 'Global',
                         source: 'Tycoons',
                         gender: 'Man'
@@ -1787,25 +2239,26 @@ BloxIndex
                         if (!p.peakRank || p.id < p.peakRank) p.peakRank = p.id;
                         if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = Number(p.netWorthValue.toFixed(1));
                     });
-                    
-                    if (!this.firstTrillionaireName && targetUser.netWorthValue >= 1000) {
-                        this.firstTrillionaireName = targetUser.name;
-                    }
 
                     this.currentUser = targetUser;
+                    this.registerRealUserRecord(this.currentUser);
                     
                     try {
                         localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                    } catch (err) {
-                        console.error('Error guardando en localStorage', err);
-                    }
+                    } catch (err) {}
                     
                     this.isRegistering = false;
                     this.showRegisterModal = false;
                     this.regUsername = '';
                     this.regPassword = '';
-                    alert(`${this.t('alertRegister')} ${cleanUsername}.`);
+                    this.notify(`¡Cuenta vinculada! Ahora crea tu empresa, ${cleanUsername}.`, '🎉');
+
+                    // Abrir automáticamente la creación de empresa para el nuevo usuario
+                    if (!this.userOwnedCompany) {
+                        setTimeout(() => this.openCompanyModal(true), 450);
+                    }
                 },
+
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
                     if (savedLang && translations[savedLang]) {
@@ -1813,10 +2266,18 @@ BloxIndex
                     }
 
                     try {
+                        let savedRegUsers = localStorage.getItem('empire_real_registered_users');
+                        if (savedRegUsers) {
+                            this.registeredUsers = JSON.parse(savedRegUsers) || [];
+                        }
+                    } catch (e) {}
+
+                    try {
                         let savedUser = localStorage.getItem('empire_current_user');
                         if (savedUser) {
                             this.currentUser = JSON.parse(savedUser);
                             await this.refreshRobloxProfile(this.currentUser);
+                            this.registerRealUserRecord(this.currentUser);
                             localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                         }
                     } catch(e) {
@@ -1830,6 +2291,11 @@ BloxIndex
 
                     this.syncGlobalMarketToCycle(currentCycle);
                     this.startCountdownLoop();
+
+                    // Si ya tenía sesión iniciada al recargar pero aún no creó su empresa, avisarle
+                    if (this.currentUser && !this.userOwnedCompany) {
+                        setTimeout(() => this.openCompanyModal(true), 600);
+                    }
                 }
             }
         }
