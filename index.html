@@ -257,7 +257,7 @@ BloxIndex
             </div>
         </div>
         
-        <!-- Vista Top 5 -->
+        <!-- Vista Top 5 con Gráfica Estilo Mercado Real -->
         <div x-show="currentFilter === 'top5' && searchQuery === ''" class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div class="md:col-span-4 space-y-3">
                 <template x-for="person in top5People" :key="person.id">
@@ -285,12 +285,12 @@ BloxIndex
                 </template>
             </div>
 
-            <div :class="getContainerGlowClass(selectedTop5Person)" class="md:col-span-8 card-bg p-8 rounded-2xl border border-neutral-800 flex flex-col justify-between" x-data="{ top5Tab: 'wealth' }">
+            <div :class="getContainerGlowClass(selectedTop5Person)" class="md:col-span-8 bg-[#121212] p-8 rounded-2xl border border-neutral-800/90 flex flex-col justify-between shadow-2xl" x-data="{ top5Tab: 'wealth' }">
                 <div>
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-4">
                             <div class="relative">
-                                <img :src="selectedTop5Person?.img" class="w-20 h-20 rounded-xl object-cover bg-black" alt="Avatar">
+                                <img :src="selectedTop5Person?.img" class="w-16 h-16 rounded-xl object-cover bg-black" alt="Avatar">
                                 <template x-if="isBloodActive(selectedTop5Person)">
                                     <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
                                 </template>
@@ -300,7 +300,7 @@ BloxIndex
                             </div>
                             <div>
                                 <div class="flex items-center gap-2.5 flex-wrap">
-                                    <h2 class="serif-font text-3xl font-bold" x-text="selectedTop5Person?.id + '. ' + selectedTop5Person?.name"></h2>
+                                    <h2 class="serif-font text-2xl md:text-3xl font-bold" x-text="selectedTop5Person?.id + '. ' + selectedTop5Person?.name"></h2>
                                     <template x-if="isTrillionaire(selectedTop5Person)">
                                         <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedTop5Person)"></span>
                                     </template>
@@ -314,34 +314,64 @@ BloxIndex
                         </template>
                     </div>
 
-                    <div class="flex gap-4 border-b border-neutral-800 pb-3 mb-6 text-sm">
-                        <button @click="top5Tab = 'wealth'" :class="top5Tab === 'wealth' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('wealthHistory')"></button>
-                        <button @click="top5Tab = 'biography'" :class="top5Tab === 'biography' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('biography')"></button>
-                        <button @click="top5Tab = 'stats'" :class="top5Tab === 'stats' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('stats')"></button>
+                    <!-- Pestañas Estilo Píldora -->
+                    <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
+                        <button @click="top5Tab = 'wealth'" :class="top5Tab === 'wealth' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('wealthHistory')"></button>
+                        <button @click="top5Tab = 'biography'" :class="top5Tab === 'biography' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('biography')"></button>
+                        <button @click="top5Tab = 'stats'" :class="top5Tab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('stats')"></button>
                     </div>
 
+                    <!-- Contenido Pestaña Wealth History -->
                     <div x-show="top5Tab === 'wealth'">
-                        <div class="text-xs text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
-                        <div class="flex items-baseline gap-3 mb-2">
-                            <div class="serif-font text-4xl font-bold" x-text="formatWorth(selectedTop5Person?.netWorthValue)"></div>
-                            <div x-show="hasDailyChange(selectedTop5Person)" :class="selectedTop5Person?.positive ? 'text-green-400' : 'text-red-400'" class="text-base font-semibold" x-text="formatDailyChange(selectedTop5Person)"></div>
+                        <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
+                        <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedTop5Person?.netWorthValue)"></div>
+                        
+                        <div class="flex items-center gap-2 text-sm font-semibold mb-7">
+                            <span :class="selectedTop5Person?.positive ? 'text-green-400' : 'text-red-500'" x-text="formatDailyChange(selectedTop5Person)"></span>
+                            <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
                         </div>
 
-                        <div class="mt-4 bg-black/50 border border-neutral-800/80 rounded-xl p-4">
-                            <div class="flex justify-between items-center text-xs text-neutral-400 mb-2">
-                                <span x-text="t('trendLabel')"></span>
-                                <span :class="selectedTop5Person?.positive ? 'text-green-400' : 'text-red-400'" class="font-semibold" x-text="selectedTop5Person?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
+                        <div class="mb-2 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold text-neutral-300 uppercase tracking-wider" x-text="t('wealthHistory')"></div>
+                                <div class="text-xs text-neutral-500 mt-0.5" x-text="t('chartSubLabel')"></div>
                             </div>
-                            <svg viewBox="0 0 400 110" class="w-full h-28 overflow-visible">
+                            <span :class="selectedTop5Person?.positive ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'" class="text-[11px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider" x-text="selectedTop5Person?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
+                        </div>
+
+                        <!-- Gráfica Estilo Mercado Real con Color Dinámico -->
+                        <div class="relative mt-2 pt-2">
+                            <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
                                 <defs>
-                                    <linearGradient :id="'grad-top5-' + selectedTop5Person?.id" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" :stop-color="selectedTop5Person?.positive ? '#4ade80' : '#f87171'" stop-opacity="0.35"/>
-                                        <stop offset="100%" :stop-color="selectedTop5Person?.positive ? '#4ade80' : '#f87171'" stop-opacity="0.0"/>
-                                    </linearGradient>
+                                    <radialGradient :id="'radial-glow-top5-' + selectedTop5Person?.id" cx="65%" cy="55%" r="50%">
+                                        <stop offset="0%" :stop-color="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0.22"/>
+                                        <stop offset="100%" :stop-color="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0"/>
+                                    </radialGradient>
                                 </defs>
-                                <path :d="getChartAreaPath(selectedTop5Person)" :fill="'url(#grad-top5-' + selectedTop5Person?.id + ')'"></path>
-                                <path :d="getChartLinePath(selectedTop5Person)" fill="none" :stroke="selectedTop5Person?.positive ? '#4ade80' : '#f87171'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <circle cx="390" :cy="selectedTop5Person?.positive ? 20 : 88" r="4.5" :fill="selectedTop5Person?.positive ? '#4ade80' : '#f87171'"></circle>
+                                <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-top5-' + selectedTop5Person?.id + ')'" rx="12"></rect>
+                                
+                                <polyline 
+                                    :points="getChartData(selectedTop5Person).pointsStr" 
+                                    fill="none" 
+                                    :stroke="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" 
+                                    stroke-width="2.6" 
+                                    stroke-linecap="round" 
+                                    stroke-linejoin="round"
+                                ></polyline>
+
+                                <circle 
+                                    :cx="getChartData(selectedTop5Person).lastX" 
+                                    :cy="getChartData(selectedTop5Person).lastY" 
+                                    r="12" 
+                                    :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'" 
+                                    fill-opacity="0.18"
+                                ></circle>
+                                <circle 
+                                    :cx="getChartData(selectedTop5Person).lastX" 
+                                    :cy="getChartData(selectedTop5Person).lastY" 
+                                    r="4.5" 
+                                    :fill="selectedTop5Person?.positive ? '#22c55e' : '#ef4444'"
+                                ></circle>
                             </svg>
                         </div>
                     </div>
@@ -437,12 +467,12 @@ BloxIndex
     <main x-show="selectedPerson" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ profileTab: 'wealth' }" style="display: none;">
         <button @click="selectedPerson = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backButton')"></button>
         
-        <div :class="getContainerGlowClass(selectedPerson)" class="card-bg p-8 rounded-2xl border border-neutral-800 flex flex-col justify-between">
+        <div :class="getContainerGlowClass(selectedPerson)" class="bg-[#121212] p-8 rounded-2xl border border-neutral-800/90 flex flex-col justify-between shadow-2xl">
             <div>
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-4">
                         <div class="relative">
-                            <img :src="selectedPerson?.img" class="w-20 h-20 rounded-xl object-cover bg-black" alt="Avatar">
+                            <img :src="selectedPerson?.img" class="w-16 h-16 rounded-xl object-cover bg-black" alt="Avatar">
                             <template x-if="isBloodActive(selectedPerson)">
                                 <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
                             </template>
@@ -452,7 +482,7 @@ BloxIndex
                         </div>
                         <div>
                             <div class="flex items-center gap-2.5 flex-wrap">
-                                <h2 class="serif-font text-3xl font-bold" x-text="selectedPerson?.id ? (selectedPerson.id + '. ' + selectedPerson?.name) : selectedPerson?.name"></h2>
+                                <h2 class="serif-font text-2xl md:text-3xl font-bold" x-text="selectedPerson?.id ? (selectedPerson.id + '. ' + selectedPerson?.name) : selectedPerson?.name"></h2>
                                 <template x-if="isTrillionaire(selectedPerson)">
                                     <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedPerson)"></span>
                                 </template>
@@ -466,34 +496,62 @@ BloxIndex
                     </template>
                 </div>
 
-                <div class="flex gap-4 border-b border-neutral-800 pb-3 mb-6 text-sm">
-                    <button @click="profileTab = 'wealth'" :class="profileTab === 'wealth' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('wealthHistory')"></button>
-                    <button @click="profileTab = 'biography'" :class="profileTab === 'biography' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('biography')"></button>
-                    <button @click="profileTab = 'stats'" :class="profileTab === 'stats' ? 'text-white font-semibold border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('stats')"></button>
+                <!-- Pestañas Estilo Píldora -->
+                <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
+                    <button @click="profileTab = 'wealth'" :class="profileTab === 'wealth' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('wealthHistory')"></button>
+                    <button @click="profileTab = 'biography'" :class="profileTab === 'biography' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('biography')"></button>
+                    <button @click="profileTab = 'stats'" :class="profileTab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('stats')"></button>
                 </div>
 
                 <div x-show="profileTab === 'wealth'">
-                    <div class="text-xs text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
-                    <div class="flex items-baseline gap-3 mb-2">
-                        <div class="serif-font text-4xl font-bold" x-text="formatWorth(selectedPerson?.netWorthValue)"></div>
-                        <div x-show="hasDailyChange(selectedPerson)" :class="selectedPerson?.positive ? 'text-green-400' : 'text-red-400'" class="text-base font-semibold" x-text="formatDailyChange(selectedPerson)"></div>
+                    <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
+                    <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedPerson?.netWorthValue)"></div>
+                    
+                    <div class="flex items-center gap-2 text-sm font-semibold mb-7">
+                        <span :class="selectedPerson?.positive ? 'text-green-400' : 'text-red-500'" x-text="formatDailyChange(selectedPerson)"></span>
+                        <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
                     </div>
 
-                    <div class="mt-4 bg-black/50 border border-neutral-800/80 rounded-xl p-4">
-                        <div class="flex justify-between items-center text-xs text-neutral-400 mb-2">
-                            <span x-text="t('trendLabel')"></span>
-                            <span :class="selectedPerson?.positive ? 'text-green-400' : 'text-red-400'" class="font-semibold" x-text="selectedPerson?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
+                    <div class="mb-2 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-neutral-300 uppercase tracking-wider" x-text="t('wealthHistory')"></div>
+                            <div class="text-xs text-neutral-500 mt-0.5" x-text="t('chartSubLabel')"></div>
                         </div>
-                        <svg viewBox="0 0 400 110" class="w-full h-32 overflow-visible">
+                        <span :class="selectedPerson?.positive ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'" class="text-[11px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider" x-text="selectedPerson?.positive ? '▲ ' + t('gaining') : '▼ ' + t('dropping')"></span>
+                    </div>
+
+                    <div class="relative mt-2 pt-2">
+                        <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
                             <defs>
-                                <linearGradient :id="'grad-prof-' + (selectedPerson?.id || 999)" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" :stop-color="selectedPerson?.positive ? '#4ade80' : '#f87171'" stop-opacity="0.35"/>
-                                    <stop offset="100%" :stop-color="selectedPerson?.positive ? '#4ade80' : '#f87171'" stop-opacity="0.0"/>
-                                </linearGradient>
+                                <radialGradient :id="'radial-glow-prof-' + (selectedPerson?.id || 999)" cx="65%" cy="55%" r="50%">
+                                    <stop offset="0%" :stop-color="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0.22"/>
+                                    <stop offset="100%" :stop-color="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0"/>
+                                </radialGradient>
                             </defs>
-                            <path :d="getChartAreaPath(selectedPerson)" :fill="'url(#grad-prof-' + (selectedPerson?.id || 999) + ')'"></path>
-                            <path :d="getChartLinePath(selectedPerson)" fill="none" :stroke="selectedPerson?.positive ? '#4ade80' : '#f87171'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <circle cx="390" :cy="selectedPerson?.positive ? 20 : 88" r="4.5" :fill="selectedPerson?.positive ? '#4ade80' : '#f87171'"></circle>
+                            <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-prof-' + (selectedPerson?.id || 999) + ')'" rx="12"></rect>
+                            
+                            <polyline 
+                                :points="getChartData(selectedPerson).pointsStr" 
+                                fill="none" 
+                                :stroke="selectedPerson?.positive ? '#22c55e' : '#ef4444'" 
+                                stroke-width="2.6" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                            ></polyline>
+
+                            <circle 
+                                :cx="getChartData(selectedPerson).lastX" 
+                                :cy="getChartData(selectedPerson).lastY" 
+                                r="12" 
+                                :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'" 
+                                fill-opacity="0.18"
+                            ></circle>
+                            <circle 
+                                :cx="getChartData(selectedPerson).lastX" 
+                                :cy="getChartData(selectedPerson).lastY" 
+                                r="4.5" 
+                                :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'"
+                            ></circle>
                         </svg>
                     </div>
                 </div>
@@ -676,6 +734,7 @@ BloxIndex
                 topGainersTitle: "Top 5 Biggest Gainers",
                 topLosersTitle: "Top 5 Biggest Losers",
                 lastCycleTag: "Last 12h Update",
+                chartSubLabel: "Tracked across every 12-hour global cycle",
                 top5: "Top 5",
                 top: "Top",
                 women: "Women",
@@ -688,7 +747,7 @@ BloxIndex
                 stats: "Stats",
                 currentNetWorth: "CURRENT NET WORTH",
                 today: "TODAY",
-                trendLabel: "7-DAY NET WORTH PERFORMANCE",
+                trendLabel: "12H CYCLE NET WORTH PERFORMANCE",
                 gaining: "GAINING VALUE",
                 dropping: "LOSING VALUE",
                 sourceWealth: "Source of Wealth / Role",
@@ -748,6 +807,7 @@ BloxIndex
                 topGainersTitle: "Top 5 Mayores Ganadores",
                 topLosersTitle: "Top 5 Mayores Perdedores",
                 lastCycleTag: "Última Act. 12h",
+                chartSubLabel: "Seguimiento en tiempo real por cada ciclo de 12 horas",
                 top5: "Top 5",
                 top: "Top",
                 women: "Mujeres",
@@ -760,9 +820,9 @@ BloxIndex
                 stats: "Estadísticas",
                 currentNetWorth: "PATRIMONIO NETO ACTUAL",
                 today: "HOY",
-                trendLabel: "RENDIMIENTO DE RIQUEZA (7 DÍAS)",
-                gaining: "GANANDO VALOR",
-                dropping: "BAJANDO VALOR",
+                trendLabel: "RENDIMIENTO POR ACTUALIZACIÓN",
+                gaining: "SUBIENDO",
+                dropping: "BAJANDO",
                 sourceWealth: "Trabajo / Fuente de Riqueza",
                 gender: "Género",
                 region: "Región",
@@ -820,6 +880,7 @@ BloxIndex
                 topGainersTitle: "Top 5 Maggiori Guadagni",
                 topLosersTitle: "Top 5 Maggiori Perdite",
                 lastCycleTag: "Ultimo Agg. 12h",
+                chartSubLabel: "Monitoraggio per ogni ciclo globale di 12 ore",
                 top5: "Top 5",
                 top: "Top",
                 women: "Donne",
@@ -832,8 +893,8 @@ BloxIndex
                 stats: "Statistiche",
                 currentNetWorth: "PATRIMONIO NETTO ATTUALE",
                 today: "OGGI",
-                trendLabel: "ANDAMENTO PATRIMONIO (7 GIORNI)",
-                gaining: "IN CRESCITA",
+                trendLabel: "ANDAMENTO PATRIMONIO",
+                gaining: "IN SALITA",
                 dropping: "IN CALO",
                 sourceWealth: "Ruolo / Fonte di Ricchezza",
                 gender: "Genere",
@@ -892,6 +953,7 @@ BloxIndex
                 topGainersTitle: "Top 5 Maiores Ganhadores",
                 topLosersTitle: "Top 5 Maiores Perdedores",
                 lastCycleTag: "Última Att. 12h",
+                chartSubLabel: "Acompanhado a cada ciclo global de 12 horas",
                 top5: "Top 5",
                 top: "Top",
                 women: "Mulheres",
@@ -904,9 +966,9 @@ BloxIndex
                 stats: "Estatísticas",
                 currentNetWorth: "PATRIMÔNIO LÍQUIDO ATUAL",
                 today: "HOJE",
-                trendLabel: "DESEMPENHO DE PATRIMÔNIO (7 DIAS)",
-                gaining: "GANHANDO VALOR",
-                dropping: "PERDENDO VALOR",
+                trendLabel: "DESEMPENHO DE PATRIMÔNIO",
+                gaining: "SUBINDO",
+                dropping: "CAINDO",
                 sourceWealth: "Trabalho / Fonte de Riqueza",
                 gender: "Gênero",
                 region: "Região",
@@ -964,6 +1026,7 @@ BloxIndex
                 topGainersTitle: "Top 5 Größte Gewinner",
                 topLosersTitle: "Top 5 Größte Verlierer",
                 lastCycleTag: "Letztes 12h-Update",
+                chartSubLabel: "Verfolgt über jeden globalen 12-Stunden-Zyklus",
                 top5: "Top 5",
                 top: "Top",
                 women: "Frauen",
@@ -976,9 +1039,9 @@ BloxIndex
                 stats: "Statistiken",
                 currentNetWorth: "AKTUELLES NETTOVERMÖGEN",
                 today: "HEUTE",
-                trendLabel: "7-TAGE-VERMÖGENSENTWICKLUNG",
-                gaining: "WERTSTEIGERUNG",
-                dropping: "WERTVERLUST",
+                trendLabel: "VERMÖGENSENTWICKLUNG",
+                gaining: "STEIGEND",
+                dropping: "FALLEND",
                 sourceWealth: "Rolle / Vermögensquelle",
                 gender: "Geschlecht",
                 region: "Region",
@@ -1048,112 +1111,112 @@ BloxIndex
 
         function getBasePeople() {
             return [
-                { id: 1, name: 'Boti', netWorthValue: 803.2, peakRank: 1, peakNetWorth: 803.2, changeVal: 14.5, changeText: '▲ +$14.5B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-598A1E6CEBD8F31170FB54EE84B1577F-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Boti maintains his position at the summit.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
-                { id: 2, name: 'Giacolamela', netWorthValue: 662.3, peakRank: 2, peakNetWorth: 662.3, changeVal: 8.1, changeText: '▲ +$8.1B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6A0D4EFDF769ADF1D04EDF965FE4E5D1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Giacolamela holds a commanding position.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
-                { id: 3, name: 'Alpha', netWorthValue: 473.8, peakRank: 3, peakNetWorth: 473.8, changeVal: -5.2, changeText: '▼ -$5.2B', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BBC0AC360CCE4D5EC4796ACE83C36DA7-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Alpha secures a prominent standing.'], country: 'Global', source: 'Retail & E-Commerce', gender: 'Man' },
-                { id: 4, name: 'Vector', netWorthValue: 292.6, peakRank: 4, peakNetWorth: 292.6, changeVal: -1.4, changeText: '▼ -$1.4B', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-314B0FF852E2197D2C64342328C77EE0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Vector establishes a formidable presence.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 5, name: 'Yophas', netWorthValue: 289.2, peakRank: 5, peakNetWorth: 289.2, changeVal: -0.7, changeText: '▼ -$705M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-98E94E750538C1062C3B1F82724A73DF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yophas firmly secures his place.'], country: 'Global', source: 'Investors', gender: 'Man' },
-                { id: 6, name: 'Madison', netWorthValue: 287.9, peakRank: 6, peakNetWorth: 287.9, changeVal: 4.2, changeText: '▲ +$4.2B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D268E183D003FEBD0A5E6CDAD7E70BB4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Madison ranks among top innovators.'], country: 'Global', source: 'Tycoons', gender: 'Women' },
-                { id: 7, name: 'Chris', netWorthValue: 281.0, peakRank: 7, peakNetWorth: 281.0, changeVal: 2.1, changeText: '▲ +$2.1B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0FCE5CD735B26387DF6B820B78D194B4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chris commands market influence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 8, name: 'Yuki', netWorthValue: 254.9, peakRank: 8, peakNetWorth: 254.9, changeVal: 5.6, changeText: '▲ +$5.6B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-51FE1EF702BCEEC6A270D563818F51B6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yuki represents digital ecosystems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 9, name: 'Kasper', netWorthValue: 237.9, peakRank: 9, peakNetWorth: 237.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC06858A574D17A719A055CCFC355F2F-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kasper breaks into elite ranks.'], country: 'Global', source: 'Investors', gender: 'Man' },
-                { id: 10, name: 'Tito', netWorthValue: 209.3, peakRank: 10, peakNetWorth: 209.3, changeVal: 5.9, changeText: '▲ +$5.9B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-316103E68F90BEEDEA43FF58D66BC705-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tito commands a powerful portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 11, name: 'Eclipse', netWorthValue: 201.3, peakRank: 11, peakNetWorth: 201.3, changeVal: 17.0, changeText: '▲ +$17.0B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-081A4015104BC6AD94B91FED5198EF9C-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Eclipse surges onto the leaderboard.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
-                { id: 12, name: 'CYUL', netWorthValue: 191.2, peakRank: 12, peakNetWorth: 191.2, changeVal: 8.4, changeText: '▲ +$8.4B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-21DC1F850EAA53DE027602AC2E2289BD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['CYUL solidifies a strong position.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 13, name: 'Acidic', netWorthValue: 185.0, peakRank: 13, peakNetWorth: 185.0, changeVal: -1.2, changeText: '▼ -$1.2B', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A93290ADDB12E46B76328E0D03E4C2B6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Acidic maintains a robust enterprise portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 14, name: 'Sabrina', netWorthValue: 177.9, peakRank: 14, peakNetWorth: 177.9, changeVal: -0.7, changeText: '▼ -$720M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8C32772581413C0CB9FB4273C52332EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sabrina commands notable influence.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 15, name: 'Philip', netWorthValue: 177.1, peakRank: 15, peakNetWorth: 177.1, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2188A5445A8636BDBD0BAEAD250D04DA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Philip drives continuous growth.'], country: 'Global', source: 'Investors', gender: 'Man' },
-                { id: 16, name: 'Sully', netWorthValue: 175.0, peakRank: 16, peakNetWorth: 175.0, changeVal: 0.2, changeText: '▲ +$150M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3D6EC1601A5A57A9885D7D141835C0C9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sully secures his standing.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 17, name: 'Djedax', netWorthValue: 172.3, peakRank: 17, peakNetWorth: 172.3, changeVal: -0.8, changeText: '▼ -$760M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A9AD94640E88886A60E659FEED0449FD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Djedax maintains a solid presence.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 18, name: 'zthebee', netWorthValue: 169.8, peakRank: 18, peakNetWorth: 169.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E76C7C0D9069A9F25C41E827F4EA34DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['zthebee commands an impressive portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 19, name: 'KasokuVT', netWorthValue: 166.3, peakRank: 19, peakNetWorth: 166.3, changeVal: 0.2, changeText: '▲ +$221M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-67F4754D8B939E4C66227735E31D25EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['KasokuVT drives virtual networks.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 20, name: 'Epikical', netWorthValue: 165.9, peakRank: 20, peakNetWorth: 165.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B5C96CCE0839DBD41487306CA5EB11E8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Epikical closes out top tier.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 21, name: 't47co', netWorthValue: 161.2, peakRank: 21, peakNetWorth: 161.2, changeVal: 3.9, changeText: '▲ +$3.9B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-231A417BE4F33BA99FF848BDDB5D75AD-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['t47co expands rapidly.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 22, name: 'Jason', netWorthValue: 160.6, peakRank: 22, peakNetWorth: 160.6, changeVal: 1.1, changeText: '▲ +$1.1B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-973FC39AD12FA1DEFB76BAD748DD8C2B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jason secures steady financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 23, name: 'Newt', netWorthValue: 157.3, peakRank: 23, peakNetWorth: 157.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FAA36DF4B111CA9747F245A495E5C4CE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Newt maintains a powerful capital standing.'], country: 'Global', source: 'Investors', gender: 'Man' },
-                { id: 24, name: 'Alonzo', netWorthValue: 154.3, peakRank: 24, peakNetWorth: 154.3, changeVal: 0.8, changeText: '▲ +$794M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F252E4A0826F8B0A3179A46930ED2940-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Alonzo drives ongoing expansion.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 25, name: 'blankmotive', netWorthValue: 151.4, peakRank: 25, peakNetWorth: 151.4, changeVal: -0.3, changeText: '▼ -$254M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3AA046E94E4D227C4F38F96933775F47-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['blankmotive manages a specialized tech portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 26, name: 'HeartEditor', netWorthValue: 148.3, peakRank: 26, peakNetWorth: 148.3, changeVal: 0.1, changeText: '▲ +$139M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C82500D180927161A920FEC291AFA52D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['HeartEditor oversees elite digital content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 27, name: 'Yamenxdroyal', netWorthValue: 144.0, peakRank: 27, peakNetWorth: 144.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC7B0E124FFB376E385CF57D89B0BDBD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yamenxdroyal holds strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 28, name: 'fairyqueen059', netWorthValue: 143.3, peakRank: 28, peakNetWorth: 143.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A68445B6F379F620FDB4E1236E7E453D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['fairyqueen059 builds value through luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 29, name: 'Thyff', netWorthValue: 141.7, peakRank: 29, peakNetWorth: 141.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C1D32763E81DACCDE42529DE7BAA3B36-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Thyff anchors robust investments.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 30, name: 'Cleo', netWorthValue: 140.8, peakRank: 30, peakNetWorth: 140.8, changeVal: 0.4, changeText: '▲ +$370M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4203CE0DDEA79F8CC6E0866E8EC26BE5-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Cleo drives consistent market growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 31, name: 'Devin', netWorthValue: 136.6, peakRank: 31, peakNetWorth: 136.6, changeVal: 2.8, changeText: '▲ +$2.8B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D174CE2D768F55799B74E5B7522A316-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Devin secures strong financial positioning.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 32, name: 'Adrian', netWorthValue: 134.8, peakRank: 32, peakNetWorth: 134.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AADB4313E80551C178724DFE28B80683-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Adrian manages diversified asset portfolios.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 33, name: 'Panther', netWorthValue: 133.1, peakRank: 33, peakNetWorth: 133.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D15AF34B997DC6C81DEF087E2CB3783-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Panther commands a stealthy portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Women' },
-                { id: 34, name: 'Yoyo', netWorthValue: 131.7, peakRank: 34, peakNetWorth: 131.7, changeVal: -0.6, changeText: '▼ -$584M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C9E1817C655EC32DE62656F1D610CAC0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yoyo oversees flexible digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
-                { id: 35, name: 'Khs1251', netWorthValue: 130.2, peakRank: 35, peakNetWorth: 130.2, changeVal: 4.9, changeText: '▲ +$4.9B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C442CDCFC46C92B91F026AC7D91E801-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Khs1251 accelerates through continuous tech innovations.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 36, name: 'logi', netWorthValue: 130.1, peakRank: 36, peakNetWorth: 130.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4DA54E16117FF4D95D21A801D801C3-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['logi maintains robust logistics networks.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 37, name: 'Hex', netWorthValue: 127.5, peakRank: 37, peakNetWorth: 127.5, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E9FBB219DE64D5FD43100AD60EDA0972-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hex expands market share through cryptographic protocols.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 38, name: 'James', netWorthValue: 126.3, peakRank: 38, peakNetWorth: 126.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-652E5D2B117E2C77BAC9650D141F470B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['James commands a diversified portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 39, name: 'freudi6n', netWorthValue: 124.9, peakRank: 39, peakNetWorth: 124.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8704721932065DE8A6E371F745D6FC53-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['freudi6n maintains a solid financial position.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 40, name: 'Vince', netWorthValue: 123.4, peakRank: 40, peakNetWorth: 123.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFACCB214D445D75B4485CB131EEED29-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Vince rounds out the top 40.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 41, name: 'kravings', netWorthValue: 122.0, peakRank: 41, peakNetWorth: 122.0, changeVal: -0.2, changeText: '▼ -$240M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AB3FF1B027150CF6E790A546718FB0BA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['kravings manages a dynamic digital asset portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 42, name: 'AceDipped', netWorthValue: 119.8, peakRank: 42, peakNetWorth: 119.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CB932DDC6A44439881618A5798DBD591-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['AceDipped secures a prominent place.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 43, name: 'Val', netWorthValue: 119.3, peakRank: 43, peakNetWorth: 119.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CDA8284C76572F98D79151E0A5E4BC0D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Val oversees high-value venture capital funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 44, name: 'JessieK', netWorthValue: 117.7, peakRank: 44, peakNetWorth: 117.7, changeVal: 0.5, changeText: '▲ +$484M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B9B196290D535D2DB2FE0BD36129FE23-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['JessieK drives steady portfolio growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 45, name: 'piz', netWorthValue: 117.7, peakRank: 45, peakNetWorth: 117.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C1346B68B8449A1631E2C18957EF9A2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['piz maintains substantial capital reserves.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 46, name: 'Protato', netWorthValue: 116.4, peakRank: 46, peakNetWorth: 116.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5B3E19BA7DA4D0A5174A18655F324A7F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Protato commands a thriving digital empire.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 47, name: '_M_', netWorthValue: 116.0, peakRank: 47, peakNetWorth: 116.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D5898C7230953EBD628A902C36CE135A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['_M_ secures a spot among global elite.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 48, name: 'Waffle Fox', netWorthValue: 115.4, peakRank: 48, peakNetWorth: 115.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Waffle Fox builds lasting wealth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 49, name: 'MisterYan', netWorthValue: 115.0, peakRank: 49, peakNetWorth: 115.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DA3ACBA42CFEFCFCA78BC8E4896579C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['MisterYan directs strategic global investments.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 50, name: 'Hum', netWorthValue: 113.8, peakRank: 50, peakNetWorth: 113.8, changeVal: 0.0, changeText: '▼ -$19M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2E6EE698A2CD0FFDEFE8000CEBDB7BAF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hum rounds out the Top 50 billionaires list.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 51, name: 'Overdrive', netWorthValue: 112.4, peakRank: 51, peakNetWorth: 112.4, changeVal: 4.3, changeText: '▲ +$4.3B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-88F0B9E3647A7BFFF677EA434192F16A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Overdrive accelerates market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 52, name: 'Chara', netWorthValue: 112.0, peakRank: 52, peakNetWorth: 112.0, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EBEE9636E7BF391B2E34CF04332B9986-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chara maintains stable corporate holdings.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 53, name: 'Maximus026', netWorthValue: 110.2, peakRank: 53, peakNetWorth: 110.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-020F1429C2BAA98DC7E55737E4D41F8F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Maximus026 commands a robust portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 54, name: 'Logan', netWorthValue: 109.6, peakRank: 54, peakNetWorth: 109.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E67A365BC09CE1367DC088D6A457A83-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Logan secures consistent financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 55, name: 'Amber', netWorthValue: 109.2, peakRank: 55, peakNetWorth: 109.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0F3FE493D59B04E21D13D1D5A125A309-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Amber builds significant value through retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 56, name: 'Serene', netWorthValue: 107.8, peakRank: 56, peakNetWorth: 107.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E797C5C1AB752F57CB61859F7ED2AF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Serene manages a tranquil portfolio.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 57, name: 'RICODUDE', netWorthValue: 107.4, peakRank: 57, peakNetWorth: 107.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D8B9FDDF4720970EBABE757868710CB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['RICODUDE maintains a strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 58, name: 'Clutch', netWorthValue: 106.6, peakRank: 58, peakNetWorth: 106.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-74A5A17710CCEFDBB8A3C988AEE7ED42-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Clutch commands robust capital reserves.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 59, name: 'Arctic', netWorthValue: 106.1, peakRank: 59, peakNetWorth: 106.1, changeVal: 1.3, changeText: '▲ +$1.3B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FBE4F6A75ED050DFAB8E80BA93374C50-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Arctic expands rapidly through sustainable energy.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 60, name: 'Dani', netWorthValue: 106.0, peakRank: 60, peakNetWorth: 106.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-31FA129C7D748D1125F76F60A4F5450E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Dani rounds out the leaderboard.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 61, name: 'Tubularlly', netWorthValue: 105.2, peakRank: 61, peakNetWorth: 105.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EAF2E2CC19D7B4BA26CDCD8F637194CD-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tubularlly expands her digital ecosystem.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 62, name: 'John', netWorthValue: 104.8, peakRank: 62, peakNetWorth: 104.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EDCA09DAB8940AA7580CE0590F01854B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['John manages reliable enterprise resources.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 63, name: 'XxAmanitaxX', netWorthValue: 104.0, peakRank: 63, peakNetWorth: 104.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-29FA52EB1A45D1D4696CCC2351E95F0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['XxAmanitaxX directs niche luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 64, name: 'Xcnar', netWorthValue: 103.2, peakRank: 64, peakNetWorth: 103.2, changeVal: 0.2, changeText: '▲ +$227M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-121DB50D2B060316660AC2E03D6ED3DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xcnar accelerates through tactical tech.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 65, name: 'Midas', netWorthValue: 103.0, peakRank: 65, peakNetWorth: 103.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-35C9E4976701F2852F62FD5E8A3B5BAE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Midas anchors powerful precious asset funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 66, name: 'jay', netWorthValue: 102.1, peakRank: 66, peakNetWorth: 102.1, changeVal: 0.0, changeText: '▼ -$10K', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6204A9AA64534DCDE79A3AEC0441C63A-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['jay oversees agile tech initiatives.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 67, name: 'Oscar', netWorthValue: 102.0, peakRank: 67, peakNetWorth: 102.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CE21BCFBE627761B69CEC5CCEAA466D2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Oscar maintains steady capital streams.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 68, name: 'camilorobloxenero', netWorthValue: 101.1, peakRank: 68, peakNetWorth: 101.1, changeVal: 0.0, changeText: '▲ +$100K', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-94E115BA27CF6FC09ACC663B1DFBE2A4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['camilorobloxenero drives creative community platforms.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 69, name: 'LucasDaUltimate', netWorthValue: 100.8, peakRank: 69, peakNetWorth: 100.8, changeVal: 0.0, changeText: '▲ +$9K', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D5B260C493CEC04E4D9FCE4CF33F3E9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LucasDaUltimate builds resilient digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 70, name: 'Kai', netWorthValue: 100.2, peakRank: 70, peakNetWorth: 100.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D9B22F44D7F74AE93CE6FE713857278B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kai commands influence through lifestyle branding.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 71, name: 'Solia', netWorthValue: 99.7, peakRank: 71, peakNetWorth: 99.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D51BE89A3350B28C33B33CC752B0C31A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Solia curates elegant artistic ventures.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 72, name: 'Saleh', netWorthValue: 98.1, peakRank: 72, peakNetWorth: 98.1, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E722677A06F551DDB46C949425FEA532-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Saleh directs expanding international real estate.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 73, name: 'Blez', netWorthValue: 97.7, peakRank: 73, peakNetWorth: 97.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-66D1316DD1A7303F74F19BB5B625EB02-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Blez maintains stable digital ventures.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 74, name: 'SisterAlex', netWorthValue: 97.4, peakRank: 74, peakNetWorth: 97.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7059BBDE99888783DF44F89D15D3E8C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['SisterAlex shapes contemporary lifestyle media.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 75, name: 'Heather', netWorthValue: 96.4, peakRank: 75, peakNetWorth: 96.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A92AD7C72D5751CDFEF7352B92D4E965-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Heather focuses on high-end fashion lines.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 76, name: 'Joke', netWorthValue: 95.0, peakRank: 76, peakNetWorth: 95.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DE0FAF32CAD79354ECAF3BE37A252CC2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Joke builds value through viral entertainment.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 77, name: 'Mobin', netWorthValue: 93.3, peakRank: 77, peakNetWorth: 93.3, changeVal: 2.0, changeText: '▲ +$2.0B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-97FFCE65DCD1EFA6BC190A1F33342CF8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Mobin surges with investments in cloud systems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 78, name: 'Aero Vista', netWorthValue: 92.0, peakRank: 78, peakNetWorth: 92.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFFAE7651EB13D85A43B9A994B16EB5B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Aero Vista specializes in aerospace engineering.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 79, name: 'Unknown', netWorthValue: 91.3, peakRank: 79, peakNetWorth: 91.3, changeVal: -0.7, changeText: '▼ -$663M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Unknown operates discreetly across alternatives.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 80, name: 'Pengu', netWorthValue: 90.5, peakRank: 80, peakNetWorth: 90.5, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4E9A225D3F1D0F47C4AE2525688655-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Pengu commands solid holdings in logistics.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 81, name: 'Xofer', netWorthValue: 90.2, peakRank: 81, peakNetWorth: 90.2, changeVal: -0.3, changeText: '▼ -$300M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4CEF45A75689FA4E010BFD959845618D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xofer manages diversified software solutions.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 82, name: 'Bubbles', netWorthValue: 88.0, peakRank: 82, peakNetWorth: 88.0, changeVal: -0.1, changeText: '▼ -$100M', hasChange: true, positive: false, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C0D9EECCB7FBB4844B7D88455A28C128-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Bubbles oversees creative consumer brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 83, name: 'Ken', netWorthValue: 87.2, peakRank: 83, peakNetWorth: 87.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8DF46166C54030469FE52075355ABFF1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Ken anchors reliable industrial assets.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 84, name: 'Duncan', netWorthValue: 85.0, peakRank: 84, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B98AD8D4FE8D6F1DAD6A082B76174CC9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Duncan directs specialized luxury retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 85, name: 'Froggie', netWorthValue: 85.0, peakRank: 85, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-086D595BDC53ADF5E22CADA773E769D7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Froggie maintains vibrant interactive entertainment.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 86, name: 'Geo', netWorthValue: 83.0, peakRank: 86, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E57CB6F6A4230FBCA60B133C433FD0D4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Geo maps out global real estate developments.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 87, name: 'Peach', netWorthValue: 83.0, peakRank: 87, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D6BF6FEEFCF5EFBC6A104EA0EF72337-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Peach curates boutique digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 88, name: 'paul', netWorthValue: 82.3, peakRank: 88, peakNetWorth: 82.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F00FFCD2314992C0F30357D8E9F171C6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['paul secures core enterprise value.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 89, name: 'Darius', netWorthValue: 82.0, peakRank: 89, peakNetWorth: 82.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D0FA2B1BDB662EA0C0ED161225541F3-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Darius drives solid financial returns.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 90, name: 'Jacobs', netWorthValue: 80.6, peakRank: 90, peakNetWorth: 80.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E80ED2011C3E401CCEDF97E7E71E0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jacobs manages stable multi-industry holdings.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 91, name: 'Five', netWorthValue: 80.3, peakRank: 91, peakNetWorth: 80.3, changeVal: 0.0, changeText: '▲ +$20M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C9AA2CA5C92DF7160C0DCDA987FA950-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Five advances algorithmic numerical trading.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 92, name: 'Shadow', netWorthValue: 79.7, peakRank: 92, peakNetWorth: 79.7, changeVal: 0.0, changeText: '▲ +$7M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E98D08A7DDA8D60141A1A8D98A9FEEB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Shadow maintains a private secure portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 93, name: 'Rasger', netWorthValue: 77.8, peakRank: 93, peakNetWorth: 77.8, changeVal: 1.0, changeText: '▲ +$1.0B', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1790F2FEFE2FF16B4BEAA2899F902A32-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Rasger expands rapidly through tech scaling.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 94, name: 'LePittCanard', netWorthValue: 77.7, peakRank: 94, peakNetWorth: 77.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0500A84157F24F9B473900BDC67371A7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LePittCanard oversees specialty media collections.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 95, name: 'Sab', netWorthValue: 76.9, peakRank: 95, peakNetWorth: 76.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D601D7FCD9FA11FEC0851C6AF98CE6C6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sab manages diversified digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 96, name: 'xiiiannex', netWorthValue: 76.4, peakRank: 96, peakNetWorth: 76.4, changeVal: 0.7, changeText: '▲ +$700M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['xiiiannex grows fast through interactive content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 97, name: 'Lunar', netWorthValue: 76.0, peakRank: 97, peakNetWorth: 76.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D0D9E7CD5FC44C543015024242EC12A0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Lunar commands strategic stakes in tech.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
-                { id: 98, name: 'Tendo', netWorthValue: 75.4, peakRank: 98, peakNetWorth: 75.4, changeVal: 0.2, changeText: '▲ +$248M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BCE2F9C690C407A37BC96F996C03B91E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tendo accelerates market reach.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
-                { id: 99, name: 'Luke', netWorthValue: 75.0, peakRank: 99, peakNetWorth: 75.0, changeVal: 0.0, changeText: '▲ +$8M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A1A6775CBDCC7613205369F5D1FB4B1E-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Luke builds steady capital reserves.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 100, name: 'dgx', netWorthValue: 73.7, peakRank: 100, peakNetWorth: 73.7, changeVal: 0.1, changeText: '▲ +$100M', hasChange: true, positive: true, img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2F98487E4C47E68E5B440F33F2FE64C2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['dgx closes the top 100 with resilient networks.'], country: 'Global', source: 'Technology & AI', gender: 'Man' }
+                { id: 1, name: 'Boti', netWorthValue: 803.2, peakRank: 1, peakNetWorth: 803.2, changeVal: 14.5, changeText: '▲ +$14.5B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-598A1E6CEBD8F31170FB54EE84B1577F-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Boti maintains his position at the summit.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
+                { id: 2, name: 'Giacolamela', netWorthValue: 662.3, peakRank: 2, peakNetWorth: 662.3, changeVal: 8.1, changeText: '▲ +$8.1B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6A0D4EFDF769ADF1D04EDF965FE4E5D1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Giacolamela holds a commanding position.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
+                { id: 3, name: 'Alpha', netWorthValue: 473.8, peakRank: 3, peakNetWorth: 473.8, changeVal: -5.2, changeText: '▼ -$5.2B', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BBC0AC360CCE4D5EC4796ACE83C36DA7-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Alpha secures a prominent standing.'], country: 'Global', source: 'Retail & E-Commerce', gender: 'Man' },
+                { id: 4, name: 'Vector', netWorthValue: 292.6, peakRank: 4, peakNetWorth: 292.6, changeVal: -1.4, changeText: '▼ -$1.4B', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-314B0FF852E2197D2C64342328C77EE0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Vector establishes a formidable presence.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 5, name: 'Yophas', netWorthValue: 289.2, peakRank: 5, peakNetWorth: 289.2, changeVal: -0.7, changeText: '▼ -$705M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-98E94E750538C1062C3B1F82724A73DF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yophas firmly secures his place.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 6, name: 'Madison', netWorthValue: 287.9, peakRank: 6, peakNetWorth: 287.9, changeVal: 4.2, changeText: '▲ +$4.2B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D268E183D003FEBD0A5E6CDAD7E70BB4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Madison ranks among top innovators.'], country: 'Global', source: 'Tycoons', gender: 'Women' },
+                { id: 7, name: 'Chris', netWorthValue: 281.0, peakRank: 7, peakNetWorth: 281.0, changeVal: 2.1, changeText: '▲ +$2.1B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0FCE5CD735B26387DF6B820B78D194B4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chris commands market influence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 8, name: 'Yuki', netWorthValue: 254.9, peakRank: 8, peakNetWorth: 254.9, changeVal: 5.6, changeText: '▲ +$5.6B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-51FE1EF702BCEEC6A270D563818F51B6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yuki represents digital ecosystems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 9, name: 'Kasper', netWorthValue: 237.9, peakRank: 9, peakNetWorth: 237.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC06858A574D17A719A055CCFC355F2F-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kasper breaks into elite ranks.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 10, name: 'Tito', netWorthValue: 209.3, peakRank: 10, peakNetWorth: 209.3, changeVal: 5.9, changeText: '▲ +$5.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-316103E68F90BEEDEA43FF58D66BC705-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tito commands a powerful portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 11, name: 'Eclipse', netWorthValue: 201.3, peakRank: 11, peakNetWorth: 201.3, changeVal: 17.0, changeText: '▲ +$17.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-081A4015104BC6AD94B91FED5198EF9C-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Eclipse surges onto the leaderboard.'], country: 'Global', source: 'Tycoons', gender: 'Man' },
+                { id: 12, name: 'CYUL', netWorthValue: 191.2, peakRank: 12, peakNetWorth: 191.2, changeVal: 8.4, changeText: '▲ +$8.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-21DC1F850EAA53DE027602AC2E2289BD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['CYUL solidifies a strong position.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 13, name: 'Acidic', netWorthValue: 185.0, peakRank: 13, peakNetWorth: 185.0, changeVal: -1.2, changeText: '▼ -$1.2B', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A93290ADDB12E46B76328E0D03E4C2B6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Acidic maintains a robust enterprise portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 14, name: 'Sabrina', netWorthValue: 177.9, peakRank: 14, peakNetWorth: 177.9, changeVal: -0.7, changeText: '▼ -$720M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8C32772581413C0CB9FB4273C52332EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sabrina commands notable influence.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 15, name: 'Philip', netWorthValue: 177.1, peakRank: 15, peakNetWorth: 177.1, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2188A5445A8636BDBD0BAEAD250D04DA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Philip drives continuous growth.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 16, name: 'Sully', netWorthValue: 175.0, peakRank: 16, peakNetWorth: 175.0, changeVal: 0.2, changeText: '▲ +$150M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3D6EC1601A5A57A9885D7D141835C0C9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sully secures his standing.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 17, name: 'Djedax', netWorthValue: 172.3, peakRank: 17, peakNetWorth: 172.3, changeVal: -0.8, changeText: '▼ -$760M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A9AD94640E88886A60E659FEED0449FD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Djedax maintains a solid presence.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 18, name: 'zthebee', netWorthValue: 169.8, peakRank: 18, peakNetWorth: 169.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E76C7C0D9069A9F25C41E827F4EA34DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['zthebee commands an impressive portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 19, name: 'KasokuVT', netWorthValue: 166.3, peakRank: 19, peakNetWorth: 166.3, changeVal: 0.2, changeText: '▲ +$221M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-67F4754D8B939E4C66227735E31D25EA-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['KasokuVT drives virtual networks.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 20, name: 'Epikical', netWorthValue: 165.9, peakRank: 20, peakNetWorth: 165.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B5C96CCE0839DBD41487306CA5EB11E8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Epikical closes out top tier.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 21, name: 't47co', netWorthValue: 161.2, peakRank: 21, peakNetWorth: 161.2, changeVal: 3.9, changeText: '▲ +$3.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-231A417BE4F33BA99FF848BDDB5D75AD-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['t47co expands rapidly.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 22, name: 'Jason', netWorthValue: 160.6, peakRank: 22, peakNetWorth: 160.6, changeVal: 1.1, changeText: '▲ +$1.1B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-973FC39AD12FA1DEFB76BAD748DD8C2B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jason secures steady financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 23, name: 'Newt', netWorthValue: 157.3, peakRank: 23, peakNetWorth: 157.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FAA36DF4B111CA9747F245A495E5C4CE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Newt maintains a powerful capital standing.'], country: 'Global', source: 'Investors', gender: 'Man' },
+                { id: 24, name: 'Alonzo', netWorthValue: 154.3, peakRank: 24, peakNetWorth: 154.3, changeVal: 0.8, changeText: '▲ +$794M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F252E4A0826F8B0A3179A46930ED2940-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Alonzo drives ongoing expansion.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 25, name: 'blankmotive', netWorthValue: 151.4, peakRank: 25, peakNetWorth: 151.4, changeVal: -0.3, changeText: '▼ -$254M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3AA046E94E4D227C4F38F96933775F47-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['blankmotive manages a specialized tech portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 26, name: 'HeartEditor', netWorthValue: 148.3, peakRank: 26, peakNetWorth: 148.3, changeVal: 0.1, changeText: '▲ +$139M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C82500D180927161A920FEC291AFA52D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['HeartEditor oversees elite digital content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 27, name: 'Yamenxdroyal', netWorthValue: 144.0, peakRank: 27, peakNetWorth: 144.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DC7B0E124FFB376E385CF57D89B0BDBD-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yamenxdroyal holds strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 28, name: 'fairyqueen059', netWorthValue: 143.3, peakRank: 28, peakNetWorth: 143.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A68445B6F379F620FDB4E1236E7E453D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['fairyqueen059 builds value through luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 29, name: 'Thyff', netWorthValue: 141.7, peakRank: 29, peakNetWorth: 141.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C1D32763E81DACCDE42529DE7BAA3B36-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Thyff anchors robust investments.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 30, name: 'Cleo', netWorthValue: 140.8, peakRank: 30, peakNetWorth: 140.8, changeVal: 0.4, changeText: '▲ +$370M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4203CE0DDEA79F8CC6E0866E8EC26BE5-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Cleo drives consistent market growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 31, name: 'Devin', netWorthValue: 136.6, peakRank: 31, peakNetWorth: 136.6, changeVal: 2.8, changeText: '▲ +$2.8B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D174CE2D768F55799B74E5B7522A316-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Devin secures strong financial positioning.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 32, name: 'Adrian', netWorthValue: 134.8, peakRank: 32, peakNetWorth: 134.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AADB4313E80551C178724DFE28B80683-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Adrian manages diversified asset portfolios.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 33, name: 'Panther', netWorthValue: 133.1, peakRank: 33, peakNetWorth: 133.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D15AF34B997DC6C81DEF087E2CB3783-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Panther commands a stealthy portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Women' },
+                { id: 34, name: 'Yoyo', netWorthValue: 131.7, peakRank: 34, peakNetWorth: 131.7, changeVal: -0.6, changeText: '▼ -$584M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C9E1817C655EC32DE62656F1D610CAC0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Yoyo oversees flexible digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 35, name: 'Khs1251', netWorthValue: 130.2, peakRank: 35, peakNetWorth: 130.2, changeVal: 4.9, changeText: '▲ +$4.9B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C442CDCFC46C92B91F026AC7D91E801-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Khs1251 accelerates through continuous tech innovations.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 36, name: 'logi', netWorthValue: 130.1, peakRank: 36, peakNetWorth: 130.1, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4DA54E16117FF4D95D21A801D801C3-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['logi maintains robust logistics networks.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 37, name: 'Hex', netWorthValue: 127.5, peakRank: 37, peakNetWorth: 127.5, changeVal: 2.4, changeText: '▲ +$2.4B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E9FBB219DE64D5FD43100AD60EDA0972-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hex expands market share through cryptographic protocols.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 38, name: 'James', netWorthValue: 126.3, peakRank: 38, peakNetWorth: 126.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-652E5D2B117E2C77BAC9650D141F470B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['James commands a diversified portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 39, name: 'freudi6n', netWorthValue: 124.9, peakRank: 39, peakNetWorth: 124.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8704721932065DE8A6E371F745D6FC53-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['freudi6n maintains a solid financial position.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 40, name: 'Vince', netWorthValue: 123.4, peakRank: 40, peakNetWorth: 123.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFACCB214D445D75B4485CB131EEED29-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Vince rounds out the top 40.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 41, name: 'kravings', netWorthValue: 122.0, peakRank: 41, peakNetWorth: 122.0, changeVal: -0.2, changeText: '▼ -$240M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AB3FF1B027150CF6E790A546718FB0BA-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['kravings manages a dynamic digital asset portfolio.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 42, name: 'AceDipped', netWorthValue: 119.8, peakRank: 42, peakNetWorth: 119.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CB932DDC6A44439881618A5798DBD591-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['AceDipped secures a prominent place.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 43, name: 'Val', netWorthValue: 119.3, peakRank: 43, peakNetWorth: 119.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CDA8284C76572F98D79151E0A5E4BC0D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Val oversees high-value venture capital funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 44, name: 'JessieK', netWorthValue: 117.7, peakRank: 44, peakNetWorth: 117.7, changeVal: 0.5, changeText: '▲ +$484M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B9B196290D535D2DB2FE0BD36129FE23-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['JessieK drives steady portfolio growth.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 45, name: 'piz', netWorthValue: 117.7, peakRank: 45, peakNetWorth: 117.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C1346B68B8449A1631E2C18957EF9A2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['piz maintains substantial capital reserves.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 46, name: 'Protato', netWorthValue: 116.4, peakRank: 46, peakNetWorth: 116.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5B3E19BA7DA4D0A5174A18655F324A7F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Protato commands a thriving digital empire.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 47, name: '_M_', netWorthValue: 116.0, peakRank: 47, peakNetWorth: 116.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D5898C7230953EBD628A902C36CE135A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['_M_ secures a spot among global elite.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 48, name: 'Waffle Fox', netWorthValue: 115.4, peakRank: 48, peakNetWorth: 115.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Waffle Fox builds lasting wealth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 49, name: 'MisterYan', netWorthValue: 115.0, peakRank: 49, peakNetWorth: 115.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DA3ACBA42CFEFCFCA78BC8E4896579C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['MisterYan directs strategic global investments.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 50, name: 'Hum', netWorthValue: 113.8, peakRank: 50, peakNetWorth: 113.8, changeVal: 0.0, changeText: '▼ -$19M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2E6EE698A2CD0FFDEFE8000CEBDB7BAF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Hum rounds out the Top 50 billionaires list.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 51, name: 'Overdrive', netWorthValue: 112.4, peakRank: 51, peakNetWorth: 112.4, changeVal: 4.3, changeText: '▲ +$4.3B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-88F0B9E3647A7BFFF677EA434192F16A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Overdrive accelerates market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 52, name: 'Chara', netWorthValue: 112.0, peakRank: 52, peakNetWorth: 112.0, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EBEE9636E7BF391B2E34CF04332B9986-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Chara maintains stable corporate holdings.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 53, name: 'Maximus026', netWorthValue: 110.2, peakRank: 53, peakNetWorth: 110.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-020F1429C2BAA98DC7E55737E4D41F8F-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Maximus026 commands a robust portfolio.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 54, name: 'Logan', netWorthValue: 109.6, peakRank: 54, peakNetWorth: 109.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E67A365BC09CE1367DC088D6A457A83-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Logan secures consistent financial growth.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 55, name: 'Amber', netWorthValue: 109.2, peakRank: 55, peakNetWorth: 109.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0F3FE493D59B04E21D13D1D5A125A309-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Amber builds significant value through retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 56, name: 'Serene', netWorthValue: 107.8, peakRank: 56, peakNetWorth: 107.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E797C5C1AB752F57CB61859F7ED2AF-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Serene manages a tranquil portfolio.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 57, name: 'RICODUDE', netWorthValue: 107.4, peakRank: 57, peakNetWorth: 107.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D8B9FDDF4720970EBABE757868710CB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['RICODUDE maintains a strong market presence.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 58, name: 'Clutch', netWorthValue: 106.6, peakRank: 58, peakNetWorth: 106.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-74A5A17710CCEFDBB8A3C988AEE7ED42-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Clutch commands robust capital reserves.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 59, name: 'Arctic', netWorthValue: 106.1, peakRank: 59, peakNetWorth: 106.1, changeVal: 1.3, changeText: '▲ +$1.3B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-FBE4F6A75ED050DFAB8E80BA93374C50-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Arctic expands rapidly through sustainable energy.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 60, name: 'Dani', netWorthValue: 106.0, peakRank: 60, peakNetWorth: 106.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-31FA129C7D748D1125F76F60A4F5450E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Dani rounds out the leaderboard.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 61, name: 'Tubularlly', netWorthValue: 105.2, peakRank: 61, peakNetWorth: 105.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EAF2E2CC19D7B4BA26CDCD8F637194CD-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tubularlly expands her digital ecosystem.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 62, name: 'John', netWorthValue: 104.8, peakRank: 62, peakNetWorth: 104.8, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EDCA09DAB8940AA7580CE0590F01854B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['John manages reliable enterprise resources.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 63, name: 'XxAmanitaxX', netWorthValue: 104.0, peakRank: 63, peakNetWorth: 104.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-29FA52EB1A45D1D4696CCC2351E95F0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['XxAmanitaxX directs niche luxury brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 64, name: 'Xcnar', netWorthValue: 103.2, peakRank: 64, peakNetWorth: 103.2, changeVal: 0.2, changeText: '▲ +$227M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-121DB50D2B060316660AC2E03D6ED3DE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xcnar accelerates through tactical tech.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 65, name: 'Midas', netWorthValue: 103.0, peakRank: 65, peakNetWorth: 103.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-35C9E4976701F2852F62FD5E8A3B5BAE-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Midas anchors powerful precious asset funds.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 66, name: 'jay', netWorthValue: 102.1, peakRank: 66, peakNetWorth: 102.1, changeVal: 0.0, changeText: '▼ -$10K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6204A9AA64534DCDE79A3AEC0441C63A-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['jay oversees agile tech initiatives.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 67, name: 'Oscar', netWorthValue: 102.0, peakRank: 67, peakNetWorth: 102.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-CE21BCFBE627761B69CEC5CCEAA466D2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Oscar maintains steady capital streams.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 68, name: 'camilorobloxenero', netWorthValue: 101.1, peakRank: 68, peakNetWorth: 101.1, changeVal: 0.0, changeText: '▲ +$100K', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-94E115BA27CF6FC09ACC663B1DFBE2A4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['camilorobloxenero drives creative community platforms.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 69, name: 'LucasDaUltimate', netWorthValue: 100.8, peakRank: 69, peakNetWorth: 100.8, changeVal: 0.0, changeText: '▲ +$9K', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9D5B260C493CEC04E4D9FCE4CF33F3E9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LucasDaUltimate builds resilient digital assets.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 70, name: 'Kai', netWorthValue: 100.2, peakRank: 70, peakNetWorth: 100.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D9B22F44D7F74AE93CE6FE713857278B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Kai commands influence through lifestyle branding.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 71, name: 'Solia', netWorthValue: 99.7, peakRank: 71, peakNetWorth: 99.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D51BE89A3350B28C33B33CC752B0C31A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Solia curates elegant artistic ventures.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 72, name: 'Saleh', netWorthValue: 98.1, peakRank: 72, peakNetWorth: 98.1, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E722677A06F551DDB46C949425FEA532-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Saleh directs expanding international real estate.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 73, name: 'Blez', netWorthValue: 97.7, peakRank: 73, peakNetWorth: 97.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-66D1316DD1A7303F74F19BB5B625EB02-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Blez maintains stable digital ventures.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 74, name: 'SisterAlex', netWorthValue: 97.4, peakRank: 74, peakNetWorth: 97.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7059BBDE99888783DF44F89D15D3E8C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['SisterAlex shapes contemporary lifestyle media.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 75, name: 'Heather', netWorthValue: 96.4, peakRank: 75, peakNetWorth: 96.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A92AD7C72D5751CDFEF7352B92D4E965-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Heather focuses on high-end fashion lines.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 76, name: 'Joke', netWorthValue: 95.0, peakRank: 76, peakNetWorth: 95.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DE0FAF32CAD79354ECAF3BE37A252CC2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Joke builds value through viral entertainment.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 77, name: 'Mobin', netWorthValue: 93.3, peakRank: 77, peakNetWorth: 93.3, changeVal: 2.0, changeText: '▲ +$2.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-97FFCE65DCD1EFA6BC190A1F33342CF8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Mobin surges with investments in cloud systems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 78, name: 'Aero Vista', netWorthValue: 92.0, peakRank: 78, peakNetWorth: 92.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFFAE7651EB13D85A43B9A994B16EB5B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Aero Vista specializes in aerospace engineering.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 79, name: 'Unknown', netWorthValue: 91.3, peakRank: 79, peakNetWorth: 91.3, changeVal: -0.7, changeText: '▼ -$663M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Unknown operates discreetly across alternatives.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 80, name: 'Pengu', netWorthValue: 90.5, peakRank: 80, peakNetWorth: 90.5, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4E9A225D3F1D0F47C4AE2525688655-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Pengu commands solid holdings in logistics.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 81, name: 'Xofer', netWorthValue: 90.2, peakRank: 81, peakNetWorth: 90.2, changeVal: -0.3, changeText: '▼ -$300M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4CEF45A75689FA4E010BFD959845618D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xofer manages diversified software solutions.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 82, name: 'Bubbles', netWorthValue: 88.0, peakRank: 82, peakNetWorth: 88.0, changeVal: -0.1, changeText: '▼ -$100M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C0D9EECCB7FBB4844B7D88455A28C128-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Bubbles oversees creative consumer brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 83, name: 'Ken', netWorthValue: 87.2, peakRank: 83, peakNetWorth: 87.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8DF46166C54030469FE52075355ABFF1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Ken anchors reliable industrial assets.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 84, name: 'Duncan', netWorthValue: 85.0, peakRank: 84, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B98AD8D4FE8D6F1DAD6A082B76174CC9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Duncan directs specialized luxury retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 85, name: 'Froggie', netWorthValue: 85.0, peakRank: 85, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-086D595BDC53ADF5E22CADA773E769D7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Froggie maintains vibrant interactive entertainment.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 86, name: 'Geo', netWorthValue: 83.0, peakRank: 86, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E57CB6F6A4230FBCA60B133C433FD0D4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Geo maps out global real estate developments.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 87, name: 'Peach', netWorthValue: 83.0, peakRank: 87, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D6BF6FEEFCF5EFBC6A104EA0EF72337-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Peach curates boutique digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 88, name: 'paul', netWorthValue: 82.3, peakRank: 88, peakNetWorth: 82.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F00FFCD2314992C0F30357D8E9F171C6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['paul secures core enterprise value.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 89, name: 'Darius', netWorthValue: 82.0, peakRank: 89, peakNetWorth: 82.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D0FA2B1BDB662EA0C0ED161225541F3-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Darius drives solid financial returns.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 90, name: 'Jacobs', netWorthValue: 80.6, peakRank: 90, peakNetWorth: 80.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E80ED2011C3E401CCEDF97E7E71E0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jacobs manages stable multi-industry holdings.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 91, name: 'Five', netWorthValue: 80.3, peakRank: 91, peakNetWorth: 80.3, changeVal: 0.0, changeText: '▲ +$20M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C9AA2CA5C92DF7160C0DCDA987FA950-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Five advances algorithmic numerical trading.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 92, name: 'Shadow', netWorthValue: 79.7, peakRank: 92, peakNetWorth: 79.7, changeVal: 0.0, changeText: '▲ +$7M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E98D08A7DDA8D60141A1A8D98A9FEEB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Shadow maintains a private secure portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 93, name: 'Rasger', netWorthValue: 77.8, peakRank: 93, peakNetWorth: 77.8, changeVal: 1.0, changeText: '▲ +$1.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1790F2FEFE2FF16B4BEAA2899F902A32-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Rasger expands rapidly through tech scaling.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 94, name: 'LePittCanard', netWorthValue: 77.7, peakRank: 94, peakNetWorth: 77.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0500A84157F24F9B473900BDC67371A7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LePittCanard oversees specialty media collections.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 95, name: 'Sab', netWorthValue: 76.9, peakRank: 95, peakNetWorth: 76.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D601D7FCD9FA11FEC0851C6AF98CE6C6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sab manages diversified digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 96, name: 'xiiiannex', netWorthValue: 76.4, peakRank: 96, peakNetWorth: 76.4, changeVal: 0.7, changeText: '▲ +$700M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['xiiiannex grows fast through interactive content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 97, name: 'Lunar', netWorthValue: 76.0, peakRank: 97, peakNetWorth: 76.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D0D9E7CD5FC44C543015024242EC12A0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Lunar commands strategic stakes in tech.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 98, name: 'Tendo', netWorthValue: 75.4, peakRank: 98, peakNetWorth: 75.4, changeVal: 0.2, changeText: '▲ +$248M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BCE2F9C690C407A37BC96F996C03B91E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tendo accelerates market reach.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 99, name: 'Luke', netWorthValue: 75.0, peakRank: 99, peakNetWorth: 75.0, changeVal: 0.0, changeText: '▲ +$8M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A1A6775CBDCC7613205369F5D1FB4B1E-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Luke builds steady capital reserves.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 100, name: 'dgx', netWorthValue: 73.7, peakRank: 100, peakNetWorth: 73.7, changeVal: 0.1, changeText: '▲ +$100M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2F98487E4C47E68E5B440F33F2FE64C2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['dgx closes the top 100 with resilient networks.'], country: 'Global', source: 'Technology & AI', gender: 'Man' }
             ];
         }
 
         function getBaseCompanies() {
             return [
-                { id: 1, name: 'Omega AI', netWorthValue: 14.5, changeVal: -0.5, positive: false, img: OMEGA_LOGO_SVG, ceo: 'Giacolamela' }
+                { id: 1, name: 'Omega AI', netWorthValue: 14.5, changeVal: -0.5, positive: false, history: [], img: OMEGA_LOGO_SVG, ceo: 'Giacolamela' }
             ];
         }
 
@@ -1230,7 +1293,6 @@ BloxIndex
                     return val % 1 === 0 ? '$' + val.toFixed(0) + 'B' : '$' + val.toFixed(1) + 'B';
                 },
                 isTrillionaire(item) {
-                    // Solo se considera trillonario si su patrimonio actual supera o iguala 1T (1000B)
                     return item && item.netWorthValue >= 1000;
                 },
                 getTrillionaireLabel(item) {
@@ -1238,7 +1300,7 @@ BloxIndex
                     if (this.firstTrillionaireName && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
                         return this.t('firstTrillionaire');
                     }
-                    return ''; // Si no es el primero absoluto, no muestra etiqueta de trillonario
+                    return '';
                 },
                 hasDailyChange(item) {
                     return item && item.changeVal !== undefined && item.changeVal !== 0;
@@ -1291,19 +1353,42 @@ BloxIndex
                     const tier = this.getFireTier(item);
                     return tier > 0 ? this.t(`fire${tier}`) : '';
                 },
-                getChartLinePath(item) {
-                    if (!item) return '';
-                    let seed = ((item.id || 1) % 5) * 4;
-                    if (item.positive) {
-                        return `M 10 ${88 - seed} Q 90 ${75 - seed}, 140 ${68 - seed} T 260 ${45 - seed} T 390 20`;
-                    } else {
-                        return `M 10 ${22 + seed} Q 90 ${35 + seed}, 140 ${48 + seed} T 260 ${68 + seed} T 390 88`;
+                getChartData(item) {
+                    if (!item) return { pointsStr: '10,85 440,85', lastX: 440, lastY: 85 };
+                    let vals = (item.history && item.history.length >= 2) ? [...item.history] : [item.netWorthValue - (item.changeVal || 0), item.netWorthValue];
+                    
+                    while (vals.length < 24) {
+                        let first = vals[0];
+                        let r = deterministicRandom(`${item.name}_pad_${vals.length}`);
+                        let step = (r - 0.5) * (first * 0.04);
+                        vals.unshift(Math.max(5, Number((first - step).toFixed(2))));
                     }
-                },
-                getChartAreaPath(item) {
-                    if (!item) return '';
-                    let line = this.getChartLinePath(item);
-                    return `${line} L 390 105 L 10 105 Z`;
+
+                    let minV = Math.min(...vals);
+                    let maxV = Math.max(...vals);
+                    let range = maxV - minV;
+                    if (range < 0.01) range = 1;
+
+                    const width = 445;
+                    const startX = 10;
+                    const topPad = 18;
+                    const bottomPad = 155;
+                    const usableH = bottomPad - topPad;
+
+                    let coords = vals.map((v, idx) => {
+                        let x = startX + (idx / (vals.length - 1)) * (width - startX);
+                        let norm = (v - minV) / range;
+                        let y = bottomPad - norm * usableH;
+                        return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+                    });
+
+                    let pointsStr = coords.map(c => `${c.x},${c.y}`).join(' ');
+                    let last = coords[coords.length - 1];
+                    return {
+                        pointsStr,
+                        lastX: last.x,
+                        lastY: last.y
+                    };
                 },
                 get top5People() {
                     return this.people.slice(0, 5);
@@ -1352,6 +1437,7 @@ BloxIndex
                             peakRank: 1,
                             changeVal: company.changeVal,
                             positive: company.positive,
+                            history: company.history || [company.netWorthValue],
                             img: company.img,
                             bio: [`Company founded and operated by CEO ${company.ceo}.`, `Current valuation: ${this.formatWorth(company.netWorthValue)}.`],
                             country: 'Global',
@@ -1419,6 +1505,7 @@ BloxIndex
                         netWorthValue: investment,
                         changeVal: 1.0,
                         positive: true,
+                        history: [investment - 1.0, investment],
                         img: logoUrl,
                         ceo: this.currentUser.name
                     };
@@ -1482,7 +1569,14 @@ BloxIndex
                         }
                     } catch (e) {}
 
-                    const startCycle = Math.max(1, targetCycle - 30);
+                    syncedPeople.forEach(p => {
+                        p.history = [p.netWorthValue];
+                    });
+                    syncedCompanies.forEach(c => {
+                        c.history = [c.netWorthValue];
+                    });
+
+                    const startCycle = Math.max(1, targetCycle - 32);
 
                     for (let cycle = startCycle; cycle <= targetCycle; cycle++) {
                         syncedCompanies.forEach(company => {
@@ -1504,6 +1598,7 @@ BloxIndex
                             company.netWorthValue = Math.max(5.0, Number((company.netWorthValue + companyDelta).toFixed(1)));
                             company.changeVal = companyDelta;
                             company.positive = companyDelta >= 0;
+                            company.history.push(company.netWorthValue);
                         });
 
                         syncedPeople.forEach(person => {
@@ -1511,14 +1606,14 @@ BloxIndex
                             let r2 = deterministicRandom(`pers_${person.name.toLowerCase()}_c${cycle}_b`);
                             let pctChange = 0;
 
-                            if (r1 < 0.25) {
+                            if (r1 < 0.20) {
                                 pctChange = 0;
-                            } else if (r1 < 0.58) {
-                                pctChange = 0.002 + r2 * 0.035;
-                            } else if (r1 < 0.72) {
-                                pctChange = 0.03 + r2 * 0.07;
+                            } else if (r1 < 0.56) {
+                                pctChange = 0.003 + r2 * 0.038;
+                            } else if (r1 < 0.70) {
+                                pctChange = 0.025 + r2 * 0.065;
                             } else {
-                                pctChange = -(0.005 + r2 * 0.045);
+                                pctChange = -(0.005 + r2 * 0.048);
                             }
 
                             let delta = Number((person.netWorthValue * pctChange).toFixed(1));
@@ -1527,12 +1622,12 @@ BloxIndex
                             person.netWorthValue = Math.max(10.0, Number((person.netWorthValue + delta).toFixed(1)));
                             person.changeVal = delta;
                             person.positive = delta >= 0;
+                            person.history.push(person.netWorthValue);
 
                             if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
                                 person.peakNetWorth = Number(person.netWorthValue.toFixed(1));
                             }
 
-                            // Detectar al primer usuario absoluto en llegar al trillón (1000B+)
                             if (!detectedFirstTrillionaire && person.netWorthValue >= 1000) {
                                 detectedFirstTrillionaire = person.name;
                             }
@@ -1560,6 +1655,9 @@ BloxIndex
                             match.img = this.currentUser.img;
                             this.currentUser = match;
                         } else {
+                            if (!this.currentUser.history || this.currentUser.history.length === 0) {
+                                this.currentUser.history = [this.currentUser.netWorthValue];
+                            }
                             syncedPeople.push(this.currentUser);
                             syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
                             syncedPeople.forEach((p, idx) => p.id = idx + 1);
@@ -1674,6 +1772,7 @@ BloxIndex
                         peakRank: this.people.length + 1,
                         changeVal: 1.5,
                         positive: true,
+                        history: [98.5, 100.0],
                         img: avatarUrl,
                         bio: [`${cleanUsername} successfully registered into BloxIndex.`],
                         country: 'Global',
@@ -1689,7 +1788,6 @@ BloxIndex
                         if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = Number(p.netWorthValue.toFixed(1));
                     });
                     
-                    // Asignar primer trillonario si aún no existe y este usuario arranca alto
                     if (!this.firstTrillionaireName && targetUser.netWorthValue >= 1000) {
                         this.firstTrillionaireName = targetUser.name;
                     }
