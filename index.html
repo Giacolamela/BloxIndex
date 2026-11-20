@@ -1961,7 +1961,7 @@
                 people: [],
                 companies: [],
                 registeredUsers: [],
-                userPasswordsMap: {}, // { username_lowercase: password }
+                userPasswordsMap: {}, 
                 friendshipsMap: {},
                 friendRequestsMap: {},
                 firstTrillionaireName: null,
@@ -2126,13 +2126,14 @@
                     return Array.from(combined).sort();
                 },
                 get displayedPeople() {
+                    // Sincronizar y ordenar empresas de manera estricta por riqueza descendente (Top 1 es la más rica)
                     if (this.currentFilter === 'companies') {
-                        let list = this.companies;
+                        let list = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
                         if (this.searchQuery && this.searchQuery.trim() !== '') {
                             let q = this.searchQuery.toLowerCase();
                             list = list.filter(c => c.name.toLowerCase().includes(q) || c.ceo.toLowerCase().includes(q));
                         }
-                        return list.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                        return list;
                     }
 
                     let list = this.people;
@@ -2264,8 +2265,20 @@
                     };
                     reader.readAsDataURL(file);
                 },
+                loadCompaniesFromStorage() {
+                    try {
+                        let savedComps = localStorage.getItem('empire_user_companies');
+                        if (savedComps) {
+                            let parsed = JSON.parse(savedComps);
+                            if (Array.isArray(parsed)) {
+                                this.companies = parsed.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                            }
+                        }
+                    } catch (e) {}
+                },
                 saveCompaniesToStorage() {
                     try {
+                        this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
                         localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
                     } catch (e) {}
                 },
@@ -2276,6 +2289,17 @@
                         localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
                         localStorage.setItem('empire_user_passwords', JSON.stringify(this.userPasswordsMap));
                     } catch (e) {}
+                },
+                registerRealUserRecord(userObj) {
+                    if (!userObj || !userObj.name) return;
+                    const idx = this.registeredUsers.findIndex(u => u.name.toLowerCase() === userObj.name.toLowerCase());
+                    const record = { name: userObj.name, img: userObj.img, lastSeen: Date.now() };
+                    if (idx >= 0) {
+                        this.registeredUsers[idx] = record;
+                    } else {
+                        this.registeredUsers.push(record);
+                    }
+                    this.saveSocialToStorage();
                 },
                 saveCompanyChanges() {
                     if (!this.editingCompany) return;
@@ -2358,13 +2382,12 @@
                     };
 
                     this.companies.push(newCompanyEntry);
-                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
                     this.saveCompaniesToStorage();
 
                     this.showCompanyModal = false;
                     this.currentFilter = 'companies';
                     this.openCompanyDashboard(newCompanyEntry);
-                    this.notify(`¡Empresa "${compName}" fundada con éxito y visible en el Top global!`, '🏢');
+                    this.notify(`¡Empresa "${compName}" fundada con éxito y posicionada en el Top global!`, '🏢');
                 },
                 buyCompanyUpgrade(company, upg) {
                     if (!this.isCompanyOwner(company) || !this.currentUser) return;
@@ -2391,9 +2414,8 @@
                     company.positive = true;
                     company.history.push(company.netWorthValue);
 
-                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
                     this.saveCompaniesToStorage();
-                    this.notify(`¡${company.name} subió de nivel! Ganancias potenciadas.`, '🚀');
+                    this.notify(`¡${company.name} subió de nivel y ascendió posiciones en el Top!`, '🚀');
                 },
                 sendCompanyInvite(company) {
                     if (!this.isCompanyOwner(company)) return;
@@ -2549,42 +2571,24 @@
                     localStorage.removeItem('empire_current_user');
                     this.notify('Has cerrado sesión correctamente.', '🚪');
                 },
-                registerRealUserRecord(userObj) {
-                    if (!userObj || !userObj.name) return;
-                    const idx = this.registeredUsers.findIndex(u => u.name.toLowerCase() === userObj.name.toLowerCase());
-                    const record = { name: userObj.name, img: userObj.img, lastSeen: Date.now() };
-                    if (idx >= 0) {
-                        this.registeredUsers[idx] = record;
-                    } else {
-                        this.registeredUsers.push(record);
-                    }
-                    this.saveSocialToStorage();
-                },
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
-                    let syncedCompanies = [];
 
                     try {
-                        let savedComps = localStorage.getItem('empire_user_companies');
-                        if (savedComps) {
-                            let parsedComps = JSON.parse(savedComps);
-                            if (Array.isArray(parsedComps)) {
-                                syncedCompanies = parsedComps;
-                            }
-                        }
+                        this.loadCompaniesFromStorage();
                     } catch (e) {}
 
                     syncedPeople.forEach(p => {
                         p.history = [p.netWorthValue];
                     });
-                    syncedCompanies.forEach(c => {
+                    this.companies.forEach(c => {
                         if (!c.history || c.history.length === 0) c.history = [c.netWorthValue];
                     });
 
                     const startCycle = Math.max(1, targetCycle - 32);
 
                     for (let cycle = startCycle; cycle <= targetCycle; cycle++) {
-                        syncedCompanies.forEach(company => {
+                        this.companies.forEach(company => {
                             let r1 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_a`);
                             let r2 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_b`);
                             
@@ -2645,10 +2649,10 @@
                         });
                     }
 
-                    syncedCompanies.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    this.saveCompaniesToStorage();
 
                     this.people = syncedPeople;
-                    this.companies = syncedCompanies;
                     this.lastSimulatedCycle = targetCycle;
 
                     if (this.selectedTop5Person) {
@@ -2719,7 +2723,6 @@
 
                     this.isRegistering = true;
 
-                    // Verificar si ya existe contraseña registrada para este usuario
                     if (this.userPasswordsMap[lowerUsername] !== undefined) {
                         if (this.userPasswordsMap[lowerUsername] !== enteredPassword) {
                             this.isRegistering = false;
@@ -2727,7 +2730,6 @@
                             return;
                         }
                     } else {
-                        // Es un usuario nuevo, registrar su contraseña
                         this.userPasswordsMap[lowerUsername] = enteredPassword;
                         this.saveSocialToStorage();
                     }
@@ -2799,7 +2801,7 @@
                     this.showRegisterModal = false;
                     this.regUsername = '';
                     this.regPassword = '';
-                    this.notify(`¡Cuenta vinculada con éxito, ${cleanUsername}!`, '🎉');
+                    this.notify(`¡Cuenta vinculada y registrada para búsqueda de amigos, ${cleanUsername}!`, '🎉');
                 },
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
@@ -2834,12 +2836,15 @@
                         if (savedUser) {
                             this.currentUser = JSON.parse(savedUser);
                             await this.refreshRobloxProfile(this.currentUser);
+                            // Al iniciar sesión automáticamente se registra y actualiza en la lista de amigos
                             this.registerRealUserRecord(this.currentUser);
                             localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                         }
                     } catch(e) {
                         localStorage.removeItem('empire_current_user');
                     }
+
+                    this.loadCompaniesFromStorage();
 
                     let currentCycle = this.getCurrentGlobalCycle();
                     let nextCycleStart = GLOBAL_EPOCH_MS + (currentCycle + 1) * TWELVE_HOURS_MS;
