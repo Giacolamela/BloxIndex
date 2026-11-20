@@ -154,7 +154,7 @@ BloxIndex
                 <input type="text" x-model="searchQuery" :placeholder="t('searchPlaceholder')" class="w-full bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600">
             </div>
 
-            <!-- Botón Invitaciones Pendientes si el usuario tiene -->
+            <!-- Botón Invitaciones Pendientes -->
             <template x-if="currentUser && pendingInvitesForCurrentUser.length > 0">
                 <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
                     <span>📩</span>
@@ -448,7 +448,7 @@ BloxIndex
             </template>
         </div>
 
-        <!-- Cuadrícula Leaderboard (Personas y Empresas) -->
+        <!-- Cuadrícula Leaderboard (Personas y Empresas ordenadas por Top 1, 2, 3...) -->
         <div x-show="currentFilter !== 'top5' || searchQuery !== ''" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <template x-for="(item, index) in displayedPeople" :key="item.id + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
                 <div @click="currentFilter === 'companies' ? openCompanyDashboard(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
@@ -468,7 +468,8 @@ BloxIndex
                     <img :src="item.img" class="w-32 h-32 rounded-xl object-cover mb-4 bg-black border border-neutral-800" alt="Avatar">
                     
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                        <div class="serif-font text-lg font-bold" x-text="(currentFilter === 'women' || currentFilter === 'companies' || selectedCategory || searchQuery !== '' ? (index + 1) : item.id) + '. ' + item.name"></div>
+                        <!-- Numeración ordenada por el puesto actual en el Top (index + 1) -->
+                        <div class="serif-font text-lg font-bold" x-text="(index + 1) + '. ' + item.name"></div>
                     </div>
 
                     <template x-if="isTrillionaire(item)">
@@ -585,7 +586,7 @@ BloxIndex
         </div>
     </main>
 
-    <!-- NUEVA VISTA DETALLADA Y PANEL DE GESTIÓN DE EMPRESA (COMPANY DASHBOARD) -->
+    <!-- VISTA PANEL DE GESTIÓN DE EMPRESA -->
     <main x-show="selectedCompany" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ compTab: 'overview' }" style="display: none;">
         <button @click="selectedCompany = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backToCompanies')"></button>
         
@@ -605,14 +606,13 @@ BloxIndex
                             </template>
                         </div>
                         <div class="text-xs text-neutral-400 mt-1 flex items-center gap-3 flex-wrap">
-                            <span>👑 CEO: <strong class="text-white" x-text="selectedCompany?.ceo"></strong></span>
+                            <span>👑 <span x-text="t('ceoLabel')"></span>: <strong class="text-white" x-text="selectedCompany?.ceo"></strong></span>
                             <span>•</span>
                             <span>🏷️ <span x-text="selectedCompany?.sector || 'Corporate'"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Botón Editar Empresa (Solo visible para el dueño) -->
                 <template x-if="isCompanyOwner(selectedCompany)">
                     <button @click="openEditCompanyModal(selectedCompany)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 self-start sm:self-center">
                         <span>✏️</span> <span x-text="t('editCompanyBtn')"></span>
@@ -659,7 +659,7 @@ BloxIndex
                 </div>
             </div>
 
-            <!-- TAB 2: Mejoras de Empresa (Gastar dinero personal -> Subir Nivel y Ganancias) -->
+            <!-- TAB 2: Mejoras de Empresa -->
             <div x-show="compTab === 'upgrades'">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-neutral-900/80 border border-neutral-800 p-4 rounded-xl mb-6 gap-3">
                     <div>
@@ -680,7 +680,7 @@ BloxIndex
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-2xl" x-text="upg.icon"></span>
-                                    <span class="bg-neutral-800 text-neutral-300 text-xs font-bold px-2.5 py-1 rounded-md" x-text="'Nivel ' + getUpgradeLevel(selectedCompany, upg.id)"></span>
+                                    <span class="bg-neutral-800 text-neutral-300 text-xs font-bold px-2.5 py-1 rounded-md" x-text="t('levelWord') + ' ' + getUpgradeLevel(selectedCompany, upg.id)"></span>
                                 </div>
                                 <h4 class="font-bold text-base text-white" x-text="t(upg.titleKey)"></h4>
                                 <p class="text-xs text-neutral-400 mt-1" x-text="t(upg.descKey)"></p>
@@ -710,9 +710,8 @@ BloxIndex
                 </div>
             </div>
 
-            <!-- TAB 3: Equipo e Invitación de Usuarios Reales Registrados -->
+            <!-- TAB 3: Equipo e Invitaciones -->
             <div x-show="compTab === 'team'">
-                <!-- Formulario de invitación (Solo dueño) -->
                 <template x-if="isCompanyOwner(selectedCompany)">
                     <div class="bg-neutral-900/90 border border-neutral-800 p-5 rounded-xl mb-6">
                         <h3 class="text-sm font-bold text-white mb-1" x-text="t('inviteRealUserTitle')"></h3>
@@ -722,7 +721,6 @@ BloxIndex
                             <div class="relative flex-grow">
                                 <input type="text" x-model="inviteUsernameInput" :placeholder="t('inviteInputPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                                 
-                                <!-- Lista rápida de usuarios reales registrados en esta sesión/página -->
                                 <div x-show="realRegisteredUsersList.length > 0" class="mt-2 flex flex-wrap gap-1.5 items-center">
                                     <span class="text-[10px] text-neutral-500" x-text="t('registeredPlayersLabel') + ':'"></span>
                                     <template x-for="rUser in realRegisteredUsersList" :key="rUser.name">
@@ -740,21 +738,18 @@ BloxIndex
                     </div>
                 </template>
 
-                <!-- Lista de Miembros Actuales -->
                 <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3" x-text="t('companyMembersTitle')"></h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                    <!-- CEO -->
                     <div class="card-bg border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <img :src="getUserAvatarByName(selectedCompany?.ceo)" class="w-10 h-10 rounded-lg object-cover bg-black">
                             <div>
                                 <div class="text-sm font-bold text-white" x-text="selectedCompany?.ceo"></div>
-                                <div class="text-[11px] text-amber-400 font-semibold">👑 CEO / Fundador</div>
+                                <div class="text-[11px] text-amber-400 font-semibold" x-text="t('ceoFounderLabel')"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Socios Invitados -->
                     <template x-for="member in (selectedCompany?.members || [])" :key="member">
                         <div class="card-bg border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
                             <div class="flex items-center gap-3">
@@ -771,7 +766,6 @@ BloxIndex
                     </template>
                 </div>
 
-                <!-- Invitaciones Pendientes Enviadas -->
                 <template x-if="selectedCompany?.pendingInvites && selectedCompany.pendingInvites.length > 0">
                     <div>
                         <h4 class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2" x-text="t('pendingInvitesTitle')"></h4>
@@ -787,11 +781,11 @@ BloxIndex
                 </template>
             </div>
 
-            <!-- TAB 4: Estadísticas de la Empresa (Incluye Nivel de Empresa) -->
+            <!-- TAB 4: Estadísticas de la Empresa -->
             <div x-show="compTab === 'stats'" class="space-y-4 text-sm">
                 <div class="flex justify-between border-b border-neutral-800 pb-3">
                     <span class="text-neutral-400" x-text="t('companyLevelStat')"></span>
-                    <span class="font-bold text-blue-400 text-base" x-text="'Nivel ' + (selectedCompany?.level || 1)"></span>
+                    <span class="font-bold text-blue-400 text-base" x-text="t('levelWord') + ' ' + (selectedCompany?.level || 1)"></span>
                 </div>
                 <div class="flex justify-between border-b border-neutral-800 pb-3">
                     <span class="text-neutral-400" x-text="t('companyRankStat')"></span>
@@ -803,7 +797,7 @@ BloxIndex
                 </div>
                 <div class="flex justify-between border-b border-neutral-800 pb-3">
                     <span class="text-neutral-400" x-text="t('growthBonusLabel')"></span>
-                    <span class="font-bold text-green-400" x-text="'+' + getCompanyGrowthMultiplier(selectedCompany) + '% por ciclo'"></span>
+                    <span class="font-bold text-green-400" x-text="'+' + getCompanyGrowthMultiplier(selectedCompany) + '% ' + t('perCycleWord')"></span>
                 </div>
                 <div class="flex justify-between border-b border-neutral-800 pb-3">
                     <span class="text-neutral-400" x-text="t('totalMembersStat')"></span>
@@ -867,7 +861,7 @@ BloxIndex
         </div>
     </div>
 
-    <!-- MODAL 3: Crear Empresa (Con subida desde archivos y apertura automática tras login) -->
+    <!-- MODAL 3: Crear Empresa -->
     <div x-show="showCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4 py-6 overflow-y-auto" style="display: none;">
         <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-700 max-w-md w-full relative shadow-2xl my-auto">
             <button @click="showCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -898,7 +892,6 @@ BloxIndex
                     <p class="text-[11px] text-neutral-500 mt-1" x-text="t('investmentDeductNote')"></p>
                 </div>
 
-                <!-- Logo desde Archivo Local o URL/Preset -->
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1.5" x-text="t('companyLogoLabel')"></label>
                     
@@ -930,7 +923,7 @@ BloxIndex
         </div>
     </div>
 
-    <!-- MODAL 4: Editar Empresa (Nombre y Logo desde archivos en cualquier momento) -->
+    <!-- MODAL 4: Editar Empresa -->
     <div x-show="showEditCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
             <button @click="showEditCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -1094,7 +1087,6 @@ BloxIndex
                 fire20: "Fuego Verde (+$20B/día)",
                 fire30: "Fuego Azul (+$30B/día)",
                 fire40: "Fuego Morado (+$40B-$50B/día)",
-                // Nuevas traducciones de Empresa
                 upgradesTab: "Mejoras y Nivel",
                 teamTab: "Equipo e Invitar",
                 companyValuationLabel: "VALORACIÓN DE LA EMPRESA",
@@ -1106,6 +1098,8 @@ BloxIndex
                 upgradeBtn: "Invertir y Mejorar",
                 ownerOnlyAction: "Solo el CEO puede mejorar",
                 profitPerLevel: "ganancia por nivel",
+                levelWord: "Nivel",
+                perCycleWord: "por ciclo",
                 upgTechTitle: "Infraestructura Tech & IA",
                 upgTechDesc: "Automatiza procesos y aumenta la rentabilidad base de la compañía.",
                 upgMarketTitle: "Marketing Global",
@@ -1120,6 +1114,7 @@ BloxIndex
                 registeredPlayersLabel: "Usuarios activos en la web",
                 sendInviteBtn: "Enviar Invitación",
                 companyMembersTitle: "Directiva y Socios Actuales",
+                ceoFounderLabel: "👑 CEO / Fundador",
                 memberRoleLabel: "Socio Corporativo",
                 pendingInvitesTitle: "Invitaciones Pendientes de Aceptar",
                 companyLevelStat: "Nivel de la Empresa",
@@ -1215,6 +1210,8 @@ BloxIndex
                 upgradeBtn: "Invest & Upgrade",
                 ownerOnlyAction: "CEO only",
                 profitPerLevel: "profit per level",
+                levelWord: "Level",
+                perCycleWord: "per cycle",
                 upgTechTitle: "AI & Tech Infrastructure",
                 upgTechDesc: "Automate operations and boost base company returns.",
                 upgMarketTitle: "Global Marketing",
@@ -1229,6 +1226,7 @@ BloxIndex
                 registeredPlayersLabel: "Active web users",
                 sendInviteBtn: "Send Invite",
                 companyMembersTitle: "Current Board & Partners",
+                ceoFounderLabel: "👑 CEO / Founder",
                 memberRoleLabel: "Corporate Partner",
                 pendingInvitesTitle: "Pending Invitations",
                 companyLevelStat: "Company Level",
@@ -1237,6 +1235,342 @@ BloxIndex
                 invitesModalTitle: "Company Invitations",
                 invitesModalDesc: "Real players invited you to join their companies:",
                 acceptBtn: "Join"
+            },
+            it: {
+                title: "BloxIndex",
+                nextUpdateLabel: "Sincronizzazione Globale • Prossimo tra:",
+                topGainersTitle: "Top 5 Maggiori Guadagni",
+                topLosersTitle: "Top 5 Maggiori Perdite",
+                lastCycleTag: "Ultimo Agg. 12h",
+                chartSubLabel: "Monitoraggio per ogni ciclo globale di 12 ore",
+                top5: "Top 5",
+                top: "Top",
+                women: "Donne",
+                companiesTab: "Aziende",
+                categories: "Categorie",
+                searchPlaceholder: "Cerca giocatore o azienda...",
+                registerLogin: "Registrati / Accedi",
+                wealthHistory: "Storico Patrimonio",
+                biography: "Biografia",
+                stats: "Statistiche",
+                currentNetWorth: "PATRIMONIO NETTO ATTUALE",
+                gaining: "IN SALITA",
+                dropping: "IN CALO",
+                sourceWealth: "Ruolo / Settore",
+                gender: "Genere",
+                region: "Regione",
+                searchResults: "Risultati di ricerca per",
+                category: "Categoria",
+                womenTitle: "Classifica Miliardarie Donne",
+                leaderboardTitle: "Classifica dei Miliardari",
+                companiesTitle: "Classifica Aziende Create dagli Utenti",
+                ceoLabel: "CEO / Proprietario",
+                membersCount: "soci",
+                noCompaniesTitle: "Nessuna azienda creata",
+                noCompaniesDesc: "Accedi con il tuo account Roblox per fondare la tua azienda e competere nella Top!",
+                clearFilters: "Cancella Filtri",
+                backButton: "← Torna alla Classifica",
+                backToCompanies: "← Torna alla Top Aziende",
+                myProfile: "Il Mio Profilo",
+                editBio: "Modifica Profilo e Ruolo",
+                createCompanyMenu: "Crea Azienda",
+                manageMyCompany: "Gestisci la mia Azienda",
+                invitesMenu: "Inviti",
+                logout: "Disconnetti",
+                editBioBtn: "✏️ Modifica Profilo",
+                editBioTitle: "Modifica Profilo e Settore",
+                editBioDesc: "Scegli il tuo ruolo principale e aggiorna la biografia.",
+                saveBioButton: "Salva Modifiche",
+                welcomeCompanyBadge: "Benvenuto! Fonda il tuo Impero",
+                createCompanyTitle: "Crea la tua Azienda",
+                createCompanyDesc: "Fonda la tua azienda ufficiale. Carica il tuo logo dai file e scala la classifica delle Aziende!",
+                editCompanyTitle: "Modifica Azienda",
+                editCompanyDesc: "Cambia il nome o carica un nuovo logo dai tuoi file quando vuoi.",
+                editCompanyBtn: "Modifica Nome / Logo",
+                companyNameLabel: "Nome Azienda",
+                companyInvestmentLabel: "Capitale Iniziale (in Miliardi $)",
+                investmentDeductNote: "Verrà dedotto dal tuo patrimonio personale.",
+                companyLogoLabel: "Logo Aziendale (Da file o URL)",
+                uploadFromDeviceBtn: "Sfoglia File",
+                launchCompanyBtn: "Fonda Azienda",
+                laterButton: "Più tardi",
+                modalTitle: "Accedi o Registrati",
+                modalDesc: "Inserisci il tuo nome utente Roblox. Potrai creare la tua azienda subito dopo!",
+                robloxUser: "Nome Utente Roblox",
+                password: "Password",
+                authButton: "Accedi / Registrati",
+                verifying: "Verifica account...",
+                bloodMarketLabel: "🩸 Sangue nel mercato (-$1B+ oggi)",
+                peakRank: "Miglior Posizione",
+                peakNetWorth: "Patrimonio Massimo",
+                firstTrillionaire: "First Trillionaire",
+                fire1: "Fuoco Acceso (+$1B/giorno)",
+                fire5: "Fuoco Arancione (+$5B/giorno)",
+                fire10: "Fuoco Giallo (+$10B/giorno)",
+                fire15: "Fuoco Rosso (+$15B/giorno)",
+                fire20: "Fuoco Verde (+$20B/giorno)",
+                fire30: "Fuoco Blu (+$30B/giorno)",
+                fire40: "Fuoco Viola (+$40B-$50B/giorno)",
+                upgradesTab: "Miglioramenti e Livello",
+                teamTab: "Team e Inviti",
+                companyValuationLabel: "VALUTAZIONE AZIENDALE",
+                growthBonusLabel: "Bonus Crescita",
+                upgradeHeaderTitle: "Investi e Migliora Azienda",
+                upgradeHeaderDesc: "Spendi soldi personali per far salire di livello l'azienda e aumentare i profitti.",
+                yourPersonalBalance: "I tuoi Soldi Disponibili",
+                upgradeCostLabel: "Costo Miglioramento",
+                upgradeBtn: "Investi e Migliora",
+                ownerOnlyAction: "Solo il CEO",
+                profitPerLevel: "profitto per livello",
+                levelWord: "Livello",
+                perCycleWord: "per ciclo",
+                upgTechTitle: "Infrastruttura Tech & IA",
+                upgTechDesc: "Automatizza i processi e aumenta la redditività base.",
+                upgMarketTitle: "Marketing Globale",
+                upgMarketDesc: "Espandi il marchio a milioni di giocatori.",
+                upgExpansionTitle: "Sedi Internazionali",
+                upgExpansionDesc: "Apri uffici globali per moltiplicare le entrate.",
+                upgRdTitle: "Ricerca e Sviluppo",
+                upgRdDesc: "Innovazioni esclusive che fanno impennare il valore.",
+                inviteRealUserTitle: "Invita Utenti Reali",
+                inviteRealUserDesc: "Inserisci il nome utente Roblox di qualcuno che ha effettuato l'accesso a questa pagina.",
+                inviteInputPlaceholder: "Nome utente registrato...",
+                registeredPlayersLabel: "Utenti attivi sul web",
+                sendInviteBtn: "Invia Invito",
+                companyMembersTitle: "Consiglio e Soci Attuali",
+                ceoFounderLabel: "👑 CEO / Fondatore",
+                memberRoleLabel: "Socio Aziendale",
+                pendingInvitesTitle: "Inviti in Sospeso",
+                companyLevelStat: "Livello Azienda",
+                companyRankStat: "Posizione Top Aziende",
+                totalMembersStat: "Totale Membri Reali",
+                invitesModalTitle: "Inviti Aziendali",
+                invitesModalDesc: "Altri giocatori reali ti hanno invitato:",
+                acceptBtn: "Unisciti"
+            },
+            pt: {
+                title: "BloxIndex",
+                nextUpdateLabel: "Sincronização Global • Próxima em:",
+                topGainersTitle: "Top 5 Maiores Ganhadores",
+                topLosersTitle: "Top 5 Maiores Perdedores",
+                lastCycleTag: "Última Att. 12h",
+                chartSubLabel: "Acompanhado a cada ciclo global de 12 horas",
+                top5: "Top 5",
+                top: "Top",
+                women: "Mulheres",
+                companiesTab: "Empresas",
+                categories: "Categorias",
+                searchPlaceholder: "Pesquisar jogador ou empresa...",
+                registerLogin: "Registrar / Entrar",
+                wealthHistory: "Histórico de Riqueza",
+                biography: "Biografia",
+                stats: "Estatísticas",
+                currentNetWorth: "PATRIMÔNIO LÍQUIDO ATUAL",
+                gaining: "SUBINDO",
+                dropping: "CAINDO",
+                sourceWealth: "Trabalho / Setor",
+                gender: "Gênero",
+                region: "Região",
+                searchResults: "Resultados da pesquisa para",
+                category: "Categoria",
+                womenTitle: "Ranking de Mulheres Bilionárias",
+                leaderboardTitle: "Ranking dos Bilionários",
+                companiesTitle: "Ranking de Empresas Criadas por Usuários",
+                ceoLabel: "CEO / Dono",
+                membersCount: "sócios",
+                noCompaniesTitle: "Nenhuma empresa criada",
+                noCompaniesDesc: "Entre com sua conta do Roblox para fundar sua própria empresa e competir no Top!",
+                clearFilters: "Limpar Filtros",
+                backButton: "← Voltar ao Ranking",
+                backToCompanies: "← Voltar ao Top de Empresas",
+                myProfile: "Meu Perfil",
+                editBio: "Editar Perfil e Trabalho",
+                createCompanyMenu: "Criar minha Empresa",
+                manageMyCompany: "Gerenciar minha Empresa",
+                invitesMenu: "Convites",
+                logout: "Sair",
+                editBioBtn: "✏️ Editar Perfil",
+                editBioTitle: "Editar Perfil e Setor",
+                editBioDesc: "Escolha seu papel principal e atualize sua biografia.",
+                saveBioButton: "Salvar Alterações",
+                welcomeCompanyBadge: "Bem-vindo! Lance seu Império",
+                createCompanyTitle: "Criar sua Empresa",
+                createCompanyDesc: "Funde sua empresa oficial. Carregue seu logo dos arquivos e suba no Ranking de Empresas!",
+                editCompanyTitle: "Editar Empresa",
+                editCompanyDesc: "Mude o nome ou envie um novo logo dos seus arquivos quando quiser.",
+                editCompanyBtn: "Editar Nome / Logo",
+                companyNameLabel: "Nome da Empresa",
+                companyInvestmentLabel: "Capital Inicial (em Bilhões $)",
+                investmentDeductNote: "Será descontado do seu patrimônio pessoal.",
+                companyLogoLabel: "Logo da Empresa (De arquivos ou URL)",
+                uploadFromDeviceBtn: "Procurar Arquivos",
+                launchCompanyBtn: "Fundar Empresa",
+                laterButton: "Mais tarde",
+                modalTitle: "Entrar ou Registrar",
+                modalDesc: "Digite seu nome de usuário do Roblox. Você poderá criar sua empresa logo em seguida!",
+                robloxUser: "Usuário do Roblox",
+                password: "Senha",
+                authButton: "Entrar / Registrar",
+                verifying: "Verificando conta...",
+                bloodMarketLabel: "🩸 Sangue no mercado (-$1B+ hoje)",
+                peakRank: "Melhor Posição",
+                peakNetWorth: "Patrimônio Máximo",
+                firstTrillionaire: "First Trillionaire",
+                fire1: "Fogo Aceso (+$1B/dia)",
+                fire5: "Fogo Laranja (+$5B/dia)",
+                fire10: "Fogo Amarelo (+$10B/dia)",
+                fire15: "Fogo Vermelho (+$15B/dia)",
+                fire20: "Fogo Verde (+$20B/dia)",
+                fire30: "Fogo Azul (+$30B/dia)",
+                fire40: "Fogo Roxo (+$40B-$50B/dia)",
+                upgradesTab: "Melhorias e Nível",
+                teamTab: "Equipe e Convites",
+                companyValuationLabel: "VALORIAÇÃO DA EMPRESA",
+                growthBonusLabel: "Bônus de Crescimento",
+                upgradeHeaderTitle: "Investir e Melhorar Empresa",
+                upgradeHeaderDesc: "Gaste dinheiro pessoal para subir o nível da empresa e lucrar mais a cada ciclo.",
+                yourPersonalBalance: "Seu Dinheiro Disponível",
+                upgradeCostLabel: "Custo da Melhoria",
+                upgradeBtn: "Investir e Melhorar",
+                ownerOnlyAction: "Apenas o CEO",
+                profitPerLevel: "lucro por nível",
+                levelWord: "Nível",
+                perCycleWord: "por ciclo",
+                upgTechTitle: "Infraestrutura Tech & IA",
+                upgTechDesc: "Automatize processos e aumente a rentabilidade base.",
+                upgMarketTitle: "Marketing Global",
+                upgMarketDesc: "Expanda a marca para milhões de jogadores.",
+                upgExpansionTitle: "Filiais Internacionais",
+                upgExpansionDesc: "Abra sedes globais para multiplicar a receita.",
+                upgRdTitle: "Pesquisa e Desenvolvimento",
+                upgRdDesc: "Inovações exclusivas que disparam o valor das ações.",
+                inviteRealUserTitle: "Convidar Usuários Reais",
+                inviteRealUserDesc: "Insira o nome de usuário do Roblox de alguém que entrou nesta página.",
+                inviteInputPlaceholder: "Nome de usuário registrado...",
+                registeredPlayersLabel: "Usuários ativos na web",
+                sendInviteBtn: "Enviar Convite",
+                companyMembersTitle: "Diretoria e Sócios Atuais",
+                ceoFounderLabel: "👑 CEO / Fundador",
+                memberRoleLabel: "Sócio Corporativo",
+                pendingInvitesTitle: "Convites Pendentes",
+                companyLevelStat: "Nível da Empresa",
+                companyRankStat: "Posição Top Empresas",
+                totalMembersStat: "Total de Membros Reais",
+                invitesModalTitle: "Convites de Empresas",
+                invitesModalDesc: "Outros jogadores reais convidaram você:",
+                acceptBtn: "Entrar"
+            },
+            de: {
+                title: "BloxIndex",
+                nextUpdateLabel: "Globale Synchronisierung • Nächstes in:",
+                topGainersTitle: "Top 5 Größte Gewinner",
+                topLosersTitle: "Top 5 Größte Verlierer",
+                lastCycleTag: "Letztes 12h-Update",
+                chartSubLabel: "Verfolgt über jeden globalen 12-Stunden-Zyklus",
+                top5: "Top 5",
+                top: "Top",
+                women: "Frauen",
+                companiesTab: "Unternehmen",
+                categories: "Kategorien",
+                searchPlaceholder: "Spieler oder Firma suchen...",
+                registerLogin: "Registrieren / Login",
+                wealthHistory: "Vermögensverlauf",
+                biography: "Biografie",
+                stats: "Statistiken",
+                currentNetWorth: "AKTUELLES NETTOVERMÖGEN",
+                gaining: "STEIGEND",
+                dropping: "FALLEND",
+                sourceWealth: "Rolle / Sektor",
+                gender: "Geschlecht",
+                region: "Region",
+                searchResults: "Suchergebnisse für",
+                category: "Kategorie",
+                womenTitle: "Milliardärinnen-Rangliste",
+                leaderboardTitle: "Die Milliardärs-Rangliste",
+                companiesTitle: "Top-Benutzerunternehmen Rangliste",
+                ceoLabel: "CEO / Eigentümer",
+                membersCount: "Partner",
+                noCompaniesTitle: "Noch keine Unternehmen erstellt",
+                noCompaniesDesc: "Melde dich mit deinem Roblox-Konto an, um dein eigenes Unternehmen zu gründen!",
+                clearFilters: "Filter zurücksetzen",
+                backButton: "← Zurück zur Rangliste",
+                backToCompanies: "← Zurück zur Unternehmens-Top",
+                myProfile: "Mein Profil",
+                editBio: "Profil & Rolle bearbeiten",
+                createCompanyMenu: "Unternehmen gründen",
+                manageMyCompany: "Unternehmen verwalten",
+                invitesMenu: "Einladungen",
+                logout: "Abmelden",
+                editBioBtn: "✏️ Profil bearbeiten",
+                editBioTitle: "Profil & Sektor bearbeiten",
+                editBioDesc: "Wähle deine Hauptrolle und aktualisiere deine Biografie.",
+                saveBioButton: "Änderungen speichern",
+                welcomeCompanyBadge: "Willkommen! Starte dein Imperium",
+                createCompanyTitle: "Gründe dein Unternehmen",
+                createCompanyDesc: "Starte dein offizielles Unternehmen. Lade dein Logo aus deinen Dateien hoch!",
+                editCompanyTitle: "Unternehmen bearbeiten",
+                editCompanyDesc: "Ändere den Namen oder lade ein neues Logo hoch.",
+                editCompanyBtn: "Name / Logo bearbeiten",
+                companyNameLabel: "Unternehmensname",
+                companyInvestmentLabel: "Startkapital (in Milliarden $)",
+                investmentDeductNote: "Wird von deinem Privatvermögen abgezogen.",
+                companyLogoLabel: "Firmenlogo (Aus Dateien oder URL)",
+                uploadFromDeviceBtn: "Dateien durchsuchen",
+                launchCompanyBtn: "Unternehmen gründen",
+                laterButton: "Später",
+                modalTitle: "Anmelden oder Registrieren",
+                modalDesc: "Gib deinen Roblox-Benutzernamen ein. Du wirst direkt danach aufgefordert, dein Unternehmen zu gründen!",
+                robloxUser: "Roblox-Benutzername",
+                password: "Passwort",
+                authButton: "Login / Registrieren",
+                verifying: "Konto wird überprüft...",
+                bloodMarketLabel: "🩸 Blut im Markt (-$1B+ heute)",
+                peakRank: "Höchster Rang",
+                peakNetWorth: "Höchstes Nettovermögen",
+                firstTrillionaire: "First Trillionaire",
+                fire1: "Entfachtes Feuer (+$1B/Tag)",
+                fire5: "Oranges Feuer (+$5B/Tag)",
+                fire10: "Gelbes Feuer (+$10B/Tag)",
+                fire15: "Rotes Feuer (+$15B/Tag)",
+                fire20: "Grünes Feuer (+$20B/Tag)",
+                fire30: "Blaues Feuer (+$30B/Tag)",
+                fire40: "Violettes Feuer (+$40B-$50B/Tag)",
+                upgradesTab: "Upgrades & Level",
+                teamTab: "Team & Einladung",
+                companyValuationLabel: "UNTERNEHMENSBEWERTUNG",
+                growthBonusLabel: "Wachstumsbonus",
+                upgradeHeaderTitle: "Investieren & Aufrüsten",
+                upgradeHeaderDesc: "Gib persönliches Geld aus, um dein Unternehmen im Level zu steigern.",
+                yourPersonalBalance: "Dein verfügbares Geld",
+                upgradeCostLabel: "Upgrade-Kosten",
+                upgradeBtn: "Investieren",
+                ownerOnlyAction: "Nur CEO",
+                profitPerLevel: "Gewinn pro Level",
+                levelWord: "Level",
+                perCycleWord: "pro Zyklus",
+                upgTechTitle: "KI & Tech-Infrastruktur",
+                upgTechDesc: "Automatisiere Abläufe und steigere die Rendite.",
+                upgMarketTitle: "Globales Marketing",
+                upgMarketDesc: "Erweitere die Markenbekanntheit.",
+                upgExpansionTitle: "Internationale Niederlassungen",
+                upgExpansionDesc: "Eröffne globale Standorte für mehr Einnahmen.",
+                upgRdTitle: "Forschung & Entwicklung",
+                upgRdDesc: "Exklusive Innovationen für den Aktienwert.",
+                inviteRealUserTitle: "Echte Benutzer einladen",
+                inviteRealUserDesc: "Gib den Roblox-Benutzernamen ein, um sie als Partner einzuladen.",
+                inviteInputPlaceholder: "Registrierter Benutzername...",
+                registeredPlayersLabel: "Aktive Web-Benutzer",
+                sendInviteBtn: "Einladung senden",
+                companyMembersTitle: "Aktueller Vorstand & Partner",
+                ceoFounderLabel: "👑 CEO / Gründer",
+                memberRoleLabel: "Unternehmenspartner",
+                pendingInvitesTitle: "Ausstehende Einladungen",
+                companyLevelStat: "Unternehmenslevel",
+                companyRankStat: "Top-Unternehmen Rang",
+                totalMembersStat: "Gesamte echte Mitglieder",
+                invitesModalTitle: "Unternehmens-Einladungen",
+                invitesModalDesc: "Echte Spieler haben dich eingeladen:",
+                acceptBtn: "Beitreten"
             }
         };
 
@@ -1713,7 +2047,6 @@ BloxIndex
                     this.showEditCompanyModal = true;
                 },
 
-                // Subir imagen desde archivos locales (FileReader -> DataURL)
                 handleLogoFileUpload(event, mode) {
                     const file = event.target.files[0];
                     if (!file) return;
@@ -1737,8 +2070,7 @@ BloxIndex
                     try {
                         localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
                     } catch (e) {
-                        console.error('Error guardando empresas (posible límite de almacenamiento por imagen muy pesada)', e);
-                        this.notify('Aviso: La imagen es muy grande para guardar en caché local, usa una más ligera si no persiste.', '⚠️');
+                        console.error('Error guardando empresas', e);
                     }
                 },
 
@@ -1806,7 +2138,6 @@ BloxIndex
                         return;
                     }
 
-                    // Descontar inversión del patrimonio personal del usuario
                     this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - investment).toFixed(1));
                     let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
                     if (personInList) {
@@ -1842,7 +2173,6 @@ BloxIndex
                     this.notify(`¡Empresa "${compName}" fundada y añadida al Top de Empresas!`, '🏢');
                 },
 
-                // Comprar mejora de empresa (Gasta dinero personal, sube nivel y valor)
                 buyCompanyUpgrade(company, upg) {
                     if (!this.isCompanyOwner(company) || !this.currentUser) return;
                     const cost = this.getUpgradeCost(company, upg);
@@ -1851,7 +2181,6 @@ BloxIndex
                         return;
                     }
 
-                    // El usuario pierde dinero personal al invertirlo
                     this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - cost).toFixed(1));
                     let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
                     if (personInList) {
@@ -1859,12 +2188,10 @@ BloxIndex
                     }
                     localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
 
-                    // Sube el nivel de la mejora, el nivel general de la empresa y su valoración
                     if (!company.upgrades) company.upgrades = { tech: 0, marketing: 0, expansion: 0, rd: 0 };
                     company.upgrades[upg.id] = (company.upgrades[upg.id] || 0) + 1;
                     company.level = (company.level || 1) + 1;
 
-                    // La valoración de la empresa sube por la inversión + rentabilidad inmediata
                     const addedValue = Number((cost * 1.15).toFixed(1));
                     company.netWorthValue = Number((company.netWorthValue + addedValue).toFixed(1));
                     company.changeVal = Number(((company.changeVal || 0) + addedValue).toFixed(1));
@@ -1873,10 +2200,9 @@ BloxIndex
 
                     this.companies.sort((a, b) => b.netWorthValue - a.netWorthValue);
                     this.saveCompaniesToStorage();
-                    this.notify(`¡${company.name} subió a Nivel ${company.level}! Ganancias potenciadas.`, '🚀');
+                    this.notify(`¡${company.name} subió de nivel! Ganancias potenciadas.`, '🚀');
                 },
 
-                // Invitar usuarios reales que hayan entrado en la página
                 sendCompanyInvite(company) {
                     if (!this.isCompanyOwner(company)) return;
                     const targetName = this.inviteUsernameInput.trim();
@@ -1889,7 +2215,6 @@ BloxIndex
                         return;
                     }
 
-                    // Verificar que sea un usuario real que haya entrado a la página
                     const realUser = this.registeredUsers.find(u => u.name.toLowerCase() === targetName.toLowerCase());
                     if (!realUser) {
                         this.notify(`"${targetName}" aún no ha ingresado a esta página con su cuenta.`, '🔍');
@@ -2021,7 +2346,6 @@ BloxIndex
                             let r1 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_a`);
                             let r2 = deterministicRandom(`comp_${company.name.toLowerCase()}_c${cycle}_b`);
                             
-                            // Bono extra de rendimiento según el Nivel de la Empresa y sus mejoras
                             let levelBonus = ((company.level || 1) - 1) * 0.008;
                             let pctChange = 0;
 
@@ -2192,7 +2516,6 @@ BloxIndex
                         this.regPassword = '';
                         this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}!`, '👋');
 
-                        // Si aún no tiene empresa, abrir automáticamente el creador de empresa
                         if (!this.userOwnedCompany) {
                             setTimeout(() => this.openCompanyModal(true), 450);
                         }
@@ -2253,7 +2576,6 @@ BloxIndex
                     this.regPassword = '';
                     this.notify(`¡Cuenta vinculada! Ahora crea tu empresa, ${cleanUsername}.`, '🎉');
 
-                    // Abrir automáticamente la creación de empresa para el nuevo usuario
                     if (!this.userOwnedCompany) {
                         setTimeout(() => this.openCompanyModal(true), 450);
                     }
@@ -2292,7 +2614,6 @@ BloxIndex
                     this.syncGlobalMarketToCycle(currentCycle);
                     this.startCountdownLoop();
 
-                    // Si ya tenía sesión iniciada al recargar pero aún no creó su empresa, avisarle
                     if (this.currentUser && !this.userOwnedCompany) {
                         setTimeout(() => this.openCompanyModal(true), 600);
                     }
