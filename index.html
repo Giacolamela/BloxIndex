@@ -176,22 +176,26 @@ BloxIndex
                         <span class="text-xs text-neutral-400">▾</span>
                     </div>
 
-                    <div x-show="showUserMenu" class="absolute right-0 mt-2 w-56 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
+                    <div x-show="showUserMenu" class="absolute right-0 mt-2 w-60 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
                         <button @click="openProfile(currentUser); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center gap-2">
                             👤 <span x-text="t('myProfile')"></span>
                         </button>
                         <button @click="openBioEditor(currentUser); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center gap-2">
                             ✏️ <span x-text="t('editBio')"></span>
                         </button>
-                        <template x-if="userOwnedCompany">
-                            <button @click="openCompanyDashboard(userOwnedCompany); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2 font-semibold">
-                                🏢 <span x-text="t('manageMyCompany') + ' (' + userOwnedCompany.name + ')'"></span>
-                            </button>
-                        </template>
-                        <template x-if="!userOwnedCompany">
-                            <button @click="openCompanyModal(false); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2 font-semibold">
-                                🏢 <span x-text="t('createCompanyMenu')"></span>
-                            </button>
+                        <button @click="openCompanyModal(false); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2 font-semibold">
+                            🏢 <span x-text="t('createAnotherCompany')"></span>
+                        </button>
+                        <template x-if="userOwnedCompanies.length > 0">
+                            <div class="border-t border-neutral-800 my-1 pt-1">
+                                <div class="px-4 py-1 text-[10px] text-neutral-500 uppercase font-bold" x-text="t('myCompaniesLabel')"></div>
+                                <template x-for="comp in userOwnedCompanies" :key="comp.name">
+                                    <button @click="openCompanyDashboard(comp); showUserMenu = false" class="w-full text-left px-4 py-1.5 text-xs hover:bg-neutral-800 text-emerald-400 hover:text-emerald-300 transition flex items-center justify-between">
+                                        <span class="truncate" x-text="comp.name"></span>
+                                        <span class="text-[10px] text-neutral-500" x-text="'LVL ' + (comp.level || 1)"></span>
+                                    </button>
+                                </template>
+                            </div>
                         </template>
                         <template x-if="pendingInvitesForCurrentUser.length > 0">
                             <button @click="showInvitesModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
@@ -420,14 +424,9 @@ BloxIndex
             <h1 class="serif-font text-3xl font-normal" x-text="searchQuery !== '' ? t('searchResults') + ': ' + searchQuery : (selectedCategory ? t('category') + ': ' + selectedCategory : (currentFilter === 'women' ? t('womenTitle') : (currentFilter === 'companies' ? t('companiesTitle') : t('leaderboardTitle'))))"></h1>
             
             <div class="flex items-center gap-3">
-                <template x-if="currentFilter === 'companies' && currentUser && !userOwnedCompany">
+                <template x-if="currentFilter === 'companies' && currentUser">
                     <button @click="openCompanyModal(false)" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
                         <span>🏢</span> <span x-text="t('createCompanyMenu')"></span>
-                    </button>
-                </template>
-                <template x-if="currentFilter === 'companies' && userOwnedCompany">
-                    <button @click="openCompanyDashboard(userOwnedCompany)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
-                        <span>⚙️</span> <span x-text="t('manageMyCompany')"></span>
                     </button>
                 </template>
                 <template x-if="selectedCategory || searchQuery !== ''">
@@ -450,7 +449,7 @@ BloxIndex
 
         <!-- Cuadrícula Leaderboard (Personas y Empresas ordenadas por Top 1, 2, 3...) -->
         <div x-show="currentFilter !== 'top5' || searchQuery !== ''" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <template x-for="(item, index) in displayedPeople" :key="item.id + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
+            <template x-for="(item, index) in displayedPeople" :key="(item.id || item.name) + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
                 <div @click="currentFilter === 'companies' ? openCompanyDashboard(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
                     
                     <!-- Badge de Nivel si es empresa -->
@@ -468,7 +467,6 @@ BloxIndex
                     <img :src="item.img" class="w-32 h-32 rounded-xl object-cover mb-4 bg-black border border-neutral-800" alt="Avatar">
                     
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                        <!-- Numeración basada estrictamente en el índice del bucle (1, 2, 3...) -->
                         <div class="serif-font text-lg font-bold" x-text="(index + 1) + '. ' + item.name"></div>
                     </div>
 
@@ -613,11 +611,18 @@ BloxIndex
                     </div>
                 </div>
 
-                <template x-if="isCompanyOwner(selectedCompany)">
-                    <button @click="openEditCompanyModal(selectedCompany)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 self-start sm:self-center">
-                        <span>✏️</span> <span x-text="t('editCompanyBtn')"></span>
-                    </button>
-                </template>
+                <div class="flex items-center gap-2.5 self-start sm:self-center flex-wrap">
+                    <template x-if="isCompanyOwner(selectedCompany)">
+                        <button @click="openEditCompanyModal(selectedCompany)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <span>✏️</span> <span x-text="t('editCompanyBtn')"></span>
+                        </button>
+                    </template>
+                    <template x-if="isCompanyOwner(selectedCompany)">
+                        <button @click="deleteCompany(selectedCompany)" class="bg-red-900/40 hover:bg-red-900/80 border border-red-700/50 text-red-300 px-3 py-2 rounded-xl text-xs font-semibold transition" title="Eliminar empresa">
+                            🗑️
+                        </button>
+                    </template>
+                </div>
             </div>
 
             <!-- Pestañas de la Empresa -->
@@ -1049,8 +1054,9 @@ BloxIndex
                 backToCompanies: "← Volver al Top de Empresas",
                 myProfile: "Mi Perfil",
                 editBio: "Editar Perfil y Trabajo",
-                createCompanyMenu: "Crear mi Empresa",
-                manageMyCompany: "Gestionar mi Empresa",
+                createCompanyMenu: "Crear Empresa",
+                createAnotherCompany: "Crear otra Empresa",
+                myCompaniesLabel: "Mis Empresas",
                 invitesMenu: "Invitaciones",
                 logout: "Cerrar sesión",
                 editBioBtn: "✏️ Editar Perfil",
@@ -1059,7 +1065,7 @@ BloxIndex
                 saveBioButton: "Guardar Cambios",
                 welcomeCompanyBadge: "¡Bienvenido! Funda tu Imperio",
                 createCompanyTitle: "Crea tu Empresa",
-                createCompanyDesc: "Como nuevo miembro en BloxIndex, funda tu empresa oficial. Sube tu propio logo desde tus archivos y escala en el Top de Empresas.",
+                createCompanyDesc: "Funda una nueva empresa oficial. Sube tu propio logo desde tus archivos y escala en el Top de Empresas.",
                 editCompanyTitle: "Editar Empresa",
                 editCompanyDesc: "Cambia el nombre o sube un nuevo logo desde tus archivos cuando quieras.",
                 editCompanyBtn: "Editar Nombre / Logo",
@@ -1161,8 +1167,9 @@ BloxIndex
                 backToCompanies: "← Back to Companies Top",
                 myProfile: "My Profile",
                 editBio: "Edit Profile & Role",
-                createCompanyMenu: "Create my Company",
-                manageMyCompany: "Manage my Company",
+                createCompanyMenu: "Create Company",
+                createAnotherCompany: "Create another Company",
+                myCompaniesLabel: "My Companies",
                 invitesMenu: "Invitations",
                 logout: "Logout",
                 editBioBtn: "✏️ Edit Profile",
@@ -1171,7 +1178,7 @@ BloxIndex
                 saveBioButton: "Save Changes",
                 welcomeCompanyBadge: "Welcome! Launch Your Empire",
                 createCompanyTitle: "Create Your Company",
-                createCompanyDesc: "Launch your official company. Upload your logo directly from your files and climb the Companies Leaderboard!",
+                createCompanyDesc: "Launch a new official company. Upload your logo directly from your files and climb the Companies Leaderboard!",
                 editCompanyTitle: "Edit Company Settings",
                 editCompanyDesc: "Change your company's name or upload a new logo from your files anytime.",
                 editCompanyBtn: "Edit Name / Logo",
@@ -1274,7 +1281,8 @@ BloxIndex
                 myProfile: "Il Mio Profilo",
                 editBio: "Modifica Profilo e Ruolo",
                 createCompanyMenu: "Crea Azienda",
-                manageMyCompany: "Gestisci la mia Azienda",
+                createAnotherCompany: "Crea un'altra Azienda",
+                myCompaniesLabel: "Le mie Aziende",
                 invitesMenu: "Inviti",
                 logout: "Disconnetti",
                 editBioBtn: "✏️ Modifica Profilo",
@@ -1283,7 +1291,7 @@ BloxIndex
                 saveBioButton: "Salva Modifiche",
                 welcomeCompanyBadge: "Benvenuto! Fonda il tuo Impero",
                 createCompanyTitle: "Crea la tua Azienda",
-                createCompanyDesc: "Fonda la tua azienda ufficiale. Carica il tuo logo dai file e scala la classifica delle Aziende!",
+                createCompanyDesc: "Fonda una nuova azienda ufficiale. Carica il tuo logo dai file e scala la classifica delle Aziende!",
                 editCompanyTitle: "Modifica Azienda",
                 editCompanyDesc: "Cambia il nome o carica un nuovo logo dai tuoi file quando vuoi.",
                 editCompanyBtn: "Modifica Nome / Logo",
@@ -1385,8 +1393,9 @@ BloxIndex
                 backToCompanies: "← Voltar ao Top de Empresas",
                 myProfile: "Meu Perfil",
                 editBio: "Editar Perfil e Trabalho",
-                createCompanyMenu: "Criar minha Empresa",
-                manageMyCompany: "Gerenciar minha Empresa",
+                createCompanyMenu: "Criar Empresa",
+                createAnotherCompany: "Criar outra Empresa",
+                myCompaniesLabel: "Minhas Empresas",
                 invitesMenu: "Convites",
                 logout: "Sair",
                 editBioBtn: "✏️ Editar Perfil",
@@ -1395,7 +1404,7 @@ BloxIndex
                 saveBioButton: "Salvar Alterações",
                 welcomeCompanyBadge: "Bem-vindo! Lance seu Império",
                 createCompanyTitle: "Criar sua Empresa",
-                createCompanyDesc: "Funde sua empresa oficial. Carregue seu logo dos arquivos e suba no Ranking de Empresas!",
+                createCompanyDesc: "Funde uma nova empresa oficial. Carregue seu logo dos arquivos e suba no Ranking de Empresas!",
                 editCompanyTitle: "Editar Empresa",
                 editCompanyDesc: "Mude o nome ou envie um novo logo dos seus arquivos quando quiser.",
                 editCompanyBtn: "Editar Nome / Logo",
@@ -1455,7 +1464,7 @@ BloxIndex
                 pendingInvitesTitle: "Convites Pendentes",
                 companyLevelStat: "Nível da Empresa",
                 companyRankStat: "Posição Top Empresas",
-                totalMembersStat: "Total de Membros Reais",
+                totalMembersStat: "Total de Membros Reali",
                 invitesModalTitle: "Convites de Empresas",
                 invitesModalDesc: "Outros jogadores reais convidaram você:",
                 acceptBtn: "Entrar"
@@ -1498,7 +1507,8 @@ BloxIndex
                 myProfile: "Mein Profil",
                 editBio: "Profil & Rolle bearbeiten",
                 createCompanyMenu: "Unternehmen gründen",
-                manageMyCompany: "Unternehmen verwalten",
+                createAnotherCompany: "Weiteres Unternehmen gründen",
+                myCompaniesLabel: "Meine Unternehmen",
                 invitesMenu: "Einladungen",
                 logout: "Abmelden",
                 editBioBtn: "✏️ Profil bearbeiten",
@@ -1507,7 +1517,7 @@ BloxIndex
                 saveBioButton: "Änderungen speichern",
                 welcomeCompanyBadge: "Willkommen! Starte dein Imperium",
                 createCompanyTitle: "Gründe dein Unternehmen",
-                createCompanyDesc: "Starte dein offizielles Unternehmen. Lade dein Logo aus deinen Dateien hoch!",
+                createCompanyDesc: "Starte ein neues offizielles Unternehmen. Lade dein Logo aus deinen Dateien hoch!",
                 editCompanyTitle: "Unternehmen bearbeiten",
                 editCompanyDesc: "Ändere den Namen oder lade ein neues Logo hoch.",
                 editCompanyBtn: "Name / Logo bearbeiten",
@@ -1693,47 +1703,27 @@ BloxIndex
             ];
         }
 
-        function getBaseCompanies() {
-            return [
-                {
-                    id: 1,
-                    name: 'Omega AI',
-                    netWorthValue: 14.5,
-                    changeVal: 1.2,
-                    positive: true,
-                    history: [13.3, 14.5],
-                    img: OMEGA_LOGO_SVG,
-                    ceo: 'Giacolamela',
-                    sector: 'Technology & AI',
-                    level: 2,
-                    upgrades: { tech: 1, marketing: 0, expansion: 0, rd: 0 },
-                    members: [],
-                    pendingInvites: []
-                }
-            ];
-        }
-
         function empireApp() {
             return {
                 lang: 'es',
                 currentFilter: 'all',
                 selectedCategory: null,
                 selectedPerson: null,
-                selectedCompany: null,
                 selectedTop5Person: null,
+                selectedCompany: null,
                 showRegisterModal: false,
                 showCategoriesDropdown: false,
                 showUserMenu: false,
                 showBioModal: false,
                 showCompanyModal: false,
-                isAutoCompanyPrompt: false,
                 showEditCompanyModal: false,
                 showInvitesModal: false,
+                isAutoCompanyPrompt: false,
                 editingCompany: null,
                 editCompanyNameInput: '',
                 editCompanyLogoInput: '',
                 tempBioText: '',
-                tempSource: '',
+                tempSource: 'Tycoons',
                 newCompanyName: '',
                 newCompanySector: 'Technology & AI',
                 newCompanyInvestment: 15.0,
@@ -1746,47 +1736,34 @@ BloxIndex
                 regPassword: '',
                 isRegistering: false,
                 currentUser: null,
-                registeredUsers: [],
                 people: [],
                 companies: [],
+                registeredUsers: [],
                 firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
                 timeRemainingMs: TWELVE_HOURS_MS,
                 timerInterval: null,
                 toastMessage: '',
-                toastIcon: 'ℹ️',
+                toastIcon: '✨',
                 toastTimeout: null,
-
                 companyUpgradesList: [
-                    { id: 'tech', icon: '🤖', titleKey: 'upgTechTitle', descKey: 'upgTechDesc', baseCost: 5.0, bonusPct: 1.5 },
-                    { id: 'marketing', icon: '📢', titleKey: 'upgMarketTitle', descKey: 'upgMarketDesc', baseCost: 4.0, bonusPct: 1.2 },
-                    { id: 'expansion', icon: '🌐', titleKey: 'upgExpansionTitle', descKey: 'upgExpansionDesc', baseCost: 8.0, bonusPct: 2.2 },
-                    { id: 'rd', icon: '🧬', titleKey: 'upgRdTitle', descKey: 'upgRdDesc', baseCost: 12.0, bonusPct: 3.0 }
+                    { id: 'tech', icon: '⚡', titleKey: 'upgTechTitle', descKey: 'upgTechDesc', bonusPct: 15, baseCost: 5.0 },
+                    { id: 'marketing', icon: '📈', titleKey: 'upgMarketTitle', descKey: 'upgMarketDesc', bonusPct: 20, baseCost: 8.0 },
+                    { id: 'expansion', icon: '🌍', titleKey: 'upgExpansionTitle', descKey: 'upgExpansionDesc', bonusPct: 35, baseCost: 15.0 },
+                    { id: 'rd', icon: '🔬', titleKey: 'upgRdTitle', descKey: 'upgRdDesc', bonusPct: 50, baseCost: 30.0 }
                 ],
-
                 notify(msg, icon = '✨') {
                     this.toastMessage = msg;
                     this.toastIcon = icon;
                     if (this.toastTimeout) clearTimeout(this.toastTimeout);
                     this.toastTimeout = setTimeout(() => {
                         this.toastMessage = '';
-                    }, 4500);
+                    }, 4000);
                 },
-
                 t(key) {
-                    return translations[this.lang]?.[key] || translations['es'][key] || translations['en'][key] || key;
+                    return translations[this.lang]?.[key] || translations['es'][key] || key;
                 },
-
-                resetViews(filterName) {
-                    this.currentFilter = filterName;
-                    this.selectedCategory = null;
-                    this.selectedPerson = null;
-                    this.selectedCompany = null;
-                    this.showCategoriesDropdown = false;
-                    this.searchQuery = '';
-                },
-
                 get formattedCountdown() {
                     let totalSeconds = Math.max(0, Math.floor(this.timeRemainingMs / 1000));
                     let hours = Math.floor(totalSeconds / 3600);
@@ -1795,86 +1772,24 @@ BloxIndex
                     const pad = (n) => String(n).padStart(2, '0');
                     return `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
                 },
-
                 get top5Gainers() {
-                    return [...this.people]
-                        .filter(p => p.changeVal > 0)
-                        .sort((a, b) => b.changeVal - a.changeVal)
-                        .slice(0, 5);
+                    return [...this.people].filter(p => p.changeVal > 0).sort((a, b) => b.changeVal - a.changeVal).slice(0, 5);
                 },
-
                 get top5Losers() {
-                    return [...this.people]
-                        .filter(p => p.changeVal < 0)
-                        .sort((a, b) => a.changeVal - b.changeVal)
-                        .slice(0, 5);
+                    return [...this.people].filter(p => p.changeVal < 0).sort((a, b) => a.changeVal - b.changeVal).slice(0, 5);
                 },
-
-                get userOwnedCompany() {
-                    if (!this.currentUser) return null;
-                    return this.companies.find(c => c.ceo.toLowerCase() === this.currentUser.name.toLowerCase()) || null;
-                },
-
-                get pendingInvitesForCurrentUser() {
-                    if (!this.currentUser) return [];
-                    const uLower = this.currentUser.name.toLowerCase();
-                    return this.companies.filter(c => 
-                        Array.isArray(c.pendingInvites) && 
-                        c.pendingInvites.some(inv => inv.toLowerCase() === uLower)
-                    );
-                },
-
-                get realRegisteredUsersList() {
-                    if (!this.currentUser) return this.registeredUsers;
-                    return this.registeredUsers.filter(u => u.name.toLowerCase() !== this.currentUser.name.toLowerCase());
-                },
-
-                isCompanyOwner(comp) {
-                    if (!comp || !this.currentUser) return false;
-                    return comp.ceo.toLowerCase() === this.currentUser.name.toLowerCase();
-                },
-
-                getCompanyRank(comp) {
-                    if (!comp) return 1;
-                    let sorted = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    let idx = sorted.findIndex(c => c.name.toLowerCase() === comp.name.toLowerCase());
-                    return idx >= 0 ? idx + 1 : 1;
-                },
-
-                getUpgradeLevel(comp, upgId) {
-                    if (!comp || !comp.upgrades) return 0;
-                    return comp.upgrades[upgId] || 0;
-                },
-
-                getUpgradeCost(comp, upg) {
-                    const lvl = this.getUpgradeLevel(comp, upg.id);
-                    return Number((upg.baseCost * Math.pow(1.45, lvl)).toFixed(1));
-                },
-
-                getCompanyGrowthMultiplier(comp) {
-                    if (!comp || !comp.upgrades) return "0.0";
-                    let totalBonus = 0;
-                    this.companyUpgradesList.forEach(upg => {
-                        totalBonus += (comp.upgrades[upg.id] || 0) * upg.bonusPct;
-                    });
-                    return totalBonus.toFixed(1);
-                },
-
-                getUserAvatarByName(username) {
-                    if (!username) return PRESET_COMPANY_LOGOS[0];
-                    const lower = username.toLowerCase();
-                    const reg = this.registeredUsers.find(u => u.name.toLowerCase() === lower);
-                    if (reg && reg.img) return reg.img;
-                    const pers = this.people.find(p => p.name.toLowerCase() === lower);
-                    if (pers && pers.img) return pers.img;
-                    return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
-                },
-
                 changeLanguage(newLang) {
                     this.lang = newLang;
                     localStorage.setItem('empire_lang', newLang);
                 },
-
+                resetViews(filterName) {
+                    this.currentFilter = filterName;
+                    this.selectedCategory = null;
+                    this.selectedPerson = null;
+                    this.selectedCompany = null;
+                    this.showCategoriesDropdown = false;
+                    this.searchQuery = '';
+                },
                 formatWorth(val) {
                     if (val === undefined || val === null) return '$0B';
                     if (val >= 1000) {
@@ -1883,23 +1798,19 @@ BloxIndex
                     }
                     return val % 1 === 0 ? '$' + val.toFixed(0) + 'B' : '$' + val.toFixed(1) + 'B';
                 },
-
                 isTrillionaire(item) {
                     return item && item.netWorthValue >= 1000;
                 },
-
                 getTrillionaireLabel(item) {
                     if (!this.isTrillionaire(item)) return '';
-                    if (this.firstTrillionaireName && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
+                    if (this.firstTrillionaireName && item.name && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
                         return this.t('firstTrillionaire');
                     }
                     return '';
                 },
-
                 hasDailyChange(item) {
                     return item && item.changeVal !== undefined && item.changeVal !== 0;
                 },
-
                 formatDailyChange(item) {
                     if (!this.hasDailyChange(item)) return '▲ +$0B (0.0%)';
                     let prevWorth = item.netWorthValue - item.changeVal;
@@ -1918,11 +1829,9 @@ BloxIndex
                     let pctSign = percentage >= 0 ? '+' : '';
                     return `${symbol} ${sign}${valStr} (${pctSign}${percentage.toFixed(1)}%)`;
                 },
-
                 isBloodActive(item) {
                     return item && item.changeVal !== undefined && item.changeVal <= -1.0;
                 },
-
                 getFireTier(item) {
                     if (!item || item.changeVal === undefined || item.changeVal < 1.0) return 0;
                     const gain = item.changeVal;
@@ -1934,34 +1843,29 @@ BloxIndex
                     if (gain >= 5) return 5;
                     return 1;
                 },
-
                 hasFire(item) {
                     return this.getFireTier(item) > 0;
                 },
-
                 getFireBadgeClass(item) {
                     const tier = this.getFireTier(item);
                     return tier > 0 ? `fire-tier-${tier}` : '';
                 },
-
                 getContainerGlowClass(item) {
                     if (this.isBloodActive(item)) return 'blood-glow';
                     const tier = this.getFireTier(item);
                     return tier > 0 ? `glow-tier-${tier}` : '';
                 },
-
                 getFireLabel(item) {
                     const tier = this.getFireTier(item);
                     return tier > 0 ? this.t(`fire${tier}`) : '';
                 },
-
                 getChartData(item) {
                     if (!item) return { pointsStr: '10,85 440,85', lastX: 440, lastY: 85 };
                     let vals = (item.history && item.history.length >= 2) ? [...item.history] : [item.netWorthValue - (item.changeVal || 0), item.netWorthValue];
                     
                     while (vals.length < 24) {
                         let first = vals[0];
-                        let r = deterministicRandom(`${item.name}_pad_${vals.length}`);
+                        let r = deterministicRandom(`${item.name || 'item'}_pad_${vals.length}`);
                         let step = (r - 0.5) * (first * 0.04);
                         vals.unshift(Math.max(5, Number((first - step).toFixed(2))));
                     }
@@ -1986,22 +1890,15 @@ BloxIndex
 
                     let pointsStr = coords.map(c => `${c.x},${c.y}`).join(' ');
                     let last = coords[coords.length - 1];
-                    return {
-                        pointsStr,
-                        lastX: last.x,
-                        lastY: last.y
-                    };
+                    return { pointsStr, lastX: last.x, lastY: last.y };
                 },
-
                 get top5People() {
                     return this.people.slice(0, 5);
                 },
-
                 get uniqueCategories() {
                     let combined = new Set([...AVAILABLE_SECTORS, ...this.people.map(p => p.source)]);
                     return Array.from(combined).sort();
                 },
-
                 get displayedPeople() {
                     if (this.currentFilter === 'companies') {
                         let list = this.companies;
@@ -2009,7 +1906,7 @@ BloxIndex
                             let q = this.searchQuery.toLowerCase();
                             list = list.filter(c => c.name.toLowerCase().includes(q) || c.ceo.toLowerCase().includes(q));
                         }
-                        return [...list].sort((a, b) => b.netWorthValue - a.netWorthValue);
+                        return list.sort((a, b) => b.netWorthValue - a.netWorthValue);
                     }
 
                     let list = this.people;
@@ -2023,57 +1920,108 @@ BloxIndex
                             list = list.filter(p => p.source === this.selectedCategory);
                         }
                     }
-                    return [...list].sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    return list.sort((a, b) => b.netWorthValue - a.netWorthValue);
                 },
-
+                get userOwnedCompanies() {
+                    if (!this.currentUser) return [];
+                    return this.companies.filter(c => c.ceo.toLowerCase() === this.currentUser.name.toLowerCase());
+                },
+                get pendingInvitesForCurrentUser() {
+                    if (!this.currentUser) return [];
+                    const uName = this.currentUser.name.toLowerCase();
+                    return this.companies.filter(c => c.pendingInvites && c.pendingInvites.some(i => i.toLowerCase() === uName));
+                },
+                get realRegisteredUsersList() {
+                    return this.registeredUsers.filter(u => !this.currentUser || u.name.toLowerCase() !== this.currentUser.name.toLowerCase());
+                },
                 openProfile(person) {
-                    this.selectedCompany = null;
                     this.selectedPerson = person;
+                    this.selectedCompany = null;
                 },
-
                 openCompanyDashboard(company) {
-                    this.selectedPerson = null;
-                    if (!company.upgrades) company.upgrades = { tech: 0, marketing: 0, expansion: 0, rd: 0 };
-                    if (!company.level) company.level = 1;
-                    if (!company.members) company.members = [];
-                    if (!company.pendingInvites) company.pendingInvites = [];
                     this.selectedCompany = company;
+                    this.selectedPerson = null;
                 },
-
+                isCompanyOwner(company) {
+                    if (!this.currentUser || !company) return false;
+                    return company.ceo.toLowerCase() === this.currentUser.name.toLowerCase();
+                },
+                getCompanyRank(company) {
+                    let sorted = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    let idx = sorted.findIndex(c => c.name.toLowerCase() === company.name.toLowerCase());
+                    return idx >= 0 ? idx + 1 : 1;
+                },
+                getUpgradeLevel(company, upgId) {
+                    if (!company || !company.upgrades) return 0;
+                    return company.upgrades[upgId] || 0;
+                },
+                getUpgradeCost(company, upg) {
+                    let lvl = this.getUpgradeLevel(company, upg.id);
+                    return Number((upg.baseCost * Math.pow(1.4, lvl)).toFixed(1));
+                },
+                getCompanyGrowthMultiplier(company) {
+                    if (!company || !company.upgrades) return 0;
+                    let total = 0;
+                    this.companyUpgradesList.forEach(u => {
+                        let lvl = company.upgrades[u.id] || 0;
+                        total += lvl * u.bonusPct;
+                    });
+                    return total;
+                },
+                getUserAvatarByName(name) {
+                    if (!name) return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
+                    if (this.currentUser && this.currentUser.name.toLowerCase() === name.toLowerCase()) {
+                        return this.currentUser.img;
+                    }
+                    let p = this.people.find(x => x.name.toLowerCase() === name.toLowerCase());
+                    if (p) return p.img;
+                    let u = this.registeredUsers.find(x => x.name.toLowerCase() === name.toLowerCase());
+                    if (u) return u.img;
+                    return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
+                },
+                openBioEditor(person) {
+                    if (!person) person = this.currentUser;
+                    if (!person) return;
+                    this.tempBioText = person.bio ? person.bio.join('\n') : '';
+                    this.tempSource = person.source || 'Tycoons';
+                    this.showBioModal = true;
+                },
+                openCompanyModal(isAuto = false) {
+                    if (!this.currentUser) {
+                        this.showRegisterModal = true;
+                        return;
+                    }
+                    this.isAutoCompanyPrompt = isAuto;
+                    this.newCompanyName = '';
+                    this.newCompanySector = 'Technology & AI';
+                    this.newCompanyInvestment = 15.0;
+                    this.newCompanyLogo = OMEGA_LOGO_SVG;
+                    this.showCompanyModal = true;
+                },
                 openEditCompanyModal(company) {
                     this.editingCompany = company;
                     this.editCompanyNameInput = company.name;
                     this.editCompanyLogoInput = company.img;
                     this.showEditCompanyModal = true;
                 },
-
                 handleLogoFileUpload(event, mode) {
                     const file = event.target.files[0];
                     if (!file) return;
-                    if (!file.type.startsWith('image/')) {
-                        this.notify('Por favor selecciona un archivo de imagen válido.', '⚠️');
-                        return;
-                    }
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         if (mode === 'create') {
                             this.newCompanyLogo = e.target.result;
-                        } else {
+                        } else if (mode === 'edit') {
                             this.editCompanyLogoInput = e.target.result;
                         }
-                        this.notify('Imagen cargada correctamente desde tus archivos.', '🖼️');
                     };
                     reader.readAsDataURL(file);
                 },
-
                 saveCompaniesToStorage() {
                     try {
                         localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
-                    } catch (e) {
-                        console.error('Error guardando empresas', e);
-                    }
+                    } catch (e) {}
                 },
-
                 saveCompanyChanges() {
                     if (!this.editingCompany) return;
                     let newName = this.editCompanyNameInput.trim();
@@ -2093,27 +2041,18 @@ BloxIndex
                     this.saveCompaniesToStorage();
                     this.showEditCompanyModal = false;
                     this.editingCompany = null;
-                    this.notify('¡Nombre y logo de la empresa actualizados!', '✅');
+                    this.notify('¡Empresa actualizada con éxito!', '✅');
                 },
+                deleteCompany(company) {
+                    if (!this.isCompanyOwner(company)) return;
+                    if (!confirm(`¿Estás seguro de eliminar la empresa "${company.name}"?`)) return;
 
-                openBioEditor(person) {
-                    if (!person) person = this.currentUser;
-                    if (!person) return;
-                    this.tempBioText = person.bio ? person.bio.join('\n') : '';
-                    this.tempSource = person.source || 'Tycoons';
-                    this.showBioModal = true;
+                    this.companies = this.companies.filter(c => c.name !== company.name);
+                    this.saveCompaniesToStorage();
+                    this.selectedCompany = null;
+                    this.currentFilter = 'companies';
+                    this.notify('Empresa eliminada correctamente.', '🗑️');
                 },
-
-                openCompanyModal(isAuto = false) {
-                    if (!this.currentUser) return;
-                    this.isAutoCompanyPrompt = isAuto;
-                    this.newCompanyName = '';
-                    this.newCompanySector = 'Technology & AI';
-                    this.newCompanyInvestment = Math.min(15.0, Math.max(5.0, Number((this.currentUser.netWorthValue * 0.15).toFixed(1))));
-                    this.newCompanyLogo = OMEGA_LOGO_SVG;
-                    this.showCompanyModal = true;
-                },
-
                 createCompany() {
                     if (!this.currentUser) return;
                     if (!this.newCompanyName || !this.newCompanyName.trim()) {
@@ -2125,6 +2064,7 @@ BloxIndex
                         this.notify('Ese nombre de empresa está restringido.', '🚫');
                         return;
                     }
+
                     if (this.companies.some(c => c.name.toLowerCase() === compName.toLowerCase())) {
                         this.notify('Ya existe una empresa con ese nombre en el ranking.', '⚠️');
                         return;
@@ -2148,7 +2088,6 @@ BloxIndex
                     let logoUrl = this.newCompanyLogo.trim() || OMEGA_LOGO_SVG;
 
                     let newCompanyEntry = {
-                        id: this.companies.length + 1,
                         name: compName,
                         netWorthValue: investment,
                         changeVal: 1.0,
@@ -2170,9 +2109,8 @@ BloxIndex
                     this.showCompanyModal = false;
                     this.currentFilter = 'companies';
                     this.openCompanyDashboard(newCompanyEntry);
-                    this.notify(`¡Empresa "${compName}" fundada y añadida al Top de Empresas!`, '🏢');
+                    this.notify(`¡Empresa "${compName}" fundada con éxito!`, '🏢');
                 },
-
                 buyCompanyUpgrade(company, upg) {
                     if (!this.isCompanyOwner(company) || !this.currentUser) return;
                     const cost = this.getUpgradeCost(company, upg);
@@ -2202,7 +2140,6 @@ BloxIndex
                     this.saveCompaniesToStorage();
                     this.notify(`¡${company.name} subió de nivel! Ganancias potenciadas.`, '🚀');
                 },
-
                 sendCompanyInvite(company) {
                     if (!this.isCompanyOwner(company)) return;
                     const targetName = this.inviteUsernameInput.trim();
@@ -2238,7 +2175,6 @@ BloxIndex
                     this.saveCompaniesToStorage();
                     this.notify(`¡Invitación enviada a ${realUser.name}!`, '📩');
                 },
-
                 respondToInvite(company, accept) {
                     if (!this.currentUser) return;
                     const uLower = this.currentUser.name.toLowerCase();
@@ -2259,14 +2195,12 @@ BloxIndex
                         this.showInvitesModal = false;
                     }
                 },
-
                 removeCompanyMember(company, memberName) {
                     if (!this.isCompanyOwner(company)) return;
                     company.members = (company.members || []).filter(m => m !== memberName);
                     this.saveCompaniesToStorage();
                     this.notify(`${memberName} fue removido de la empresa.`, '👋');
                 },
-
                 saveUserBio() {
                     if (!this.currentUser) return;
                     let lines = this.tempBioText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -2288,14 +2222,12 @@ BloxIndex
                     this.showBioModal = false;
                     this.notify('¡Perfil y sector actualizados!', '✅');
                 },
-
                 logoutUser() {
                     this.currentUser = null;
                     this.selectedCompany = null;
                     localStorage.removeItem('empire_current_user');
                     this.notify('Has cerrado sesión correctamente.', '🚪');
                 },
-
                 registerRealUserRecord(userObj) {
                     if (!userObj || !userObj.name) return;
                     const idx = this.registeredUsers.findIndex(u => u.name.toLowerCase() === userObj.name.toLowerCase());
@@ -2309,25 +2241,16 @@ BloxIndex
                         localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
                     } catch (e) {}
                 },
-
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
-                    let syncedCompanies = getBaseCompanies();
-                    let detectedFirstTrillionaire = this.firstTrillionaireName;
+                    let syncedCompanies = []; // Sin empresas por defecto en el top
 
                     try {
                         let savedComps = localStorage.getItem('empire_user_companies');
                         if (savedComps) {
                             let parsedComps = JSON.parse(savedComps);
                             if (Array.isArray(parsedComps)) {
-                                parsedComps.forEach(c => {
-                                    let existingIdx = syncedCompanies.findIndex(baseC => baseC.name.toLowerCase() === c.name.toLowerCase());
-                                    if (existingIdx >= 0) {
-                                        syncedCompanies[existingIdx] = { ...syncedCompanies[existingIdx], ...c };
-                                    } else {
-                                        syncedCompanies.push(c);
-                                    }
-                                });
+                                syncedCompanies = parsedComps;
                             }
                         }
                     } catch (e) {}
@@ -2392,10 +2315,6 @@ BloxIndex
                             if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
                                 person.peakNetWorth = Number(person.netWorthValue.toFixed(1));
                             }
-
-                            if (!detectedFirstTrillionaire && person.netWorthValue >= 1000) {
-                                detectedFirstTrillionaire = person.name;
-                            }
                         });
 
                         syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
@@ -2407,38 +2326,15 @@ BloxIndex
                         });
                     }
 
-                    if (!detectedFirstTrillionaire) {
-                        let topCandidate = syncedPeople.find(p => p.netWorthValue >= 1000);
-                        if (topCandidate) detectedFirstTrillionaire = topCandidate.name;
-                    }
-
-                    if (this.currentUser) {
-                        let match = syncedPeople.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
-                        if (match) {
-                            match.bio = this.currentUser.bio;
-                            match.source = this.currentUser.source;
-                            match.img = this.currentUser.img;
-                            this.currentUser = match;
-                        } else {
-                            if (!this.currentUser.history || this.currentUser.history.length === 0) {
-                                this.currentUser.history = [this.currentUser.netWorthValue];
-                            }
-                            syncedPeople.push(this.currentUser);
-                            syncedPeople.sort((a, b) => b.netWorthValue - a.netWorthValue);
-                            syncedPeople.forEach((p, idx) => p.id = idx + 1);
-                        }
-                    }
-
                     syncedCompanies.sort((a, b) => b.netWorthValue - a.netWorthValue);
 
-                    this.firstTrillionaireName = detectedFirstTrillionaire;
                     this.people = syncedPeople;
                     this.companies = syncedCompanies;
                     this.lastSimulatedCycle = targetCycle;
 
                     if (this.selectedTop5Person) {
                         let updatedTop = this.people.find(p => p.name === this.selectedTop5Person.name);
-                        this.selectedTop5Person = updatedTop || this.people[0];
+                        this.selectedTop5Person = updatedTop || (this.people.length > 0 ? this.people[0] : null);
                     } else if (this.people.length > 0) {
                         this.selectedTop5Person = this.people[0];
                     }
@@ -2449,16 +2345,14 @@ BloxIndex
                     }
 
                     if (this.selectedCompany) {
-                        let updatedComp = this.companies.find(c => c.name === this.selectedCompany.name);
+                        let updatedComp = this.companies.find(c => c.name.toLowerCase() === this.selectedCompany.name.toLowerCase());
                         if (updatedComp) this.selectedCompany = updatedComp;
                     }
                 },
-
                 getCurrentGlobalCycle() {
                     const elapsed = Math.max(0, Date.now() - GLOBAL_EPOCH_MS);
                     return Math.floor(elapsed / TWELVE_HOURS_MS);
                 },
-
                 startCountdownLoop() {
                     if (this.timerInterval) clearInterval(this.timerInterval);
                     this.timerInterval = setInterval(() => {
@@ -2474,7 +2368,6 @@ BloxIndex
                         }
                     }, 1000);
                 },
-
                 async refreshRobloxProfile(userObj) {
                     try {
                         let userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(userObj.name)}&limit=5`);
@@ -2491,7 +2384,6 @@ BloxIndex
                         }
                     } catch (e) {}
                 },
-
                 async handleAuthUser() {
                     if (!this.regUsername || !this.regUsername.trim()) {
                         this.notify('Por favor, introduce un nombre de usuario de Roblox.', '⚠️');
@@ -2515,10 +2407,6 @@ BloxIndex
                         this.regUsername = '';
                         this.regPassword = '';
                         this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}!`, '👋');
-
-                        if (!this.userOwnedCompany) {
-                            setTimeout(() => this.openCompanyModal(true), 450);
-                        }
                         return;
                     }
 
@@ -2574,13 +2462,8 @@ BloxIndex
                     this.showRegisterModal = false;
                     this.regUsername = '';
                     this.regPassword = '';
-                    this.notify(`¡Cuenta vinculada! Ahora crea tu empresa, ${cleanUsername}.`, '🎉');
-
-                    if (!this.userOwnedCompany) {
-                        setTimeout(() => this.openCompanyModal(true), 450);
-                    }
+                    this.notify(`¡Cuenta vinculada con éxito, ${cleanUsername}!`, '🎉');
                 },
-
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
                     if (savedLang && translations[savedLang]) {
@@ -2613,10 +2496,6 @@ BloxIndex
 
                     this.syncGlobalMarketToCycle(currentCycle);
                     this.startCountdownLoop();
-
-                    if (this.currentUser && !this.userOwnedCompany) {
-                        setTimeout(() => this.openCompanyModal(true), 600);
-                    }
                 }
             }
         }
