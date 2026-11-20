@@ -276,11 +276,11 @@
                                     <div class="text-[11px] text-neutral-400" x-text="formatWorth(u.netWorthValue)"></div>
                                 </div>
                             </div>
-                            <template x-if="hasSentRequestTo(u.name)">
-                                <span class="text-[11px] bg-neutral-800 text-neutral-400 px-3 py-1.5 rounded-lg font-semibold" x-text="t('requestSentBadge')"></span>
+                            <template x-if="areWeFriends(u.name)">
+                                <span class="text-[11px] bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg font-semibold" x-text="t('alreadyFriendsBadge')"></span>
                             </template>
-                            <template x-if="!hasSentRequestTo(u.name)">
-                                <button @click="sendFriendRequest(u.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('addBtn')"></button>
+                            <template x-if="!areWeFriends(u.name)">
+                                <button @click="sendFriendRequest(u.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="hasSentRequestTo(u.name) ? t('requestSentBadge') : t('addBtn')"></button>
                             </template>
                         </div>
                     </template>
@@ -472,7 +472,7 @@
                             </template>
                             <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedTop5Person?.name.toLowerCase()">
                                 <button @click="sendFriendRequest(selectedTop5Person.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                    <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                                    <span>👥</span> <span x-text="hasSentRequestTo(selectedTop5Person.name) ? t('requestSentBadge') : t('addFriendBtn')"></span>
                                 </button>
                             </template>
                         </div>
@@ -669,14 +669,9 @@
                                         <span>✓</span> <span x-text="t('acceptRequestBtn')"></span>
                                     </button>
                                 </template>
-                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name) && hasSentRequestTo(selectedPerson?.name)">
-                                    <span class="bg-neutral-800 border border-neutral-700 text-neutral-400 px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                                        <span>⏳</span> <span x-text="t('requestSentBadge')"></span>
-                                    </span>
-                                </template>
-                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name) && !hasSentRequestTo(selectedPerson?.name)">
+                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name)">
                                     <button @click="sendFriendRequest(selectedPerson.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                        <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                                        <span>👥</span> <span x-text="hasSentRequestTo(selectedPerson.name) ? t('requestSentBadge') : t('addFriendBtn')"></span>
                                     </button>
                                 </template>
                             </div>
@@ -714,7 +709,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- MODAL 6: Modal Dedicado de Solicitudes de Amistad -->
     <div x-show="showFriendRequestsModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
@@ -1907,6 +1902,14 @@
                         return p.name.toLowerCase().includes(this.inviteUsernameInput.toLowerCase());
                     });
                 },
+                get availableUsersToFriend() {
+                    if (!this.currentUser) return this.people;
+                    const myName = this.currentUser.name.toLowerCase();
+                    return this.people.filter(p => p.name.toLowerCase() !== myName).filter(p => {
+                        if (!this.friendSearchInput) return true;
+                        return p.name.toLowerCase().includes(this.friendSearchInput.toLowerCase());
+                    });
+                },
                 isUserOnline(username) {
                     if (!username) return false;
                     if (this.currentUser && this.currentUser.name.toLowerCase() === username.toLowerCase()) return true;
@@ -2231,33 +2234,23 @@
                         return;
                     }
 
-                    // Normalizar y unificar todas las solicitudes entrantes bajo la clave en minúsculas del usuario destino
-                    let mergedList = [];
-                    Object.keys(this.friendRequestsMap).forEach(k => {
-                        if (k.toLowerCase() === targetLower && Array.isArray(this.friendRequestsMap[k])) {
-                            this.friendRequestsMap[k].forEach(s => {
-                                if (!mergedList.some(x => x.toLowerCase() === s.toLowerCase())) {
-                                    mergedList.push(s);
-                                }
-                            });
-                            if (k !== targetLower) {
-                                delete this.friendRequestsMap[k];
-                            }
+                    // Limpieza y reseteo de bug si se queda trabado, permitiendo presionar nuevamente
+                    let updatedReqs = { ...this.friendRequestsMap };
+                    Object.keys(updatedReqs).forEach(k => {
+                        if (k.toLowerCase() === targetLower && Array.isArray(updatedReqs[k])) {
+                            updatedReqs[k] = updatedReqs[k].filter(s => s.toLowerCase() !== myLower);
                         }
                     });
 
-                    if (mergedList.some(s => s.toLowerCase() === myLower)) {
-                        this.notify('Ya enviaste una solicitud de amistad a este usuario.', '⏳');
-                        return;
+                    let targetList = updatedReqs[targetLower] || [];
+                    if (!targetList.some(s => s.toLowerCase() === myLower)) {
+                        targetList.push(myName);
                     }
+                    updatedReqs[targetLower] = targetList;
 
-                    mergedList.push(myName);
-                    this.friendRequestsMap = {
-                        ...this.friendRequestsMap,
-                        [targetLower]: mergedList
-                    };
+                    this.friendRequestsMap = updatedReqs;
                     this.saveSocialToStorage();
-                    this.notify(`Solicitud de amistad enviada a ${cleanTarget}!`, '👥');
+                    this.notify(`¡Solicitud de amistad enviada a ${cleanTarget}!`, '👥');
                 },
                 acceptFriendRequest(requesterName) {
                     if (!this.currentUser || !requesterName) return;
@@ -2265,7 +2258,6 @@
                     const myLower = myName.toLowerCase();
                     const reqLower = requesterName.toLowerCase();
 
-                    // Eliminar la solicitud en ambas direcciones
                     const updatedReqs = { ...this.friendRequestsMap };
                     Object.keys(updatedReqs).forEach(key => {
                         if (key.toLowerCase() === myLower && Array.isArray(updatedReqs[key])) {
@@ -2277,7 +2269,6 @@
                     });
                     this.friendRequestsMap = updatedReqs;
 
-                    // Guardar amistad mutua en ambas listas
                     const updatedFriends = { ...this.friendshipsMap };
                     let myList = [];
                     Object.keys(updatedFriends).forEach(k => {
@@ -2328,26 +2319,6 @@
                     this.friendRequestsMap = updatedReqs;
                     this.saveSocialToStorage();
                     this.notify('Solicitud de amistad rechazada.', '❌');
-
-                    if (this.incomingFriendRequests.length === 0) {
-                        this.showFriendRequestsModal = false;
-                    }
-                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
-                        this.showInvitesModal = false;
-                    }
-                },
-                rejectFriendRequest(requesterName) {
-                    if (!this.currentUser) return;
-                    const myLower = this.currentUser.name.toLowerCase();
-                    const reqLower = requesterName.toLowerCase();
-
-                    Object.keys(this.friendRequestsMap).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
-                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== reqLower);
-                        }
-                    });
-                    this.saveSocialToStorage();
-                    this.notify('Friend request declined.', '❌');
 
                     if (this.incomingFriendRequests.length === 0) {
                         this.showFriendRequestsModal = false;
@@ -2642,102 +2613,6 @@
                         this.lang = savedLang;
                     } else {
                         this.lang = 'en';
-                    }
-                    if (!this.regPassword) {
-                        this.notify('Por favor, introduce tu contraseña.', '⚠️');
-                        return;
-                    }
-                    
-                    let cleanUsername = this.regUsername.trim();
-                    let lowerUsername = cleanUsername.toLowerCase();
-                    let enteredPassword = this.regPassword;
-
-                    this.isRegistering = true;
-
-                    if (this.userPasswordsMap[lowerUsername] !== undefined) {
-                        if (this.userPasswordsMap[lowerUsername] !== enteredPassword) {
-                            this.isRegistering = false;
-                            this.notify(this.t('incorrectPasswordError'), '❌');
-                            return;
-                        }
-                    } else {
-                        this.userPasswordsMap[lowerUsername] = enteredPassword;
-                        this.saveSocialToStorage();
-                    }
-
-                    let existingPerson = this.people.find(p => p.name.toLowerCase() === lowerUsername);
-                    
-                    if (existingPerson) {
-                        await this.refreshRobloxProfile(existingPerson);
-                        this.currentUser = existingPerson;
-                        this.registerRealUserRecord(this.currentUser);
-                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                        this.isRegistering = false;
-                        this.showRegisterModal = false;
-                        this.regUsername = '';
-                        this.regPassword = '';
-                        this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}! (Estás Online)`, '🟢');
-                        return;
-                    }
-
-                    let avatarUrl = 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
-                    
-                    try {
-                        let userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(cleanUsername)}&limit=10`);
-                        let userData = await userRes.json();
-                        if (userData.data && userData.data.length > 0) {
-                            let matchedUser = userData.data.find(u => u.name.toLowerCase() === lowerUsername) || userData.data[0];
-                            let userId = matchedUser.id;
-                            let thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
-                            let thumbData = await thumbRes.json();
-                            if (thumbData.data && thumbData.data.length > 0 && thumbData.data[0].imageUrl) {
-                                avatarUrl = thumbData.data[0].imageUrl;
-                                cleanUsername = matchedUser.name;
-                            }
-                        }
-                    } catch (e) {}
-
-                    let targetUser = {
-                        id: this.people.length + 1,
-                        name: cleanUsername,
-                        netWorthValue: 100.0,
-                        peakNetWorth: 100.0,
-                        peakRank: this.people.length + 1,
-                        changeVal: 1.5,
-                        positive: true,
-                        history: [98.5, 100.0],
-                        img: avatarUrl,
-                        bio: [`${cleanUsername} se unió oficialmente a BloxIndex.`],
-                        country: 'Global',
-                        source: 'Tycoons',
-                        gender: 'Man'
-                    };
-
-                    this.people.push(targetUser);
-                    this.people.sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    this.people.forEach((p, idx) => {
-                        p.id = idx + 1;
-                        if (!p.peakRank || p.id < p.peakRank) p.peakRank = p.id;
-                        if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = Number(p.netWorthValue.toFixed(1));
-                    });
-
-                    this.currentUser = targetUser;
-                    this.registerRealUserRecord(this.currentUser);
-                    
-                    try {
-                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                    } catch (err) {}
-                    
-                    this.isRegistering = false;
-                    this.showRegisterModal = false;
-                    this.regUsername = '';
-                    this.regPassword = '';
-                    this.notify(`¡Cuenta registrada con éxito y en línea, ${cleanUsername}!`, '🎉');
-                },
-                async initEmpire() {
-                    let savedLang = localStorage.getItem('empire_lang');
-                    if (savedLang && translations[savedLang]) {
-                        this.lang = savedLang;
                     }
 
                     try {
