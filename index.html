@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,19 +141,30 @@
         </div>
 
         <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+            <!-- Search Input -->
+            <div class="relative w-full sm:w-56">
+                <input type="text" x-model="searchQuery" :placeholder="t('searchPlaceholder')" class="w-full bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600">
+            </div>
+
             <div class="relative">
                 <select x-model="lang" @change="changeLanguage(lang)" class="bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 cursor-pointer">
+                    <option value="en">🇺🇸 English</option>
                     <option value="es">🇪🇸 Español</option>
-                    <option value="en">🇬🇧 English</option>
                     <option value="it">🇮🇹 Italiano</option>
-                    <option value="pt">🇵🇹 Português</option>
+                    <option value="pt">🇧🇷 Português</option>
                     <option value="de">🇩🇪 Deutsch</option>
                 </select>
             </div>
-
-            <div class="relative w-full md:w-48">
-                <input type="text" x-model="searchQuery" :placeholder="t('searchPlaceholder')" class="w-full bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600">
-            </div>
+            <!-- Friend Requests Button (Always visible for logged-in users) -->
+            <template x-if="currentUser">
+                <button @click="showFriendRequestsModal = true" 
+                        :class="incomingFriendRequests.length > 0 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 animate-pulse' : 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'"
+                        class="relative border px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 whitespace-nowrap">
+                    <span>🤝</span>
+                    <span x-text="t('friendRequestsBtn')"></span>
+                    <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.2 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
+                </button>
+            </template>
 
             <!-- Botón de Notificaciones de Invitaciones -->
             <template x-if="currentUser && (pendingInvitesForCurrentUser.length > 0 || incomingFriendRequests.length > 0)">
@@ -192,6 +203,10 @@
                             <span class="flex items-center gap-2">👥 <span x-text="t('friendsTab')"></span></span>
                             <span class="bg-neutral-800 text-white px-1.5 py-0.5 rounded text-[10px]" x-text="userFriends.length"></span>
                         </button>
+                        <button @click="showFriendRequestsModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
+                            <span class="flex items-center gap-2">🤝 <span x-text="t('friendRequestsBtn')"></span></span>
+                            <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
+                        </button>
                         <template x-if="userOwnedCompanies.length > 0">
                             <div class="border-t border-neutral-800 my-1 pt-1">
                                 <div class="px-4 py-1 text-[10px] text-neutral-500 uppercase font-bold" x-text="t('myCompaniesLabel')"></div>
@@ -219,77 +234,72 @@
         </div>
     </header>
 
-    <!-- Vista de Amigos -->
+    <!-- Friends View -->
     <main x-show="showFriendsView" class="flex-grow max-w-5xl mx-auto w-full" style="display: none;">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
                 <h1 class="serif-font text-3xl font-bold" x-text="t('friendsTitle')"></h1>
                 <p class="text-xs text-neutral-400 mt-1" x-text="t('friendsDesc')"></p>
             </div>
-            <button @click="showFriendsView = false" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition self-start" x-text="t('backButton')"></button>
+            <div class="flex items-center gap-2.5 self-start">
+                <button @click="showFriendRequestsModal = true" 
+                        :class="incomingFriendRequests.length > 0 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300' : 'bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700'"
+                        class="border px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2">
+                    <span>🤝</span>
+                    <span x-text="t('friendRequestsBtn')"></span>
+                    <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
+                </button>
+                <button @click="showFriendsView = false" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition" x-text="t('backButton')"></button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- Buscar y Añadir Amigos -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl md:col-span-1 shadow-lg">
-                <h3 class="serif-font text-lg font-bold text-white mb-1" x-text="t('addFriendTitle')"></h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Search and Add Friends -->
+            <div class="card-bg border border-neutral-800 p-6 rounded-2xl">
+                <h3 class="text-base font-bold text-white mb-1" x-text="t('addFriendTitle')"></h3>
                 <p class="text-xs text-neutral-400 mb-4" x-text="t('addFriendDesc')"></p>
                 
-                <div class="space-y-3">
-                    <input type="text" x-model="friendSearchInput" :placeholder="t('friendSearchPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                    
-                    <div class="max-h-48 overflow-y-auto space-y-2 mt-2">
-                        <template x-for="candidate in availableUsersToFriend" :key="candidate.name">
-                            <div class="bg-black/50 border border-neutral-800 p-2.5 rounded-xl flex items-center justify-between">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="relative">
-                                        <img :src="candidate.img" class="w-8 h-8 rounded-lg object-cover bg-black">
-                                        <template x-if="isUserOnline(candidate.name)">
-                                            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
-                                        </template>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs font-semibold text-white truncate max-w-[90px]" x-text="candidate.name"></div>
-                                        <div class="text-[9px] text-green-400" x-show="isUserOnline(candidate.name)" x-text="t('onlineStatusLabel')"></div>
-                                    </div>
-                                </div>
-                                <button @click="sendFriendRequest(candidate.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-[11px] font-semibold transition" x-text="t('addBtn')"></button>
-                            </div>
-                        </template>
-                    </div>
-                </div>
+                <input type="text" x-model="friendSearchInput" :placeholder="t('friendSearchPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white mb-4 focus:outline-none focus:border-blue-500">
 
-                <template x-if="incomingFriendRequests.length > 0">
-                    <div class="mt-6 pt-4 border-t border-neutral-800">
-                        <h4 class="text-xs font-bold text-amber-400 uppercase mb-3" x-text="t('pendingRequestsTitle')"></h4>
-                        <div class="space-y-2">
-                            <template x-for="reqName in incomingFriendRequests" :key="reqName">
-                                <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <img :src="getUserAvatarByName(reqName)" class="w-7 h-7 rounded-full object-cover">
-                                        <span class="text-xs font-bold text-white" x-text="reqName"></span>
-                                    </div>
-                                    <div class="flex gap-1">
-                                        <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-2.5 py-1 rounded text-[10px] font-semibold" x-text="t('acceptBtn')">✓</button>
-                                        <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1 rounded text-[10px]">✕</button>
-                                    </div>
+                <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                    <template x-for="u in availableUsersToFriend" :key="u.name">
+                        <div class="bg-black/40 border border-neutral-800/80 p-3 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3 cursor-pointer" @click="openProfile(u)">
+                                <div class="relative">
+                                    <img :src="u.img" class="w-10 h-10 rounded-xl object-cover bg-black">
+                                    <template x-if="isUserOnline(u.name)">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
+                                    </template>
                                 </div>
+                                <div>
+                                    <div class="text-sm font-bold text-white" x-text="u.name"></div>
+                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(u.netWorthValue)"></div>
+                                </div>
+                            </div>
+                            <template x-if="hasSentRequestTo(u.name)">
+                                <span class="text-[11px] bg-neutral-800 text-neutral-400 px-3 py-1.5 rounded-lg font-semibold" x-text="t('requestSentBadge')"></span>
+                            </template>
+                            <template x-if="!hasSentRequestTo(u.name)">
+                                <button @click="sendFriendRequest(u.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('addBtn')"></button>
                             </template>
                         </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
 
-            <!-- Lista de Amigos -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl md:col-span-2 shadow-lg">
-                <h3 class="serif-font text-lg font-bold text-white mb-4" x-text="t('myFriendsListTitle') + ' (' + userFriends.length + ')'"></h3>
-                
-                <div x-show="userFriends.length === 0" class="text-center py-12 text-neutral-500 text-xs">
-                    <div class="text-3xl mb-2">🤝</div>
-                    <span x-text="t('noFriendsYet')"></span>
+            <!-- My Friends List -->
+            <div class="card-bg border border-neutral-800 p-6 rounded-2xl">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center justify-between">
+                    <span x-text="t('myFriendsListTitle')"></span>
+                    <span class="bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs px-2.5 py-0.5 rounded-full font-bold" x-text="userFriends.length"></span>
+                </h3>
+
+                <div x-show="userFriends.length === 0" class="text-center py-12 bg-black/30 rounded-xl border border-neutral-800/60">
+                    <div class="text-3xl mb-2">👥</div>
+                    <p class="text-xs text-neutral-400" x-text="t('noFriendsYet')"></p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
                     <template x-for="friendName in userFriends" :key="friendName">
                         <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
                             <div class="flex items-center gap-3">
@@ -300,11 +310,14 @@
                                     </template>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-white" x-text="friendName"></div>
+                                    <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                        <span x-text="friendName"></span>
+                                        <span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9px] px-1.5 py-0.5 rounded font-semibold" x-text="t('alreadyFriendsBadge')"></span>
+                                    </div>
                                     <div class="text-[11px] font-medium" :class="isUserOnline(friendName) ? 'text-green-400' : 'text-neutral-500'" x-text="isUserOnline(friendName) ? t('onlineStatus') : t('offlineStatus')"></div>
                                 </div>
                             </div>
-                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Eliminar amigo">✕</button>
+                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Remove friend">✕</button>
                         </div>
                     </template>
                 </div>
@@ -312,7 +325,7 @@
         </div>
     </main>
 
-    <!-- Contenido Principal (Rankings) -->
+    <!-- Main Content (Leaderboards) -->
     <main x-show="!selectedPerson && !selectedCompany && !showFriendsView" class="flex-grow max-w-7xl mx-auto w-full">
 
         <!-- Top 5 Ganadores y Perdedores -->
@@ -411,7 +424,7 @@
                                 </template>
                             </div>
                             <template x-if="isBloodActive(person)">
-                                <span class="blood-badge text-base" title="Perdiendo capital">🩸</span>
+                                <span class="blood-badge text-base" title="Losing capital">🩸</span>
                             </template>
                             <template x-if="!isBloodActive(person) && hasFire(person)">
                                 <span :class="getFireBadgeClass(person)" class="fire-badge text-base" :title="getFireLabel(person)">🔥</span>
@@ -436,7 +449,7 @@
                                     <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
                                 </template>
                                 <template x-if="isBloodActive(selectedTop5Person)">
-                                    <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
+                                    <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Losing capital">🩸</span>
                                 </template>
                                 <template x-if="!isBloodActive(selectedTop5Person) && hasFire(selectedTop5Person)">
                                     <span :class="getFireBadgeClass(selectedTop5Person)" class="fire-badge absolute -top-2 -right-2 text-xl" :title="getFireLabel(selectedTop5Person)">🔥</span>
@@ -576,7 +589,7 @@
                     </template>
 
                     <template x-if="isBloodActive(item)">
-                        <span class="blood-badge absolute top-3 right-3 text-base" title="Perdiendo capital">🩸</span>
+                        <span class="blood-badge absolute top-3 right-3 text-base" title="Losing capital">🩸</span>
                     </template>
                     <template x-if="!isBloodActive(item) && hasFire(item)">
                         <span :class="getFireBadgeClass(item)" class="fire-badge absolute top-3 right-3 text-base" :title="getFireLabel(item)">🔥</span>
@@ -623,7 +636,7 @@
                                 <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
                             </template>
                             <template x-if="isBloodActive(selectedPerson)">
-                                <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
+                                <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Losing capital">🩸</span>
                             </template>
                             <template x-if="!isBloodActive(selectedPerson) && hasFire(selectedPerson)">
                                 <span :class="getFireBadgeClass(selectedPerson)" class="fire-badge absolute -top-2 -right-2 text-xl" :title="getFireLabel(selectedPerson)">🔥</span>
@@ -692,32 +705,32 @@
                 </div>
 
                 <div x-show="profileTab === 'stats'" class="space-y-4 text-sm">
-                    <div class="flex justify-between border-b border-neutral-800 pb-3">
-                        <span class="text-neutral-400" x-text="t('peakRank')"></span>
-                        <span class="font-bold text-amber-400" x-text="'#' + (selectedPerson?.peakRank || selectedPerson?.id || 1)"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-neutral-800 pb-3">
-                        <span class="text-neutral-400" x-text="t('peakNetWorth')"></span>
-                        <span class="font-bold text-green-400" x-text="formatWorth(selectedPerson?.peakNetWorth || selectedPerson?.netWorthValue)"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-neutral-800 pb-3">
-                        <span class="text-neutral-400" x-text="t('sourceWealth')"></span>
-                        <span class="font-medium" x-text="selectedPerson?.source"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-neutral-800 pb-3">
-                        <span class="text-neutral-400" x-text="t('gender')"></span>
-                        <span class="font-medium" x-text="selectedPerson?.gender"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-neutral-800 pb-3">
-                        <span class="text-neutral-400" x-text="t('region')"></span>
-                        <span class="font-medium" x-text="selectedPerson?.country"></span>
-                    </div>
+                    <template x-for="friendName in userFriends" :key="friendName">
+                        <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative">
+                                    <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
+                                    <template x-if="isUserOnline(friendName)">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
+                                    </template>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                        <span x-text="friendName"></span>
+                                        <span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9px] px-1.5 py-0.5 rounded font-semibold" x-text="t('alreadyFriendsBadge')"></span>
+                                    </div>
+                                    <div class="text-[11px] font-medium" :class="isUserOnline(friendName) ? 'text-green-400' : 'text-neutral-500'" x-text="isUserOnline(friendName) ? t('onlineStatus') : t('offlineStatus')"></div>
+                                </div>
+                            </div>
+                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Remove friend">✕</button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- VISTA PANEL DE GESTIÓN DE EMPRESA -->
+    <!-- COMPANY MANAGEMENT DASHBOARD VIEW -->
     <main x-show="selectedCompany" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ compTab: 'overview' }" style="display: none;">
         <button @click="selectedCompany = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backToCompanies')"></button>
         
@@ -751,7 +764,7 @@
                         </button>
                     </template>
                     <template x-if="isCompanyOwner(selectedCompany)">
-                        <button @click="deleteCompany(selectedCompany)" class="bg-red-900/40 hover:bg-red-900/80 border border-red-700/50 text-red-300 px-3 py-2 rounded-xl text-xs font-semibold transition" title="Eliminar empresa">
+                        <button @click="deleteCompany(selectedCompany)" class="bg-red-900/40 hover:bg-red-900/80 border border-red-700/50 text-red-300 px-3 py-2 rounded-xl text-xs font-semibold transition" title="Delete company">
                             🗑️
                         </button>
                     </template>
@@ -886,33 +899,33 @@
                                 <div class="text-[11px] text-amber-400 font-semibold" x-text="t('ceoFounderLabel')"></div>
                             </div>
                         </div>
-                    </div>
-
-                    <template x-for="member in (selectedCompany?.members || [])" :key="member">
-                        <div class="card-bg border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img :src="getUserAvatarByName(member)" class="w-10 h-10 rounded-lg object-cover bg-black">
-                                <div>
-                                    <div class="text-sm font-bold text-white" x-text="member"></div>
-                                    <div class="text-[11px] text-blue-400" x-text="t('memberRoleLabel')"></div>
-                                </div>
-                            </div>
-                            <template x-if="isCompanyOwner(selectedCompany)">
-                                <button @click="removeCompanyMember(selectedCompany, member)" class="text-xs text-red-400 hover:text-red-300 px-2 py-1" title="Expulsar">✕</button>
+                        <div class="flex items-center gap-2">
+                            <template x-if="currentUser && currentUser.name.toLowerCase() === selectedTop5Person?.name.toLowerCase()">
+                                <button @click="openBioEditor(selectedTop5Person)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
                             </template>
-                        </div>
-                    </template>
-                </div>
-
-                <template x-if="selectedCompany?.pendingInvites && selectedCompany.pendingInvites.length > 0">
-                    <div>
-                        <h4 class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2" x-text="t('pendingInvitesTitle')"></h4>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="inv in selectedCompany.pendingInvites" :key="inv">
-                                <span class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-lg flex items-center gap-2">
-                                    <span>⏳</span>
-                                    <span x-text="inv"></span>
-                                </span>
+                            <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedTop5Person?.name.toLowerCase()">
+                                <div>
+                                    <template x-if="areWeFriends(selectedTop5Person?.name)">
+                                        <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                            <span>🤝</span> <span x-text="t('alreadyFriendsBadge')"></span>
+                                        </span>
+                                    </template>
+                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && hasIncomingRequestFrom(selectedTop5Person?.name)">
+                                        <button @click="acceptFriendRequest(selectedTop5Person.name)" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                                            <span>✓</span> <span x-text="t('acceptRequestBtn')"></span>
+                                        </button>
+                                    </template>
+                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && !hasIncomingRequestFrom(selectedTop5Person?.name) && hasSentRequestTo(selectedTop5Person?.name)">
+                                        <span class="bg-neutral-800 border border-neutral-700 text-neutral-400 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                            <span>⏳</span> <span x-text="t('requestSentBadge')"></span>
+                                        </span>
+                                    </template>
+                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && !hasIncomingRequestFrom(selectedTop5Person?.name) && !hasSentRequestTo(selectedTop5Person?.name)">
+                                        <button @click="sendFriendRequest(selectedTop5Person.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                                            <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                                        </button>
+                                    </template>
+                                </div>
                             </template>
                         </div>
                     </div>
@@ -958,7 +971,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('robloxUser')"></label>
-                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="ej. raxinou3" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="e.g. raxinou3" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('password')"></label>
@@ -991,7 +1004,7 @@
 
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('biography')"></label>
-                    <textarea x-model="tempBioText" rows="4" class="w-full bg-black border border-neutral-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Escribe tu biografía..."></textarea>
+                    <textarea x-model="tempBioText" rows="4" class="w-full bg-black border border-neutral-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Write your biography..."></textarea>
                 </div>
 
                 <button @click="saveUserBio()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('saveBioButton')"></button>
@@ -999,7 +1012,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: Crear Empresa -->
+    <!-- MODAL 3: Create Company -->
     <div x-show="showCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4 py-6 overflow-y-auto" style="display: none;">
         <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-700 max-w-md w-full relative shadow-2xl my-auto">
             <button @click="showCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -1012,7 +1025,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyNameLabel')"></label>
-                    <input type="text" x-model="newCompanyName" placeholder="ej. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="text" x-model="newCompanyName" placeholder="e.g. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
 
                 <div>
@@ -1041,12 +1054,12 @@
                                 <span x-text="t('uploadFromDeviceBtn')"></span>
                                 <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'create')" class="hidden">
                             </label>
-                            <input type="text" x-model="newCompanyLogo" placeholder="O pega una URL de imagen..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
+                            <input type="text" x-model="newCompanyLogo" placeholder="Or paste an image URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 mt-2">
-                        <span class="text-[10px] text-neutral-500">Emblemas:</span>
+                        <span class="text-[10px] text-neutral-500">Emblems:</span>
                         <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
                             <img :src="preset" @click="newCompanyLogo = preset" :class="newCompanyLogo === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-8 h-8 rounded-lg cursor-pointer bg-black object-cover transition">
                         </template>
@@ -1083,7 +1096,7 @@
                                 <span x-text="t('uploadFromDeviceBtn')"></span>
                                 <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'edit')" class="hidden">
                             </label>
-                            <input type="text" x-model="editCompanyLogoInput" placeholder="O pega una URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
+                            <input type="text" x-model="editCompanyLogoInput" placeholder="Or paste a URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
                     <div class="flex items-center gap-2 mt-2">
@@ -1097,7 +1110,7 @@
         </div>
     </div>
 
-    <!-- MODAL 5: Centro de Notificaciones e Invitaciones (Empresas y Amigos) -->
+    <!-- MODAL 5: Notification Center & Invitations (Companies & Friends) -->
     <div x-show="showInvitesModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative shadow-2xl">
             <button @click="showInvitesModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -1109,12 +1122,12 @@
             <p class="text-xs text-neutral-400 mb-6" x-text="t('notificationsDesc')"></p>
 
             <div class="space-y-6 max-h-96 overflow-y-auto pr-1">
-                <!-- Invitaciones de Empresas -->
+                <!-- Company Invitations -->
                 <div>
                     <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                         <span>🏢</span> <span x-text="t('companyInvitesHeader')"></span> (<span x-text="pendingInvitesForCurrentUser.length"></span>)
                     </h3>
-                    
+
                     <div x-show="pendingInvitesForCurrentUser.length === 0" class="text-xs text-neutral-500 italic bg-black/30 p-3 rounded-xl">
                         <span x-text="t('noCompanyInvites')"></span>
                     </div>
@@ -1123,10 +1136,10 @@
                         <template x-for="comp in pendingInvitesForCurrentUser" :key="comp.name">
                             <div class="bg-black/60 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3">
-                                    <img :src="comp.img" class="w-10 h-10 rounded-lg object-cover bg-black">
+                                    <img :src="comp.img" class="w-10 h-10 rounded-xl object-cover bg-black">
                                     <div>
                                         <div class="text-sm font-bold text-white" x-text="comp.name"></div>
-                                        <div class="text-[11px] text-neutral-400" x-text="'CEO: ' + comp.ceo"></div>
+                                        <div class="text-[11px] text-neutral-400" x-text="t('ceoLabel') + ': ' + comp.ceo"></div>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5">
@@ -1138,7 +1151,7 @@
                     </div>
                 </div>
 
-                <!-- Solicitudes de Amistad -->
+                <!-- Friend Requests -->
                 <div class="pt-4 border-t border-neutral-800">
                     <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                         <span>👥</span> <span x-text="t('friendRequestsHeader')"></span> (<span x-text="incomingFriendRequests.length"></span>)
@@ -1166,6 +1179,54 @@
                         </template>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: Modal Dedicado de Solicitudes de Amistad -->
+    <div x-show="showFriendRequestsModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
+        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative shadow-2xl">
+            <button @click="showFriendRequestsModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
+            
+            <div class="flex items-center gap-2.5 mb-2">
+                <span class="text-2xl">🤝</span>
+                <h2 class="serif-font text-2xl font-bold text-white" x-text="t('friendRequestsModalTitle')"></h2>
+            </div>
+            <p class="text-xs text-neutral-400 mb-6" x-text="t('friendRequestsModalDesc')"></p>
+
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                <div x-show="incomingFriendRequests.length === 0" class="text-center py-8 bg-black/40 border border-neutral-800/80 rounded-xl">
+                    <div class="text-3xl mb-2">📭</div>
+                    <p class="text-xs text-neutral-400" x-text="t('noFriendRequests')"></p>
+                </div>
+
+                <template x-for="reqName in incomingFriendRequests" :key="reqName">
+                    <div class="bg-black/60 border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <img :src="getUserAvatarByName(reqName)" class="w-11 h-11 rounded-full object-cover bg-black border border-neutral-700">
+                                <template x-if="isUserOnline(reqName)">
+                                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
+                                </template>
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-white" x-text="reqName"></div>
+                                <div class="text-[11px] text-amber-400" x-text="t('wantsToBeFriend')"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                                <span>✓</span> <span x-text="t('acceptBtn')"></span>
+                            </button>
+                            <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition" title="Reject">✕</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-neutral-800 flex justify-between items-center">
+                <button @click="showFriendRequestsModal = false; showFriendsView = true; selectedPerson = null; selectedCompany = null;" class="text-xs text-blue-400 hover:text-blue-300 font-semibold" x-text="t('viewAllMyFriendsLink')"></button>
+                <button @click="showFriendRequestsModal = false" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('closeBtn')"></button>
             </div>
         </div>
     </div>
@@ -1327,7 +1388,15 @@
                 offlineStatus: "⚪ Desconectado",
                 onlineStatusLabel: "En línea",
                 pendingRequestsTitle: "Solicitudes Entrantes",
-                addBtn: "+ Añadir"
+                addBtn: "+ Añadir",
+                friendRequestsBtn: "Solicitudes",
+                friendRequestsModalTitle: "Solicitudes de Amistad",
+                friendRequestsModalDesc: "Acepta las solicitudes para que ambos aparezcan agregados como amigos mutuamente.",
+                alreadyFriendsBadge: "Amigos",
+                acceptRequestBtn: "Aceptar Solicitud",
+                requestSentBadge: "Solicitud Enviada",
+                viewAllMyFriendsLink: "Ver mis amigos →",
+                closeBtn: "Cerrar"
             },
             en: {
                 title: "BloxIndex",
@@ -1460,7 +1529,15 @@
                 offlineStatus: "⚪ Offline",
                 onlineStatusLabel: "Online",
                 pendingRequestsTitle: "Incoming Requests",
-                addBtn: "+ Add"
+                addBtn: "+ Add",
+                friendRequestsBtn: "Requests",
+                friendRequestsModalTitle: "Friend Requests",
+                friendRequestsModalDesc: "Accept requests so both of you appear added as mutual friends.",
+                alreadyFriendsBadge: "Friends",
+                acceptRequestBtn: "Accept Request",
+                requestSentBadge: "Request Sent",
+                viewAllMyFriendsLink: "View my friends →",
+                closeBtn: "Close"
             },
             it: {
                 title: "BloxIndex",
@@ -1593,7 +1670,15 @@
                 offlineStatus: "⚪ Offline",
                 onlineStatusLabel: "Online",
                 pendingRequestsTitle: "Richieste in Arrivo",
-                addBtn: "+ Aggiungi"
+                addBtn: "+ Aggiungi",
+                friendRequestsBtn: "Richieste",
+                friendRequestsModalTitle: "Richieste di Amicizia",
+                friendRequestsModalDesc: "Accetta le richieste affinché entrambi appariate come amici.",
+                alreadyFriendsBadge: "Amici",
+                acceptRequestBtn: "Accetta Richiesta",
+                requestSentBadge: "Richiesta Inviata",
+                viewAllMyFriendsLink: "Vedi i miei amici →",
+                closeBtn: "Chiudi"
             },
             pt: {
                 title: "BloxIndex",
@@ -1726,7 +1811,15 @@
                 offlineStatus: "⚪ Offline",
                 onlineStatusLabel: "Online",
                 pendingRequestsTitle: "Solicitações Recebidas",
-                addBtn: "+ Adicionar"
+                addBtn: "+ Adicionar",
+                friendRequestsBtn: "Solicitações",
+                friendRequestsModalTitle: "Solicitações de Amizade",
+                friendRequestsModalDesc: "Aceite as solicitações para que ambos apareçam como amigos.",
+                alreadyFriendsBadge: "Amigos",
+                acceptRequestBtn: "Aceitar Solicitação",
+                requestSentBadge: "Solicitação Enviada",
+                viewAllMyFriendsLink: "Ver meus amigos →",
+                closeBtn: "Fechar"
             },
             de: {
                 title: "BloxIndex",
@@ -1859,7 +1952,15 @@
                 offlineStatus: "⚪ Offline",
                 onlineStatusLabel: "Online",
                 pendingRequestsTitle: "Eingehende Anfragen",
-                addBtn: "+ Hinzufügen"
+                addBtn: "+ Hinzufügen",
+                friendRequestsBtn: "Anfragen",
+                friendRequestsModalTitle: "Freundschaftsanfragen",
+                friendRequestsModalDesc: "Nimm Anfragen an, damit ihr beide gegenseitig als Freunde erscheint.",
+                alreadyFriendsBadge: "Freunde",
+                acceptRequestBtn: "Anfrage annehmen",
+                requestSentBadge: "Anfrage gesendet",
+                viewAllMyFriendsLink: "Meine Freunde ansehen →",
+                closeBtn: "Schließen"
             }
         };
 
@@ -1984,7 +2085,7 @@
 
         function empireApp() {
             return {
-                lang: 'es',
+                lang: 'en',
                 currentFilter: 'all',
                 selectedCategory: null,
                 selectedPerson: null,
@@ -1998,6 +2099,7 @@
                 showCompanyModal: false,
                 showEditCompanyModal: false,
                 showInvitesModal: false,
+                showFriendRequestsModal: false,
                 isAutoCompanyPrompt: false,
                 editingCompany: null,
                 editCompanyNameInput: '',
@@ -2047,7 +2149,7 @@
                     }, 4000);
                 },
                 t(key) {
-                    return translations[this.lang]?.[key] || translations['es'][key] || key;
+                    return translations[this.lang]?.[key] || translations['en'][key] || key;
                 },
                 get formattedCountdown() {
                     let totalSeconds = Math.max(0, Math.floor(this.timeRemainingMs / 1000));
@@ -2219,17 +2321,54 @@
                 },
                 get incomingFriendRequests() {
                     if (!this.currentUser) return [];
-                    return this.friendRequestsMap[this.currentUser.name] || [];
+                    const myLower = this.currentUser.name.toLowerCase();
+                    let list = [];
+                    Object.keys(this.friendRequestsMap).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
+                            this.friendRequestsMap[key].forEach(sender => {
+                                if (!list.some(x => x.toLowerCase() === sender.toLowerCase())) {
+                                    list.push(sender);
+                                }
+                            });
+                        }
+                    });
+                    return list;
                 },
                 get userFriends() {
                     if (!this.currentUser) return [];
-                    return this.friendshipsMap[this.currentUser.name] || [];
+                    const myLower = this.currentUser.name.toLowerCase();
+                    let list = [];
+                    Object.keys(this.friendshipsMap).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(this.friendshipsMap[key])) {
+                            this.friendshipsMap[key].forEach(friend => {
+                                if (!list.some(x => x.toLowerCase() === friend.toLowerCase())) {
+                                    list.push(friend);
+                                }
+                            });
+                        }
+                    });
+                    return list;
+                },
+                areWeFriends(targetName) {
+                    if (!this.currentUser || !targetName) return false;
+                    return this.userFriends.some(f => f.toLowerCase() === targetName.toLowerCase());
+                },
+                hasIncomingRequestFrom(targetName) {
+                    if (!this.currentUser || !targetName) return false;
+                    return this.incomingFriendRequests.some(r => r.toLowerCase() === targetName.toLowerCase());
+                },
+                hasSentRequestTo(targetName) {
+                    if (!this.currentUser || !targetName) return false;
+                    const myLower = this.currentUser.name.toLowerCase();
+                    const targetKey = Object.keys(this.friendRequestsMap).find(k => k.toLowerCase() === targetName.toLowerCase());
+                    if (!targetKey || !Array.isArray(this.friendRequestsMap[targetKey])) return false;
+                    return this.friendRequestsMap[targetKey].some(s => s.toLowerCase() === myLower);
                 },
                 get availableUsersToFriend() {
                     if (!this.currentUser) return [];
                     const myName = this.currentUser.name.toLowerCase();
                     const myFriends = this.userFriends.map(f => f.toLowerCase());
-                    const myPending = (this.friendRequestsMap[this.currentUser.name] || []).map(p => p.toLowerCase());
+                    const myPending = this.incomingFriendRequests.map(p => p.toLowerCase());
                     
                     return this.people.filter(u => {
                         const uName = u.name.toLowerCase();
@@ -2379,11 +2518,11 @@
                     if (!this.editingCompany) return;
                     let newName = this.editCompanyNameInput.trim();
                     if (!newName) {
-                        this.notify('El nombre de la empresa no puede estar vacío.', '⚠️');
+                        this.notify('Company name cannot be empty.', '⚠️');
                         return;
                     }
                     if (BANNED_COMPANIES.includes(newName.toLowerCase())) {
-                        this.notify('Ese nombre de empresa no está permitido.', '🚫');
+                        this.notify('That company name is not allowed.', '🚫');
                         return;
                     }
                     let newLogo = this.editCompanyLogoInput.trim() || OMEGA_LOGO_SVG;
@@ -2394,32 +2533,31 @@
                     this.saveCompaniesToStorage();
                     this.showEditCompanyModal = false;
                     this.editingCompany = null;
-                    this.notify('¡Empresa actualizada con éxito!', '✅');
+                    this.notify('Company updated successfully!', '✅');
                 },
                 deleteCompany(company) {
                     if (!this.isCompanyOwner(company)) return;
-                    if (!confirm(`¿Estás seguro de eliminar la empresa "${company.name}"?`)) return;
 
                     this.companies = this.companies.filter(c => c.name !== company.name);
                     this.saveCompaniesToStorage();
                     this.selectedCompany = null;
                     this.currentFilter = 'companies';
-                    this.notify('Empresa eliminada correctamente.', '🗑️');
+                    this.notify('Company deleted successfully.', '🗑️');
                 },
                 createCompany() {
                     if (!this.currentUser) return;
                     if (!this.newCompanyName || !this.newCompanyName.trim()) {
-                        this.notify('Por favor, escribe un nombre para tu empresa.', '⚠️');
+                        this.notify('Please enter a name for your company.', '⚠️');
                         return;
                     }
                     let compName = this.newCompanyName.trim();
                     if (BANNED_COMPANIES.includes(compName.toLowerCase())) {
-                        this.notify('Ese nombre de empresa está restringido.', '🚫');
+                        this.notify('That company name is restricted.', '🚫');
                         return;
                     }
 
                     if (this.companies.some(c => c.name.toLowerCase() === compName.toLowerCase())) {
-                        this.notify('Ya existe una empresa con ese nombre en el ranking.', '⚠️');
+                        this.notify('A company with that name already exists on the leaderboard.', '⚠️');
                         return;
                     }
 
@@ -2427,7 +2565,7 @@
                     if (investment <= 0) investment = 5.0;
 
                     if (this.currentUser.netWorthValue < investment) {
-                        this.notify('No tienes suficiente patrimonio personal para esa inversión inicial.', '💸');
+                        this.notify('You do not have enough personal net worth for that initial investment.', '💸');
                         return;
                     }
 
@@ -2461,13 +2599,13 @@
                     this.showCompanyModal = false;
                     this.currentFilter = 'companies';
                     this.openCompanyDashboard(newCompanyEntry);
-                    this.notify(`¡Empresa "${compName}" fundada con éxito y posicionada en el Top global!`, '🏢');
+                    this.notify(`Company "${compName}" founded successfully and ranked on the Global Top!`, '🏢');
                 },
                 buyCompanyUpgrade(company, upg) {
                     if (!this.isCompanyOwner(company) || !this.currentUser) return;
                     const cost = this.getUpgradeCost(company, upg);
                     if (this.currentUser.netWorthValue < cost) {
-                        this.notify('No tienes suficiente dinero personal para esta mejora.', '💸');
+                        this.notify('You do not have enough personal money for this upgrade.', '💸');
                         return;
                     }
 
@@ -2489,17 +2627,17 @@
                     company.history.push(company.netWorthValue);
 
                     this.saveCompaniesToStorage();
-                    this.notify(`¡${company.name} subió de nivel y ascendió posiciones en el Top!`, '🚀');
+                    this.notify(`${company.name} leveled up and climbed the leaderboard!`, '🚀');
                 },
                 sendCompanyInvite(company) {
                     if (!this.isCompanyOwner(company)) return;
                     const targetName = this.inviteUsernameInput.trim();
                     if (!targetName) {
-                        this.notify('Escribe o selecciona el nombre del usuario que deseas invitar.', '⚠️');
+                        this.notify('Enter or select the username you want to invite.', '⚠️');
                         return;
                     }
                     if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
-                        this.notify('Ya eres el CEO de esta empresa.', '👑');
+                        this.notify('You are already the CEO of this company.', '👑');
                         return;
                     }
 
@@ -2507,18 +2645,18 @@
                     if (!company.pendingInvites) company.pendingInvites = [];
 
                     if (company.members.some(m => m.toLowerCase() === targetName.toLowerCase())) {
-                        this.notify(`${targetName} ya es miembro de tu empresa.`, 'ℹ️');
+                        this.notify(`${targetName} is already a member of your company.`, 'ℹ️');
                         return;
                     }
                     if (company.pendingInvites.some(i => i.toLowerCase() === targetName.toLowerCase())) {
-                        this.notify(`Ya enviaste una invitación a ${targetName}.`, '⏳');
+                        this.notify(`You already sent an invitation to ${targetName}.`, '⏳');
                         return;
                     }
 
                     company.pendingInvites.push(targetName);
                     this.inviteUsernameInput = '';
                     this.saveCompaniesToStorage();
-                    this.notify(`¡Invitación enviada a ${targetName} con éxito!`, '📩');
+                    this.notify(`Invitation sent to ${targetName} successfully!`, '📩');
                 },
                 respondToCompanyInvite(company, accept) {
                     if (!this.currentUser) return;
@@ -2530,9 +2668,9 @@
                         if (!company.members.some(m => m.toLowerCase() === uLower)) {
                             company.members.push(this.currentUser.name);
                         }
-                        this.notify(`¡Te has unido oficialmente a ${company.name}!`, '🤝');
+                        this.notify(`You have officially joined ${company.name}!`, '🤝');
                     } else {
-                        this.notify(`Has rechazado la invitación de ${company.name}.`, '❌');
+                        this.notify(`You declined the invitation from ${company.name}.`, '❌');
                     }
 
                     this.saveCompaniesToStorage();
@@ -2544,7 +2682,7 @@
                     if (!this.isCompanyOwner(company)) return;
                     company.members = (company.members || []).filter(m => m !== memberName);
                     this.saveCompaniesToStorage();
-                    this.notify(`${memberName} fue removido de la empresa.`, '👋');
+                    this.notify(`${memberName} was removed from the company.`, '👋');
                 },
                 sendFriendRequest(targetName) {
                     if (!this.currentUser) {
@@ -2552,72 +2690,107 @@
                         return;
                     }
                     if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
-                        this.notify('No puedes enviarte solicitud de amistad a ti mismo.', '⚠️');
+                        this.notify('You cannot send a friend request to yourself.', '⚠️');
                         return;
                     }
 
-                    if (this.userFriends.some(f => f.toLowerCase() === targetName.toLowerCase())) {
-                        this.notify(`Ya eres amigo de ${targetName}.`, '🤝');
+                    if (this.areWeFriends(targetName)) {
+                        this.notify(`You are already friends with ${targetName}.`, '🤝');
                         return;
                     }
 
-                    if (!this.friendRequestsMap[targetName]) {
-                        this.friendRequestsMap[targetName] = [];
-                    }
-                    if (this.friendRequestsMap[targetName].includes(this.currentUser.name)) {
-                        this.notify('Ya le has enviado una solicitud a este usuario.', '⏳');
+                    if (this.hasIncomingRequestFrom(targetName)) {
+                        this.acceptFriendRequest(targetName);
                         return;
                     }
 
-                    this.friendRequestsMap[targetName].push(this.currentUser.name);
+                    const existingKey = Object.keys(this.friendRequestsMap).find(k => k.toLowerCase() === targetName.toLowerCase()) || targetName;
+                    if (!this.friendRequestsMap[existingKey]) {
+                        this.friendRequestsMap[existingKey] = [];
+                    }
+                    if (this.friendRequestsMap[existingKey].some(s => s.toLowerCase() === this.currentUser.name.toLowerCase())) {
+                        this.notify('You have already sent a friend request to this user.', '⏳');
+                        return;
+                    }
+
+                    this.friendRequestsMap[existingKey].push(this.currentUser.name);
                     this.saveSocialToStorage();
-                    this.notify(`¡Solicitud de amistad enviada a ${targetName}!`, '👥');
+                    this.notify(`Friend request sent to ${targetName}!`, '👥');
                 },
                 acceptFriendRequest(requesterName) {
                     if (!this.currentUser) return;
                     const myName = this.currentUser.name;
+                    const myLower = myName.toLowerCase();
+                    const reqLower = requesterName.toLowerCase();
 
-                    if (this.friendRequestsMap[myName]) {
-                        this.friendRequestsMap[myName] = this.friendRequestsMap[myName].filter(n => n !== requesterName);
+                    // Remove incoming request across any matching keys
+                    Object.keys(this.friendRequestsMap).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
+                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== reqLower);
+                        }
+                        if (key.toLowerCase() === reqLower && Array.isArray(this.friendRequestsMap[key])) {
+                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== myLower);
+                        }
+                    });
+
+                    // Add mutual friendship: A -> B and B -> A
+                    const myFriendKey = Object.keys(this.friendshipsMap).find(k => k.toLowerCase() === myLower) || myName;
+                    if (!this.friendshipsMap[myFriendKey]) this.friendshipsMap[myFriendKey] = [];
+                    if (!this.friendshipsMap[myFriendKey].some(f => f.toLowerCase() === reqLower)) {
+                        this.friendshipsMap[myFriendKey].push(requesterName);
                     }
 
-                    if (!this.friendshipsMap[myName]) this.friendshipsMap[myName] = [];
-                    if (!this.friendshipsMap[myName].includes(requesterName)) this.friendshipsMap[myName].push(requesterName);
-
-                    if (!this.friendshipsMap[requesterName]) this.friendshipsMap[requesterName] = [];
-                    if (!this.friendshipsMap[requesterName].includes(myName)) this.friendshipsMap[requesterName].push(myName);
+                    const reqFriendKey = Object.keys(this.friendshipsMap).find(k => k.toLowerCase() === reqLower) || requesterName;
+                    if (!this.friendshipsMap[reqFriendKey]) this.friendshipsMap[reqFriendKey] = [];
+                    if (!this.friendshipsMap[reqFriendKey].some(f => f.toLowerCase() === myLower)) {
+                        this.friendshipsMap[reqFriendKey].push(myName);
+                    }
 
                     this.saveSocialToStorage();
-                    this.notify(`¡Ahora tú y ${requesterName} son amigos en la web!`, '🤝');
+                    this.notify(`You and ${requesterName} are now mutual friends!`, '🤝');
 
+                    if (this.incomingFriendRequests.length === 0) {
+                        this.showFriendRequestsModal = false;
+                    }
                     if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
                         this.showInvitesModal = false;
                     }
                 },
                 rejectFriendRequest(requesterName) {
                     if (!this.currentUser) return;
-                    const myName = this.currentUser.name;
-                    if (this.friendRequestsMap[myName]) {
-                        this.friendRequestsMap[myName] = this.friendRequestsMap[myName].filter(n => n !== requesterName);
-                    }
-                    this.saveSocialToStorage();
-                    this.notify('Solicitud de amistad rechazada.', '❌');
+                    const myLower = this.currentUser.name.toLowerCase();
+                    const reqLower = requesterName.toLowerCase();
 
+                    Object.keys(this.friendRequestsMap).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
+                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== reqLower);
+                        }
+                    });
+                    this.saveSocialToStorage();
+                    this.notify('Friend request declined.', '❌');
+
+                    if (this.incomingFriendRequests.length === 0) {
+                        this.showFriendRequestsModal = false;
+                    }
                     if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
                         this.showInvitesModal = false;
                     }
                 },
                 removeFriend(friendName) {
                     if (!this.currentUser) return;
-                    const myName = this.currentUser.name;
-                    if (this.friendshipsMap[myName]) {
-                        this.friendshipsMap[myName] = this.friendshipsMap[myName].filter(n => n !== friendName);
-                    }
-                    if (this.friendshipsMap[friendName]) {
-                        this.friendshipsMap[friendName] = this.friendshipsMap[friendName].filter(n => n !== myName);
-                    }
+                    const myLower = this.currentUser.name.toLowerCase();
+                    const friendLower = friendName.toLowerCase();
+
+                    Object.keys(this.friendshipsMap).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(this.friendshipsMap[key])) {
+                            this.friendshipsMap[key] = this.friendshipsMap[key].filter(n => n.toLowerCase() !== friendLower);
+                        }
+                        if (key.toLowerCase() === friendLower && Array.isArray(this.friendshipsMap[key])) {
+                            this.friendshipsMap[key] = this.friendshipsMap[key].filter(n => n.toLowerCase() !== myLower);
+                        }
+                    });
                     this.saveSocialToStorage();
-                    this.notify(`${friendName} ha sido eliminado de tus amigos.`, '👋');
+                    this.notify(`${friendName} has been removed from your friends.`, '👋');
                 },
                 saveUserBio() {
                     if (!this.currentUser) return;
@@ -2638,7 +2811,7 @@
                     } catch (e) {}
                     
                     this.showBioModal = false;
-                    this.notify('¡Perfil y sector actualizados!', '✅');
+                    this.notify('Profile and sector updated!', '✅');
                 },
                 logoutUser() {
                     if (this.currentUser) {
@@ -2649,7 +2822,7 @@
                     this.selectedCompany = null;
                     this.showFriendsView = false;
                     localStorage.removeItem('empire_current_user');
-                    this.notify('Has cerrado sesión correctamente.', '🚪');
+                    this.notify('You have logged out successfully.', '🚪');
                 },
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
@@ -2789,8 +2962,106 @@
                 },
                 async handleAuthUser() {
                     if (!this.regUsername || !this.regUsername.trim()) {
-                        this.notify('Por favor, introduce un nombre de usuario de Roblox.', '⚠️');
+                        this.notify('Please enter a Roblox username.', '⚠️');
                         return;
+                    }
+                    if (!this.regPassword) {
+                        this.notify('Please enter your password.', '⚠️');
+                        return;
+                    }
+                    
+                    let cleanUsername = this.regUsername.trim();
+                    let lowerUsername = cleanUsername.toLowerCase();
+                    let enteredPassword = this.regPassword;
+
+                    this.isRegistering = true;
+
+                    if (this.userPasswordsMap[lowerUsername] !== undefined) {
+                        if (this.userPasswordsMap[lowerUsername] !== enteredPassword) {
+                            this.isRegistering = false;
+                            this.notify(this.t('incorrectPasswordError'), '❌');
+                            return;
+                        }
+                    } else {
+                        this.userPasswordsMap[lowerUsername] = enteredPassword;
+                        this.saveSocialToStorage();
+                    }
+
+                    let existingPerson = this.people.find(p => p.name.toLowerCase() === lowerUsername);
+                    
+                    if (existingPerson) {
+                        await this.refreshRobloxProfile(existingPerson);
+                        this.currentUser = existingPerson;
+                        this.registerRealUserRecord(this.currentUser);
+                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
+                        this.isRegistering = false;
+                        this.showRegisterModal = false;
+                        this.regUsername = '';
+                        this.regPassword = '';
+                        this.notify(`Welcome back, ${existingPerson.name}! (You are Online)`, '🟢');
+                        return;
+                    }
+
+                    let avatarUrl = 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
+                    
+                    try {
+                        let userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(cleanUsername)}&limit=10`);
+                        let userData = await userRes.json();
+                        if (userData.data && userData.data.length > 0) {
+                            let matchedUser = userData.data.find(u => u.name.toLowerCase() === lowerUsername) || userData.data[0];
+                            let userId = matchedUser.id;
+                            let thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+                            let thumbData = await thumbRes.json();
+                            if (thumbData.data && thumbData.data.length > 0 && thumbData.data[0].imageUrl) {
+                                avatarUrl = thumbData.data[0].imageUrl;
+                                cleanUsername = matchedUser.name;
+                            }
+                        }
+                    } catch (e) {}
+
+                    let targetUser = {
+                        id: this.people.length + 1,
+                        name: cleanUsername,
+                        netWorthValue: 100.0,
+                        peakNetWorth: 100.0,
+                        peakRank: this.people.length + 1,
+                        changeVal: 1.5,
+                        positive: true,
+                        history: [98.5, 100.0],
+                        img: avatarUrl,
+                        bio: [`${cleanUsername} officially joined BloxIndex.`],
+                        country: 'Global',
+                        source: 'Tycoons',
+                        gender: 'Man'
+                    };
+
+                    this.people.push(targetUser);
+                    this.people.sort((a, b) => b.netWorthValue - a.netWorthValue);
+                    this.people.forEach((p, idx) => {
+                        p.id = idx + 1;
+                        if (!p.peakRank || p.id < p.peakRank) p.peakRank = p.id;
+                        if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = Number(p.netWorthValue.toFixed(1));
+                    });
+
+                    this.currentUser = targetUser;
+                    this.registerRealUserRecord(this.currentUser);
+                    
+                    try {
+                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
+                    } catch (err) {}
+                    
+                    this.isRegistering = false;
+                    this.showRegisterModal = false;
+                    this.regUsername = '';
+                    this.regPassword = '';
+                    this.notify(`Account registered successfully and online, ${cleanUsername}!`, '🎉');
+                },
+                async initEmpire() {
+                    let savedLang = localStorage.getItem('empire_lang');
+                    if (savedLang && translations[savedLang]) {
+                        this.lang = savedLang;
+                    } else {
+                        this.lang = 'en';
                     }
                     if (!this.regPassword) {
                         this.notify('Por favor, introduce tu contraseña.', '⚠️');
