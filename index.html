@@ -733,7 +733,6 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Peak Rank",
                 peakNetWorth: "Peak Net Worth",
-                firstTrillionaire: "First Trillionaire",
                 trillionaire: "Trillionaire",
                 fire1: "Ignited Fire (+$1B/day)",
                 fire5: "Orange Fire (+$5B/day)",
@@ -806,8 +805,7 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Rango Máximo (Peak Rank)",
                 peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
-                firstTrillionaire: "First Trillionaire",
-                trillionaire: "Trillionaire",
+                trillionaire: "Trillonario",
                 fire1: "Fuego Encendido (+$1B/día)",
                 fire5: "Fuego Naranja (+$5B/día)",
                 fire10: "Fuego Amarillo (+$10B/día)",
@@ -879,8 +877,7 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Miglior Posizione",
                 peakNetWorth: "Patrimonio Massimo",
-                firstTrillionaire: "First Trillionaire",
-                trillionaire: "Trillionaire",
+                trillionaire: "Trillionario",
                 fire1: "Fuoco Acceso (+$1B/giorno)",
                 fire5: "Fuoco Arancione (+$5B/giorno)",
                 fire10: "Fuoco Giallo (+$10B/giorno)",
@@ -952,8 +949,7 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Melhor Posição",
                 peakNetWorth: "Patrimônio Máximo",
-                firstTrillionaire: "First Trillionaire",
-                trillionaire: "Trillionaire",
+                trillionaire: "Trilionário",
                 fire1: "Fogo Aceso (+$1B/dia)",
                 fire5: "Fogo Laranja (+$5B/dia)",
                 fire10: "Fogo Amarelo (+$10B/dia)",
@@ -1025,8 +1021,7 @@ BloxIndex
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Höchster Rang",
                 peakNetWorth: "Höchstes Nettovermögen",
-                firstTrillionaire: "First Trillionaire",
-                trillionaire: "Trillionaire",
+                trillionaire: "Trillionär",
                 fire1: "Entfachtes Feuer (+$1B/Tag)",
                 fire5: "Oranges Feuer (+$5B/Tag)",
                 fire10: "Gelbes Feuer (+$10B/Tag)",
@@ -1194,7 +1189,6 @@ BloxIndex
                 currentUser: null,
                 people: [],
                 companies: [],
-                firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
                 timeRemainingMs: TWELVE_HOURS_MS,
@@ -1230,7 +1224,7 @@ BloxIndex
                     if (val === undefined || val === null) return '$0B';
                     if (val >= 1000) {
                         let trillions = val / 1000;
-                        return trillions % 1 === 0 ? '$' + trillions + 'T' : '$' + trillions.toFixed(2) + 'T';
+                        return '$' + trillions.toFixed(1) + 'T';
                     }
                     return val % 1 === 0 ? '$' + val.toFixed(0) + 'B' : '$' + val.toFixed(1) + 'B';
                 },
@@ -1239,9 +1233,6 @@ BloxIndex
                 },
                 getTrillionaireLabel(item) {
                     if (!this.isTrillionaire(item)) return '';
-                    if (this.firstTrillionaireName && item.name.toLowerCase() === this.firstTrillionaireName.toLowerCase()) {
-                        return this.t('firstTrillionaire');
-                    }
                     return this.t('trillionaire');
                 },
                 hasDailyChange(item) {
@@ -1255,7 +1246,7 @@ BloxIndex
                     let absChange = Math.abs(item.changeVal);
                     let valStr = '';
                     if (absChange >= 1000) {
-                        valStr = `$${(absChange / 1000).toFixed(2)}T`;
+                        valStr = `$${(absChange / 1000).toFixed(1)}T`;
                     } else if (absChange >= 1) {
                         valStr = `$${absChange.toFixed(1)}B`;
                     } else {
@@ -1470,7 +1461,6 @@ BloxIndex
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
                     let syncedCompanies = getBaseCompanies();
-                    let detectedFirstTrillionaire = null;
 
                     try {
                         let savedComps = localStorage.getItem('empire_user_companies');
@@ -1515,29 +1505,27 @@ BloxIndex
                             let r2 = deterministicRandom(`pers_${person.name.toLowerCase()}_c${cycle}_b`);
                             let pctChange = 0;
 
-                            if (r1 < 0.28) {
+                            if (r1 < 0.25) {
                                 pctChange = 0;
-                            } else if (r1 < 0.62) {
-                                pctChange = 0.002 + r2 * 0.028;
-                            } else if (r1 < 0.74) {
-                                pctChange = 0.03 + r2 * 0.06;
+                            } else if (r1 < 0.58) {
+                                pctChange = 0.002 + r2 * 0.035;
+                            } else if (r1 < 0.72) {
+                                pctChange = 0.03 + r2 * 0.07;
                             } else {
-                                pctChange = -(0.002 + r2 * 0.033);
+                                // Permitir caídas libres normales de mercado, incluso si están por encima de 1000B (1T)
+                                pctChange = -(0.005 + r2 * 0.045);
                             }
 
                             let delta = Number((person.netWorthValue * pctChange).toFixed(1));
                             if (Math.abs(delta) < 0.1) delta = 0;
 
+                            // Permitir que bajen de 1T si sufren pérdidas en el mercado
                             person.netWorthValue = Math.max(10.0, Number((person.netWorthValue + delta).toFixed(1)));
                             person.changeVal = delta;
                             person.positive = delta >= 0;
 
                             if (!person.peakNetWorth || person.netWorthValue > person.peakNetWorth) {
                                 person.peakNetWorth = Number(person.netWorthValue.toFixed(1));
-                            }
-
-                            if (!detectedFirstTrillionaire && person.netWorthValue >= 1000) {
-                                detectedFirstTrillionaire = person.name;
                             }
                         });
 
@@ -1550,16 +1538,12 @@ BloxIndex
                         });
                     }
 
-                    if (!detectedFirstTrillionaire && syncedPeople.length > 0 && syncedPeople[0].netWorthValue >= 1000) {
-                        detectedFirstTrillionaire = syncedPeople[0].name;
-                    }
-
                     if (this.currentUser) {
                         let match = syncedPeople.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
                         if (match) {
                             match.bio = this.currentUser.bio;
                             match.source = this.currentUser.source;
-                            match.img = this.currentUser.img; // Mantener avatar actualizado de Roblox
+                            match.img = this.currentUser.img;
                             this.currentUser = match;
                         } else {
                             syncedPeople.push(this.currentUser);
@@ -1570,7 +1554,6 @@ BloxIndex
 
                     syncedCompanies.sort((a, b) => b.netWorthValue - a.netWorthValue);
 
-                    this.firstTrillionaireName = detectedFirstTrillionaire;
                     this.people = syncedPeople;
                     this.companies = syncedCompanies;
                     this.lastSimulatedCycle = targetCycle;
@@ -1715,7 +1698,6 @@ BloxIndex
                         let savedUser = localStorage.getItem('empire_current_user');
                         if (savedUser) {
                             this.currentUser = JSON.parse(savedUser);
-                            // Sincronizar avatar/perfil actualizado en Roblox automáticamente al iniciar sesión
                             await this.refreshRobloxProfile(this.currentUser);
                             localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                         }
