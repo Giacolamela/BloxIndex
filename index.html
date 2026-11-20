@@ -1,4 +1,3 @@
-BloxIndex
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -61,7 +60,6 @@ BloxIndex
             animation: goldShine 2s infinite ease-in-out;
         }
 
-        /* Tiers de Fuego */
         .fire-tier-1 { filter: drop-shadow(0 0 7px #fb923c) brightness(1.1); }
         .glow-tier-1 { box-shadow: 0 0 14px rgba(251, 146, 60, 0.28); border: 1px solid rgba(251, 146, 60, 0.45); }
         .fire-tier-5 { filter: saturate(1.6) drop-shadow(0 0 11px #f97316); }
@@ -91,8 +89,6 @@ BloxIndex
          x-transition:enter-start="opacity-0 translate-y-4"
          x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 translate-y-4"
          class="fixed bottom-6 right-6 z-50 max-w-sm bg-neutral-900 border border-neutral-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3"
          style="display: none;">
         <span class="text-lg" x-text="toastIcon"></span>
@@ -116,19 +112,26 @@ BloxIndex
     <!-- Barra Superior de Navegación -->
     <header class="flex flex-col md:flex-row items-center justify-between text-sm font-medium border-b border-neutral-800 pb-3 mb-8 max-w-7xl mx-auto w-full gap-4 mt-4">
         <div class="flex items-center space-x-6 flex-wrap">
-            <button @click="resetViews('top5')" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
-            <button @click="resetViews('all')" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
-            <button @click="resetViews('women')" :class="currentFilter === 'women' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
-            <button @click="resetViews('companies')" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
+            <button @click="resetViews('top5')" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
+            <button @click="resetViews('all')" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
+            <button @click="resetViews('women')" :class="currentFilter === 'women' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
+            <button @click="resetViews('companies')" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
+            
+            <template x-if="currentUser">
+                <button @click="showFriendsView = true; selectedPerson = null; selectedCompany = null;" :class="showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1.5">
+                    <span>👥</span> <span x-text="t('friendsTab')"></span>
+                    <span x-show="userFriends.length > 0" class="bg-blue-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold" x-text="userFriends.length"></span>
+                </button>
+            </template>
             
             <div class="relative" @click.away="showCategoriesDropdown = false">
-                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'; selectedPerson = null; selectedCompany = null;" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
+                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'; selectedPerson = null; selectedCompany = null; showFriendsView = false;" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
                     <span x-text="t('categories')"></span> <span class="text-xs">▾</span>
                 </button>
 
                 <div x-show="showCategoriesDropdown" class="absolute left-0 mt-2 w-64 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
                     <template x-for="cat in uniqueCategories" :key="cat">
-                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories'" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
+                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories'; showFriendsView = false;" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
                             <span x-text="cat"></span>
                             <span class="text-xs text-neutral-500" x-text="people.filter(p => p.source === cat).length"></span>
                         </button>
@@ -138,7 +141,6 @@ BloxIndex
         </div>
 
         <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-            <!-- Selector de Idioma -->
             <div class="relative">
                 <select x-model="lang" @change="changeLanguage(lang)" class="bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 cursor-pointer">
                     <option value="es">🇪🇸 Español</option>
@@ -149,25 +151,22 @@ BloxIndex
                 </select>
             </div>
 
-            <!-- Buscador -->
             <div class="relative w-full md:w-48">
                 <input type="text" x-model="searchQuery" :placeholder="t('searchPlaceholder')" class="w-full bg-[#181818] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600">
             </div>
 
-            <!-- Botón Invitaciones Pendientes -->
+            <!-- Botón de Notificaciones de Invitaciones -->
             <template x-if="currentUser && pendingInvitesForCurrentUser.length > 0">
-                <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                    <span>📩</span>
+                <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 animate-pulse">
+                    <span>🔔</span>
                     <span x-text="pendingInvitesForCurrentUser.length"></span>
                 </button>
             </template>
 
-            <!-- Botón Registro / Login -->
             <template x-if="!currentUser">
                 <button @click="showRegisterModal = true" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap" x-text="t('registerLogin')"></button>
             </template>
 
-            <!-- Menú de Usuario -->
             <template x-if="currentUser">
                 <div class="relative" @click.away="showUserMenu = false">
                     <div @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
@@ -186,6 +185,10 @@ BloxIndex
                         <button @click="openCompanyModal(false); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2 font-semibold">
                             🏢 <span x-text="t('createAnotherCompany')"></span>
                         </button>
+                        <button @click="showFriendsView = true; selectedPerson = null; selectedCompany = null; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-purple-400 transition flex items-center justify-between">
+                            <span class="flex items-center gap-2">👥 <span x-text="t('friendsTab')"></span></span>
+                            <span class="bg-neutral-800 text-white px-1.5 py-0.5 rounded text-[10px]" x-text="userFriends.length"></span>
+                        </button>
                         <template x-if="userOwnedCompanies.length > 0">
                             <div class="border-t border-neutral-800 my-1 pt-1">
                                 <div class="px-4 py-1 text-[10px] text-neutral-500 uppercase font-bold" x-text="t('myCompaniesLabel')"></div>
@@ -199,7 +202,7 @@ BloxIndex
                         </template>
                         <template x-if="pendingInvitesForCurrentUser.length > 0">
                             <button @click="showInvitesModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
-                                <span class="flex items-center gap-2">📩 <span x-text="t('invitesMenu')"></span></span>
+                                <span class="flex items-center gap-2">🔔 <span x-text="t('invitesMenu')"></span></span>
                                 <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length"></span>
                             </button>
                         </template>
@@ -213,8 +216,88 @@ BloxIndex
         </div>
     </header>
 
+    <!-- Vista de Amigos -->
+    <main x-show="showFriendsView" class="flex-grow max-w-5xl mx-auto w-full" style="display: none;">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="serif-font text-3xl font-bold" x-text="t('friendsTitle')"></h1>
+                <p class="text-xs text-neutral-400 mt-1" x-text="t('friendsDesc')"></p>
+            </div>
+            <button @click="showFriendsView = false" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition self-start" x-text="t('backButton')"></button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Buscar y Añadir Amigos -->
+            <div class="card-bg border border-neutral-800 p-6 rounded-2xl md:col-span-1 shadow-lg">
+                <h3 class="serif-font text-lg font-bold text-white mb-1" x-text="t('addFriendTitle')"></h3>
+                <p class="text-xs text-neutral-400 mb-4" x-text="t('addFriendDesc')"></p>
+                
+                <div class="space-y-3">
+                    <input type="text" x-model="friendSearchInput" :placeholder="t('friendSearchPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    
+                    <div class="max-h-48 overflow-y-auto space-y-2 mt-2">
+                        <template x-for="candidate in availableUsersToFriend" :key="candidate.name">
+                            <div class="bg-black/50 border border-neutral-800 p-2.5 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <img :src="candidate.img" class="w-8 h-8 rounded-lg object-cover bg-black">
+                                    <div class="text-xs font-semibold text-white truncate max-w-[100px]" x-text="candidate.name"></div>
+                                </div>
+                                <button @click="sendFriendRequest(candidate.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-[11px] font-semibold transition" x-text="t('addBtn')"></button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <template x-if="incomingFriendRequests.length > 0">
+                    <div class="mt-6 pt-4 border-t border-neutral-800">
+                        <h4 class="text-xs font-bold text-amber-400 uppercase mb-3" x-text="t('pendingRequestsTitle')"></h4>
+                        <div class="space-y-2">
+                            <template x-for="reqName in incomingFriendRequests" :key="reqName">
+                                <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <img :src="getUserAvatarByName(reqName)" class="w-7 h-7 rounded-full object-cover">
+                                        <span class="text-xs font-bold text-white" x-text="reqName"></span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-2.5 py-1 rounded text-[10px] font-semibold">✓</button>
+                                        <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1 rounded text-[10px]">✕</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Lista de Amigos -->
+            <div class="card-bg border border-neutral-800 p-6 rounded-2xl md:col-span-2 shadow-lg">
+                <h3 class="serif-font text-lg font-bold text-white mb-4" x-text="t('myFriendsListTitle') + ' (' + userFriends.length + ')'"></h3>
+                
+                <div x-show="userFriends.length === 0" class="text-center py-12 text-neutral-500 text-xs">
+                    <div class="text-3xl mb-2">🤝</div>
+                    <span x-text="t('noFriendsYet')"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <template x-for="friendName in userFriends" :key="friendName">
+                        <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
+                                <div>
+                                    <div class="text-sm font-bold text-white" x-text="friendName"></div>
+                                    <div class="text-[11px] text-green-400 font-medium" x-text="t('onlineStatus')"></div>
+                                </div>
+                            </div>
+                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1">✕</button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <!-- Contenido Principal (Rankings) -->
-    <main x-show="!selectedPerson && !selectedCompany" class="flex-grow max-w-7xl mx-auto w-full">
+    <main x-show="!selectedPerson && !selectedCompany && !showFriendsView" class="flex-grow max-w-7xl mx-auto w-full">
 
         <!-- Top 5 Ganadores y Perdedores -->
         <div x-show="searchQuery === '' && !selectedCategory && currentFilter !== 'companies'" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -447,12 +530,11 @@ BloxIndex
             </template>
         </div>
 
-        <!-- Cuadrícula Leaderboard (Personas y Empresas ordenadas por Top 1, 2, 3...) -->
+        <!-- Cuadrícula Leaderboard -->
         <div x-show="currentFilter !== 'top5' || searchQuery !== ''" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <template x-for="(item, index) in displayedPeople" :key="(item.id || item.name) + '-' + (currentFilter === 'companies' ? 'comp' : 'pers')">
                 <div @click="currentFilter === 'companies' ? openCompanyDashboard(item) : openProfile(item)" :class="getContainerGlowClass(item)" class="card-bg p-4 rounded-xl cursor-pointer hover:border hover:border-neutral-600 transition flex flex-col items-center text-center relative">
                     
-                    <!-- Badge de Nivel si es empresa -->
                     <template x-if="currentFilter === 'companies'">
                         <span class="absolute top-3 left-3 bg-blue-600/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="'LVL ' + (item.level || 1)"></span>
                     </template>
@@ -514,9 +596,16 @@ BloxIndex
                             <div x-show="!isBloodActive(selectedPerson) && hasFire(selectedPerson)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedPerson)"></div>
                         </div>
                     </div>
-                    <template x-if="currentUser && currentUser.name.toLowerCase() === selectedPerson?.name.toLowerCase()">
-                        <button @click="openBioEditor(selectedPerson)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
-                    </template>
+                    <div class="flex items-center gap-2">
+                        <template x-if="currentUser && currentUser.name.toLowerCase() === selectedPerson?.name.toLowerCase()">
+                            <button @click="openBioEditor(selectedPerson)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
+                        </template>
+                        <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedPerson?.name.toLowerCase()">
+                            <button @click="sendFriendRequest(selectedPerson.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                                <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
                 <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
@@ -964,29 +1053,75 @@ BloxIndex
         </div>
     </div>
 
-    <!-- MODAL 5: Invitaciones de Empresas Recibidas -->
+    <!-- MODAL 5: Centro de Notificaciones e Invitaciones (Empresas y Amigos) -->
     <div x-show="showInvitesModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
+        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative shadow-2xl">
             <button @click="showInvitesModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('invitesModalTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-5" x-text="t('invitesModalDesc')"></p>
+            
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-2xl">🔔</span>
+                <h2 class="serif-font text-2xl font-bold text-white" x-text="t('notificationsTitle')"></h2>
+            </div>
+            <p class="text-xs text-neutral-400 mb-6" x-text="t('notificationsDesc')"></p>
 
-            <div class="space-y-3">
-                <template x-for="comp in pendingInvitesForCurrentUser" :key="comp.name">
-                    <div class="bg-black/60 border border-neutral-800 p-4 rounded-xl flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <img :src="comp.img" class="w-11 h-11 rounded-lg object-cover bg-black">
-                            <div>
-                                <div class="text-sm font-bold text-white" x-text="comp.name"></div>
-                                <div class="text-[11px] text-neutral-400" x-text="'CEO: ' + comp.ceo + ' • LVL ' + (comp.level || 1)"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button @click="respondToInvite(comp, true)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
-                            <button @click="respondToInvite(comp, false)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
-                        </div>
+            <div class="space-y-6 max-h-96 overflow-y-auto pr-1">
+                <!-- Invitaciones de Empresas -->
+                <div>
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <span>🏢</span> <span x-text="t('companyInvitesHeader')"></span> (<span x-text="pendingInvitesForCurrentUser.length"></span>)
+                    </h3>
+                    
+                    <div x-show="pendingInvitesForCurrentUser.length === 0" class="text-xs text-neutral-500 italic bg-black/30 p-3 rounded-xl">
+                        <span x-text="t('noCompanyInvites')"></span>
                     </div>
-                </template>
+
+                    <div class="space-y-2.5">
+                        <template x-for="comp in pendingInvitesForCurrentUser" :key="comp.name">
+                            <div class="bg-black/60 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <img :src="comp.img" class="w-10 h-10 rounded-lg object-cover bg-black">
+                                    <div>
+                                        <div class="text-sm font-bold text-white" x-text="comp.name"></div>
+                                        <div class="text-[11px] text-neutral-400" x-text="'CEO: ' + comp.ceo"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button @click="respondToCompanyInvite(comp, true)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
+                                    <button @click="respondToCompanyInvite(comp, false)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Solicitudes de Amistad -->
+                <div class="pt-4 border-t border-neutral-800">
+                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <span>👥</span> <span x-text="t('friendRequestsHeader')"></span> (<span x-text="incomingFriendRequests.length"></span>)
+                    </h3>
+
+                    <div x-show="incomingFriendRequests.length === 0" class="text-xs text-neutral-500 italic bg-black/30 p-3 rounded-xl">
+                        <span x-text="t('noFriendRequests')"></span>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <template x-for="reqName in incomingFriendRequests" :key="reqName">
+                            <div class="bg-black/60 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <img :src="getUserAvatarByName(reqName)" class="w-10 h-10 rounded-full object-cover bg-black">
+                                    <div>
+                                        <div class="text-sm font-bold text-white" x-text="reqName"></div>
+                                        <div class="text-[11px] text-amber-400" x-text="t('wantsToBeFriend')"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
+                                    <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1028,6 +1163,7 @@ BloxIndex
                 top: "Top",
                 women: "Mujeres",
                 companiesTab: "Empresas",
+                friendsTab: "Amigos",
                 categories: "Categorías",
                 searchPlaceholder: "Buscar jugador o empresa...",
                 registerLogin: "Registrarse / Ingresar",
@@ -1050,16 +1186,17 @@ BloxIndex
                 noCompaniesTitle: "Aún no hay empresas creadas",
                 noCompaniesDesc: "¡Ingresa con tu cuenta de Roblox para fundar tu propia empresa y competir en el Top!",
                 clearFilters: "Limpiar Filtros",
-                backButton: "← Volver al Ranking",
+                backButton: "← Volver",
                 backToCompanies: "← Volver al Top de Empresas",
                 myProfile: "Mi Perfil",
                 editBio: "Editar Perfil y Trabajo",
                 createCompanyMenu: "Crear Empresa",
                 createAnotherCompany: "Crear otra Empresa",
                 myCompaniesLabel: "Mis Empresas",
-                invitesMenu: "Invitaciones",
+                invitesMenu: "Notificaciones",
                 logout: "Cerrar sesión",
                 editBioBtn: "✏️ Editar Perfil",
+                addFriendBtn: "+ Añadir Amigo",
                 editBioTitle: "Editar Perfil y Trabajo / Sector",
                 editBioDesc: "Elige tu trabajo o sector principal y actualiza tu biografía.",
                 saveBioButton: "Guardar Cambios",
@@ -1077,7 +1214,7 @@ BloxIndex
                 launchCompanyBtn: "Fundar Empresa",
                 laterButton: "Más tarde",
                 modalTitle: "Iniciar Sesión o Registrarse",
-                modalDesc: "Introduce tu usuario de Roblox. ¡Si aún no tienes empresa, podrás crearla al instante!",
+                modalDesc: "Introduce tu usuario de Roblox. ¡Si aún no tienes empresa, podrás crearla al instante y serás registrado en la red social!",
                 robloxUser: "Usuario de Roblox",
                 password: "Contraseña",
                 authButton: "Ingresar / Registrarse",
@@ -1126,9 +1263,23 @@ BloxIndex
                 companyLevelStat: "Nivel de la Empresa",
                 companyRankStat: "Posición en el Top Empresas",
                 totalMembersStat: "Total de Miembros Reales",
-                invitesModalTitle: "Invitaciones de Empresas",
-                invitesModalDesc: "Otros jugadores reales te han invitado a unirte a sus empresas:",
-                acceptBtn: "Unirse"
+                notificationsTitle: "Centro de Notificaciones",
+                notificationsDesc: "Revisa todas tus invitaciones pendientes a empresas y solicitudes de amistad.",
+                companyInvitesHeader: "Invitaciones a Empresas",
+                noCompanyInvites: "No tienes invitaciones de empresas pendientes.",
+                friendRequestsHeader: "Solicitudes de Amistad",
+                noFriendRequests: "No tienes solicitudes de amistad pendientes.",
+                wantsToBeFriend: "Quiere ser tu amigo en la web",
+                acceptBtn: "Aceptar",
+                friendsTitle: "Gestión de Amistades",
+                friendsDesc: "Añade a otros jugadores reales registrados en la página para formar tu red social de inversores.",
+                addFriendTitle: "Buscar y Añadir",
+                addFriendDesc: "Escribe o selecciona un usuario activo para enviarle solicitud de amistad.",
+                friendSearchPlaceholder: "Buscar usuario registrado...",
+                myFriendsListTitle: "Mis Amigos",
+                noFriendsYet: "Aún no tienes amigos añadidos en la web.",
+                onlineStatus: "🟢 En línea / Conectado",
+                pendingRequestsTitle: "Solicitudes Entrantes"
             },
             en: {
                 title: "BloxIndex",
@@ -1141,6 +1292,7 @@ BloxIndex
                 top: "Top",
                 women: "Women",
                 companiesTab: "Companies",
+                friendsTab: "Friends",
                 categories: "Categories",
                 searchPlaceholder: "Search player or company...",
                 registerLogin: "Register / Login",
@@ -1163,16 +1315,17 @@ BloxIndex
                 noCompaniesTitle: "No user companies created yet",
                 noCompaniesDesc: "Log in with your Roblox account to launch your business empire!",
                 clearFilters: "Clear Filters",
-                backButton: "← Back to Leaderboard",
+                backButton: "← Back",
                 backToCompanies: "← Back to Companies Top",
                 myProfile: "My Profile",
                 editBio: "Edit Profile & Role",
                 createCompanyMenu: "Create Company",
                 createAnotherCompany: "Create another Company",
                 myCompaniesLabel: "My Companies",
-                invitesMenu: "Invitations",
+                invitesMenu: "Notifications",
                 logout: "Logout",
                 editBioBtn: "✏️ Edit Profile",
+                addFriendBtn: "+ Add Friend",
                 editBioTitle: "Edit Profile & Wealth Sector",
                 editBioDesc: "Choose your main role/sector and update your public biography.",
                 saveBioButton: "Save Changes",
@@ -1190,7 +1343,7 @@ BloxIndex
                 launchCompanyBtn: "Launch Company",
                 laterButton: "Later",
                 modalTitle: "Login or Register",
-                modalDesc: "Enter your Roblox username. You will be prompted to create your company right after!",
+                modalDesc: "Enter your Roblox username. You will be registered in the social network and can create your company right after!",
                 robloxUser: "Roblox Username",
                 password: "Password",
                 authButton: "Login / Register",
@@ -1239,9 +1392,23 @@ BloxIndex
                 companyLevelStat: "Company Level",
                 companyRankStat: "Companies Top Rank",
                 totalMembersStat: "Total Real Members",
-                invitesModalTitle: "Company Invitations",
-                invitesModalDesc: "Real players invited you to join their companies:",
-                acceptBtn: "Join"
+                notificationsTitle: "Notification Center",
+                notificationsDesc: "Check all your pending company invitations and friend requests.",
+                companyInvitesHeader: "Company Invitations",
+                noCompanyInvites: "You have no pending company invitations.",
+                friendRequestsHeader: "Friend Requests",
+                noFriendRequests: "You have no pending friend requests.",
+                wantsToBeFriend: "Wants to be your friend on the web",
+                acceptBtn: "Accept",
+                friendsTitle: "Friendship Management",
+                friendsDesc: "Add other real players registered on the page to build your investor social network.",
+                addFriendTitle: "Search & Add",
+                addFriendDesc: "Type or select an active user to send a friend request.",
+                friendSearchPlaceholder: "Search registered user...",
+                myFriendsListTitle: "My Friends",
+                noFriendsYet: "You haven't added any friends on the web yet.",
+                onlineStatus: "🟢 Online / Connected",
+                pendingRequestsTitle: "Incoming Requests"
             },
             it: {
                 title: "BloxIndex",
@@ -1254,6 +1421,7 @@ BloxIndex
                 top: "Top",
                 women: "Donne",
                 companiesTab: "Aziende",
+                friendsTab: "Amici",
                 categories: "Categorie",
                 searchPlaceholder: "Cerca giocatore o azienda...",
                 registerLogin: "Registrati / Accedi",
@@ -1274,26 +1442,27 @@ BloxIndex
                 ceoLabel: "CEO / Proprietario",
                 membersCount: "soci",
                 noCompaniesTitle: "Nessuna azienda creata",
-                noCompaniesDesc: "Accedi con il tuo account Roblox per fondare la tua azienda e competere nella Top!",
+                noCompaniesDesc: "Accedi con il tuo account Roblox per fondare la tua azienda!",
                 clearFilters: "Cancella Filtri",
-                backButton: "← Torna alla Classifica",
+                backButton: "← Indietro",
                 backToCompanies: "← Torna alla Top Aziende",
                 myProfile: "Il Mio Profilo",
                 editBio: "Modifica Profilo e Ruolo",
                 createCompanyMenu: "Crea Azienda",
                 createAnotherCompany: "Crea un'altra Azienda",
                 myCompaniesLabel: "Le mie Aziende",
-                invitesMenu: "Inviti",
+                invitesMenu: "Notifiche",
                 logout: "Disconnetti",
                 editBioBtn: "✏️ Modifica Profilo",
+                addFriendBtn: "+ Aggiungi Amico",
                 editBioTitle: "Modifica Profilo e Settore",
                 editBioDesc: "Scegli il tuo ruolo principale e aggiorna la biografia.",
                 saveBioButton: "Salva Modifiche",
                 welcomeCompanyBadge: "Benvenuto! Fonda il tuo Impero",
                 createCompanyTitle: "Crea la tua Azienda",
-                createCompanyDesc: "Fonda una nuova azienda ufficiale. Carica il tuo logo dai file e scala la classifica delle Aziende!",
+                createCompanyDesc: "Fonda una nuova azienda ufficiale. Carica il tuo logo dai file!",
                 editCompanyTitle: "Modifica Azienda",
-                editCompanyDesc: "Cambia il nome o carica un nuovo logo dai tuoi file quando vuoi.",
+                editCompanyDesc: "Cambia il nome o carica un nuovo logo dai tuoi file.",
                 editCompanyBtn: "Modifica Nome / Logo",
                 companyNameLabel: "Nome Azienda",
                 companyInvestmentLabel: "Capitale Iniziale (in Miliardi $)",
@@ -1303,7 +1472,7 @@ BloxIndex
                 launchCompanyBtn: "Fonda Azienda",
                 laterButton: "Più tardi",
                 modalTitle: "Accedi o Registrati",
-                modalDesc: "Inserisci il tuo nome utente Roblox. Potrai creare la tua azienda subito dopo!",
+                modalDesc: "Inserisci il tuo nome utente Roblox per registrarti e creare la tua azienda!",
                 robloxUser: "Nome Utente Roblox",
                 password: "Password",
                 authButton: "Accedi / Registrati",
@@ -1324,7 +1493,7 @@ BloxIndex
                 companyValuationLabel: "VALUTAZIONE AZIENDALE",
                 growthBonusLabel: "Bonus Crescita",
                 upgradeHeaderTitle: "Investi e Migliora Azienda",
-                upgradeHeaderDesc: "Spendi soldi personali per far salire di livello l'azienda e aumentare i profitti.",
+                upgradeHeaderDesc: "Spendi soldi personali per far salire di livello l'azienda.",
                 yourPersonalBalance: "I tuoi Soldi Disponibili",
                 upgradeCostLabel: "Costo Miglioramento",
                 upgradeBtn: "Investi e Migliora",
@@ -1341,7 +1510,7 @@ BloxIndex
                 upgRdTitle: "Ricerca e Sviluppo",
                 upgRdDesc: "Innovazioni esclusive che fanno impennare il valore.",
                 inviteRealUserTitle: "Invita Utenti Reali",
-                inviteRealUserDesc: "Inserisci il nome utente Roblox di qualcuno che ha effettuato l'accesso a questa pagina.",
+                inviteRealUserDesc: "Inserisci il nome utente Roblox di qualcuno.",
                 inviteInputPlaceholder: "Nome utente registrato...",
                 registeredPlayersLabel: "Utenti attivi sul web",
                 sendInviteBtn: "Invia Invito",
@@ -1352,9 +1521,23 @@ BloxIndex
                 companyLevelStat: "Livello Azienda",
                 companyRankStat: "Posizione Top Aziende",
                 totalMembersStat: "Totale Membri Reali",
-                invitesModalTitle: "Inviti Aziendali",
-                invitesModalDesc: "Altri giocatori reali ti hanno invitato:",
-                acceptBtn: "Unisciti"
+                notificationsTitle: "Centro Notifiche",
+                notificationsDesc: "Controlla tutti gli inviti alle aziende e le richieste di amicizia.",
+                companyInvitesHeader: "Inviti Aziendali",
+                noCompanyInvites: "Nessun invito aziendale in sospeso.",
+                friendRequestsHeader: "Richieste di Amicizia",
+                noFriendRequests: "Nessuna richiesta di amicizia in sospeso.",
+                wantsToBeFriend: "Vuole essere tuo amico",
+                acceptBtn: "Accetta",
+                friendsTitle: "Gestione Amicizie",
+                friendsDesc: "Aggiungi altri giocatori reali registrati sulla pagina.",
+                addFriendTitle: "Cerca e Aggiungi",
+                addFriendDesc: "Scrivi o seleziona un utente.",
+                friendSearchPlaceholder: "Cerca utente registrato...",
+                myFriendsListTitle: "I miei Amici",
+                noFriendsYet: "Non hai ancora aggiunto amici.",
+                onlineStatus: "🟢 Online / Connesso",
+                pendingRequestsTitle: "Richieste in Arrivo"
             },
             pt: {
                 title: "BloxIndex",
@@ -1367,6 +1550,7 @@ BloxIndex
                 top: "Top",
                 women: "Mulheres",
                 companiesTab: "Empresas",
+                friendsTab: "Amigos",
                 categories: "Categorias",
                 searchPlaceholder: "Pesquisar jogador ou empresa...",
                 registerLogin: "Registrar / Entrar",
@@ -1387,26 +1571,27 @@ BloxIndex
                 ceoLabel: "CEO / Dono",
                 membersCount: "sócios",
                 noCompaniesTitle: "Nenhuma empresa criada",
-                noCompaniesDesc: "Entre com sua conta do Roblox para fundar sua própria empresa e competir no Top!",
+                noCompaniesDesc: "Entre com sua conta do Roblox para fundar sua empresa!",
                 clearFilters: "Limpar Filtros",
-                backButton: "← Voltar ao Ranking",
+                backButton: "← Voltar",
                 backToCompanies: "← Voltar ao Top de Empresas",
                 myProfile: "Meu Perfil",
                 editBio: "Editar Perfil e Trabalho",
                 createCompanyMenu: "Criar Empresa",
                 createAnotherCompany: "Criar outra Empresa",
                 myCompaniesLabel: "Minhas Empresas",
-                invitesMenu: "Convites",
+                invitesMenu: "Notificações",
                 logout: "Sair",
                 editBioBtn: "✏️ Editar Perfil",
+                addFriendBtn: "+ Adicionar Amigo",
                 editBioTitle: "Editar Perfil e Setor",
                 editBioDesc: "Escolha seu papel principal e atualize sua biografia.",
                 saveBioButton: "Salvar Alterações",
                 welcomeCompanyBadge: "Bem-vindo! Lance seu Império",
                 createCompanyTitle: "Criar sua Empresa",
-                createCompanyDesc: "Funde uma nova empresa oficial. Carregue seu logo dos arquivos e suba no Ranking de Empresas!",
+                createCompanyDesc: "Funde uma nova empresa oficial. Carregue seu logo dos arquivos!",
                 editCompanyTitle: "Editar Empresa",
-                editCompanyDesc: "Mude o nome ou envie um novo logo dos seus arquivos quando quiser.",
+                editCompanyDesc: "Mude o nome ou envie um novo logo dos seus arquivos.",
                 editCompanyBtn: "Editar Nome / Logo",
                 companyNameLabel: "Nome da Empresa",
                 companyInvestmentLabel: "Capital Inicial (em Bilhões $)",
@@ -1416,7 +1601,7 @@ BloxIndex
                 launchCompanyBtn: "Fundar Empresa",
                 laterButton: "Mais tarde",
                 modalTitle: "Entrar ou Registrar",
-                modalDesc: "Digite seu nome de usuário do Roblox. Você poderá criar sua empresa logo em seguida!",
+                modalDesc: "Digite seu nome de usuário do Roblox para se registrar e criar sua empresa!",
                 robloxUser: "Usuário do Roblox",
                 password: "Senha",
                 authButton: "Entrar / Registrar",
@@ -1437,7 +1622,7 @@ BloxIndex
                 companyValuationLabel: "VALORIAÇÃO DA EMPRESA",
                 growthBonusLabel: "Bônus de Crescimento",
                 upgradeHeaderTitle: "Investir e Melhorar Empresa",
-                upgradeHeaderDesc: "Gaste dinheiro pessoal para subir o nível da empresa e lucrar mais a cada ciclo.",
+                upgradeHeaderDesc: "Gaste dinheiro pessoal para subir o nível da empresa.",
                 yourPersonalBalance: "Seu Dinheiro Disponível",
                 upgradeCostLabel: "Custo da Melhoria",
                 upgradeBtn: "Investir e Melhorar",
@@ -1452,9 +1637,9 @@ BloxIndex
                 upgExpansionTitle: "Filiais Internacionais",
                 upgExpansionDesc: "Abra sedes globais para multiplicar a receita.",
                 upgRdTitle: "Pesquisa e Desenvolvimento",
-                upgRdDesc: "Inovações exclusivas que disparam o valor das ações.",
+                upgRdDesc: "Inovações exclusivas que disparam o valor.",
                 inviteRealUserTitle: "Convidar Usuários Reais",
-                inviteRealUserDesc: "Insira o nome de usuário do Roblox de alguém que entrou nesta página.",
+                inviteRealUserDesc: "Insira o nome de usuário do Roblox.",
                 inviteInputPlaceholder: "Nome de usuário registrado...",
                 registeredPlayersLabel: "Usuários ativos na web",
                 sendInviteBtn: "Enviar Convite",
@@ -1464,10 +1649,24 @@ BloxIndex
                 pendingInvitesTitle: "Convites Pendentes",
                 companyLevelStat: "Nível da Empresa",
                 companyRankStat: "Posição Top Empresas",
-                totalMembersStat: "Total de Membros Reali",
-                invitesModalTitle: "Convites de Empresas",
-                invitesModalDesc: "Outros jogadores reais convidaram você:",
-                acceptBtn: "Entrar"
+                totalMembersStat: "Total de Membros Reais",
+                notificationsTitle: "Central de Notificações",
+                notificationsDesc: "Verifique todos os convites de empresas e solicitações de amizade.",
+                companyInvitesHeader: "Convites de Empresas",
+                noCompanyInvites: "Você não tem convites de empresas pendentes.",
+                friendRequestsHeader: "Solicitações de Amizade",
+                noFriendRequests: "Você não tem solicitações de amizade pendentes.",
+                wantsToBeFriend: "Quer ser seu amigo na web",
+                acceptBtn: "Aceitar",
+                friendsTitle: "Gerenciamento de Amizades",
+                friendsDesc: "Adicione outros jogadores reais registrados na página.",
+                addFriendTitle: "Pesquisar e Adicionar",
+                addFriendDesc: "Digite ou selecione um usuário.",
+                friendSearchPlaceholder: "Pesquisar usuário...",
+                myFriendsListTitle: "Meus Amigos",
+                noFriendsYet: "Você ainda não adicionou amigos.",
+                onlineStatus: "🟢 Online / Conectado",
+                pendingRequestsTitle: "Solicitações Recebidas"
             },
             de: {
                 title: "BloxIndex",
@@ -1480,6 +1679,7 @@ BloxIndex
                 top: "Top",
                 women: "Frauen",
                 companiesTab: "Unternehmen",
+                friendsTab: "Freunde",
                 categories: "Kategorien",
                 searchPlaceholder: "Spieler oder Firma suchen...",
                 registerLogin: "Registrieren / Login",
@@ -1500,24 +1700,25 @@ BloxIndex
                 ceoLabel: "CEO / Eigentümer",
                 membersCount: "Partner",
                 noCompaniesTitle: "Noch keine Unternehmen erstellt",
-                noCompaniesDesc: "Melde dich mit deinem Roblox-Konto an, um dein eigenes Unternehmen zu gründen!",
+                noCompaniesDesc: "Melde dich mit deinem Roblox-Konto an!",
                 clearFilters: "Filter zurücksetzen",
-                backButton: "← Zurück zur Rangliste",
+                backButton: "← Zurück",
                 backToCompanies: "← Zurück zur Unternehmens-Top",
                 myProfile: "Mein Profil",
                 editBio: "Profil & Rolle bearbeiten",
                 createCompanyMenu: "Unternehmen gründen",
                 createAnotherCompany: "Weiteres Unternehmen gründen",
                 myCompaniesLabel: "Meine Unternehmen",
-                invitesMenu: "Einladungen",
+                invitesMenu: "Benachrichtigungen",
                 logout: "Abmelden",
                 editBioBtn: "✏️ Profil bearbeiten",
+                addFriendBtn: "+ Freund hinzufügen",
                 editBioTitle: "Profil & Sektor bearbeiten",
                 editBioDesc: "Wähle deine Hauptrolle und aktualisiere deine Biografie.",
                 saveBioButton: "Änderungen speichern",
                 welcomeCompanyBadge: "Willkommen! Starte dein Imperium",
                 createCompanyTitle: "Gründe dein Unternehmen",
-                createCompanyDesc: "Starte ein neues offizielles Unternehmen. Lade dein Logo aus deinen Dateien hoch!",
+                createCompanyDesc: "Starte ein neues offizielles Unternehmen. Lade dein Logo hoch!",
                 editCompanyTitle: "Unternehmen bearbeiten",
                 editCompanyDesc: "Ändere den Namen oder lade ein neues Logo hoch.",
                 editCompanyBtn: "Name / Logo bearbeiten",
@@ -1529,7 +1730,7 @@ BloxIndex
                 launchCompanyBtn: "Unternehmen gründen",
                 laterButton: "Später",
                 modalTitle: "Anmelden oder Registrieren",
-                modalDesc: "Gib deinen Roblox-Benutzernamen ein. Du wirst direkt danach aufgefordert, dein Unternehmen zu gründen!",
+                modalDesc: "Gib deinen Roblox-Benutzernamen ein, um dich zu registrieren!",
                 robloxUser: "Roblox-Benutzername",
                 password: "Passwort",
                 authButton: "Login / Registrieren",
@@ -1550,7 +1751,7 @@ BloxIndex
                 companyValuationLabel: "UNTERNEHMENSBEWERTUNG",
                 growthBonusLabel: "Wachstumsbonus",
                 upgradeHeaderTitle: "Investieren & Aufrüsten",
-                upgradeHeaderDesc: "Gib persönliches Geld aus, um dein Unternehmen im Level zu steigern.",
+                upgradeHeaderDesc: "Gib persönliches Geld aus.",
                 yourPersonalBalance: "Dein verfügbares Geld",
                 upgradeCostLabel: "Upgrade-Kosten",
                 upgradeBtn: "Investieren",
@@ -1559,15 +1760,15 @@ BloxIndex
                 levelWord: "Level",
                 perCycleWord: "pro Zyklus",
                 upgTechTitle: "KI & Tech-Infrastruktur",
-                upgTechDesc: "Automatisiere Abläufe und steigere die Rendite.",
+                upgTechDesc: "Automatisiere Abläufe.",
                 upgMarketTitle: "Globales Marketing",
                 upgMarketDesc: "Erweitere die Markenbekanntheit.",
                 upgExpansionTitle: "Internationale Niederlassungen",
-                upgExpansionDesc: "Eröffne globale Standorte für mehr Einnahmen.",
+                upgExpansionDesc: "Eröffne globale Standorte.",
                 upgRdTitle: "Forschung & Entwicklung",
-                upgRdDesc: "Exklusive Innovationen für den Aktienwert.",
+                upgRdDesc: "Exklusive Innovationen.",
                 inviteRealUserTitle: "Echte Benutzer einladen",
-                inviteRealUserDesc: "Gib den Roblox-Benutzernamen ein, um sie als Partner einzuladen.",
+                inviteRealUserDesc: "Gib den Roblox-Benutzernamen ein.",
                 inviteInputPlaceholder: "Registrierter Benutzername...",
                 registeredPlayersLabel: "Aktive Web-Benutzer",
                 sendInviteBtn: "Einladung senden",
@@ -1578,9 +1779,23 @@ BloxIndex
                 companyLevelStat: "Unternehmenslevel",
                 companyRankStat: "Top-Unternehmen Rang",
                 totalMembersStat: "Gesamte echte Mitglieder",
-                invitesModalTitle: "Unternehmens-Einladungen",
-                invitesModalDesc: "Echte Spieler haben dich eingeladen:",
-                acceptBtn: "Beitreten"
+                notificationsTitle: "Benachrichtigungszentrale",
+                notificationsDesc: "Überprüfe alle Einladungen und Freundschaftsanfragen.",
+                companyInvitesHeader: "Unternehmens-Einladungen",
+                noCompanyInvites: "Keine ausstehenden Einladungen.",
+                friendRequestsHeader: "Freundschaftsanfragen",
+                noFriendRequests: "Keine ausstehenden Anfragen.",
+                wantsToBeFriend: "Möchte dein Freund sein",
+                acceptBtn: "Annehmen",
+                friendsTitle: "Freundschaftsverwaltung",
+                friendsDesc: "Füge andere echte Spieler hinzu.",
+                addFriendTitle: "Suchen & Hinzufügen",
+                addFriendDesc: "Wähle einen Benutzer aus.",
+                friendSearchPlaceholder: "Registrierten Benutzer suchen...",
+                myFriendsListTitle: "Meine Freunde",
+                noFriendsYet: "Du hast noch keine Freunde hinzugefügt.",
+                onlineStatus: "🟢 Online / Verbunden",
+                pendingRequestsTitle: "Eingehende Anfragen"
             }
         };
 
@@ -1711,6 +1926,7 @@ BloxIndex
                 selectedPerson: null,
                 selectedTop5Person: null,
                 selectedCompany: null,
+                showFriendsView: false,
                 showRegisterModal: false,
                 showCategoriesDropdown: false,
                 showUserMenu: false,
@@ -1729,6 +1945,7 @@ BloxIndex
                 newCompanyInvestment: 15.0,
                 newCompanyLogo: '',
                 inviteUsernameInput: '',
+                friendSearchInput: '',
                 presetCompanyLogos: PRESET_COMPANY_LOGOS,
                 allSectors: AVAILABLE_SECTORS,
                 searchQuery: '',
@@ -1739,6 +1956,8 @@ BloxIndex
                 people: [],
                 companies: [],
                 registeredUsers: [],
+                friendshipsMap: {}, // { username: [friend1, friend2] }
+                friendRequestsMap: {}, // { username: [requester1] }
                 firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
@@ -1787,6 +2006,7 @@ BloxIndex
                     this.selectedCategory = null;
                     this.selectedPerson = null;
                     this.selectedCompany = null;
+                    this.showFriendsView = false;
                     this.showCategoriesDropdown = false;
                     this.searchQuery = '';
                 },
@@ -1931,16 +2151,37 @@ BloxIndex
                     const uName = this.currentUser.name.toLowerCase();
                     return this.companies.filter(c => c.pendingInvites && c.pendingInvites.some(i => i.toLowerCase() === uName));
                 },
-                get realRegisteredUsersList() {
-                    return this.registeredUsers.filter(u => !this.currentUser || u.name.toLowerCase() !== this.currentUser.name.toLowerCase());
+                get incomingFriendRequests() {
+                    if (!this.currentUser) return [];
+                    return this.friendRequestsMap[this.currentUser.name] || [];
+                },
+                get userFriends() {
+                    if (!this.currentUser) return [];
+                    return this.friendshipsMap[this.currentUser.name] || [];
+                },
+                get availableUsersToFriend() {
+                    if (!this.currentUser) return [];
+                    const myName = this.currentUser.name.toLowerCase();
+                    const myFriends = this.userFriends.map(f => f.toLowerCase());
+                    const myPending = (this.friendRequestsMap[this.currentUser.name] || []).map(p => p.toLowerCase());
+                    
+                    return this.registeredUsers.filter(u => {
+                        const uName = u.name.toLowerCase();
+                        return uName !== myName && !myFriends.includes(uName) && !myPending.includes(uName);
+                    }).filter(u => {
+                        if (!this.friendSearchInput) return true;
+                        return u.name.toLowerCase().includes(this.friendSearchInput.toLowerCase());
+                    });
                 },
                 openProfile(person) {
                     this.selectedPerson = person;
                     this.selectedCompany = null;
+                    this.showFriendsView = false;
                 },
                 openCompanyDashboard(company) {
                     this.selectedCompany = company;
                     this.selectedPerson = null;
+                    this.showFriendsView = false;
                 },
                 isCompanyOwner(company) {
                     if (!this.currentUser || !company) return false;
@@ -2020,6 +2261,13 @@ BloxIndex
                 saveCompaniesToStorage() {
                     try {
                         localStorage.setItem('empire_user_companies', JSON.stringify(this.companies));
+                    } catch (e) {}
+                },
+                saveSocialToStorage() {
+                    try {
+                        localStorage.setItem('empire_friendships', JSON.stringify(this.friendshipsMap));
+                        localStorage.setItem('empire_friend_requests', JSON.stringify(this.friendRequestsMap));
+                        localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
                     } catch (e) {}
                 },
                 saveCompanyChanges() {
@@ -2175,7 +2423,7 @@ BloxIndex
                     this.saveCompaniesToStorage();
                     this.notify(`¡Invitación enviada a ${realUser.name}!`, '📩');
                 },
-                respondToInvite(company, accept) {
+                respondToCompanyInvite(company, accept) {
                     if (!this.currentUser) return;
                     const uLower = this.currentUser.name.toLowerCase();
                     company.pendingInvites = (company.pendingInvites || []).filter(i => i.toLowerCase() !== uLower);
@@ -2191,7 +2439,7 @@ BloxIndex
                     }
 
                     this.saveCompaniesToStorage();
-                    if (this.pendingInvitesForCurrentUser.length === 0) {
+                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
                         this.showInvitesModal = false;
                     }
                 },
@@ -2200,6 +2448,73 @@ BloxIndex
                     company.members = (company.members || []).filter(m => m !== memberName);
                     this.saveCompaniesToStorage();
                     this.notify(`${memberName} fue removido de la empresa.`, '👋');
+                },
+                sendFriendRequest(targetName) {
+                    if (!this.currentUser) {
+                        this.showRegisterModal = true;
+                        return;
+                    }
+                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) return;
+
+                    if (!this.friendRequestsMap[targetName]) {
+                        this.friendRequestsMap[targetName] = [];
+                    }
+                    if (this.friendRequestsMap[targetName].includes(this.currentUser.name)) {
+                        this.notify('Ya le has enviado una solicitud a este usuario.', '⏳');
+                        return;
+                    }
+
+                    this.friendRequestsMap[targetName].push(this.currentUser.name);
+                    this.saveSocialToStorage();
+                    this.notify(`¡Solicitud de amistad enviada a ${targetName}!`, '👥');
+                },
+                acceptFriendRequest(requesterName) {
+                    if (!this.currentUser) return;
+                    const myName = this.currentUser.name;
+
+                    // Remover de pendientes
+                    if (this.friendRequestsMap[myName]) {
+                        this.friendRequestsMap[myName] = this.friendRequestsMap[myName].filter(n => n !== requesterName);
+                    }
+
+                    // Añadir a amistades recíprocas
+                    if (!this.friendshipsMap[myName]) this.friendshipsMap[myName] = [];
+                    if (!this.friendshipsMap[myName].includes(requesterName)) this.friendshipsMap[myName].push(requesterName);
+
+                    if (!this.friendshipsMap[requesterName]) this.friendshipsMap[requesterName] = [];
+                    if (!this.friendshipsMap[requesterName].includes(myName)) this.friendshipsMap[requesterName].push(myName);
+
+                    this.saveSocialToStorage();
+                    this.notify(`¡Ahora tú y ${requesterName} son amigos en la web!`, '🤝');
+
+                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
+                        this.showInvitesModal = false;
+                    }
+                },
+                rejectFriendRequest(requesterName) {
+                    if (!this.currentUser) return;
+                    const myName = this.currentUser.name;
+                    if (this.friendRequestsMap[myName]) {
+                        this.friendRequestsMap[myName] = this.friendRequestsMap[myName].filter(n => n !== requesterName);
+                    }
+                    this.saveSocialToStorage();
+                    this.notify('Solicitud de amistad rechazada.', '❌');
+
+                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
+                        this.showInvitesModal = false;
+                    }
+                },
+                removeFriend(friendName) {
+                    if (!this.currentUser) return;
+                    const myName = this.currentUser.name;
+                    if (this.friendshipsMap[myName]) {
+                        this.friendshipsMap[myName] = this.friendshipsMap[myName].filter(n => n !== friendName);
+                    }
+                    if (this.friendshipsMap[friendName]) {
+                        this.friendshipsMap[friendName] = this.friendshipsMap[friendName].filter(n => n !== myName);
+                    }
+                    this.saveSocialToStorage();
+                    this.notify(`${friendName} ha sido eliminado de tus amigos.`, '👋');
                 },
                 saveUserBio() {
                     if (!this.currentUser) return;
@@ -2225,6 +2540,7 @@ BloxIndex
                 logoutUser() {
                     this.currentUser = null;
                     this.selectedCompany = null;
+                    this.showFriendsView = false;
                     localStorage.removeItem('empire_current_user');
                     this.notify('Has cerrado sesión correctamente.', '🚪');
                 },
@@ -2237,13 +2553,11 @@ BloxIndex
                     } else {
                         this.registeredUsers.push(record);
                     }
-                    try {
-                        localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
-                    } catch (e) {}
+                    this.saveSocialToStorage();
                 },
                 syncGlobalMarketToCycle(targetCycle) {
                     let syncedPeople = getBasePeople();
-                    let syncedCompanies = []; // Sin empresas por defecto en el top
+                    let syncedCompanies = [];
 
                     try {
                         let savedComps = localStorage.getItem('empire_user_companies');
@@ -2475,6 +2789,14 @@ BloxIndex
                         if (savedRegUsers) {
                             this.registeredUsers = JSON.parse(savedRegUsers) || [];
                         }
+                    } catch (e) {}
+
+                    try {
+                        let savedFriends = localStorage.getItem('empire_friendships');
+                        if (savedFriends) this.friendshipsMap = JSON.parse(savedFriends) || {};
+
+                        let savedReqs = localStorage.getItem('empire_friend_requests');
+                        if (savedReqs) this.friendRequestsMap = JSON.parse(savedReqs) || {};
                     } catch (e) {}
 
                     try {
