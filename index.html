@@ -905,7 +905,7 @@
         </div>
     </main>
 
-    <!-- MODAL 1: Registro / Login Roblox -->
+    <!-- MODAL 1: Registro / Login Roblox con Contraseña Segura -->
     <div x-show="showRegisterModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
         <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
             <button @click="showRegisterModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
@@ -1184,7 +1184,7 @@
                 ceoLabel: "CEO / Dueño",
                 membersCount: "socios",
                 noCompaniesTitle: "Aún no hay empresas creadas",
-                noCompaniesDesc: "¡Ingresa con tu cuenta de Roblox para fundar tu propia empresa y competir en el Top!",
+                noCompaniesDesc: "¡Ingresa con tu cuenta de Roblox para fundar tu propia empresa y competir en el Top compartido con todos!",
                 clearFilters: "Limpiar Filtros",
                 backButton: "← Volver",
                 backToCompanies: "← Volver al Top de Empresas",
@@ -1214,11 +1214,12 @@
                 launchCompanyBtn: "Fundar Empresa",
                 laterButton: "Más tarde",
                 modalTitle: "Iniciar Sesión o Registrarse",
-                modalDesc: "Introduce tu usuario de Roblox. ¡Si aún no tienes empresa, podrás crearla al instante y serás registrado en la red social!",
+                modalDesc: "Introduce tu usuario de Roblox y contraseña. Si ya tienes cuenta se validará; si eres nuevo se registrará tu contraseña segura.",
                 robloxUser: "Usuario de Roblox",
                 password: "Contraseña",
                 authButton: "Ingresar / Registrarse",
                 verifying: "Verificando cuenta...",
+                incorrectPasswordError: "Contraseña incorrecta. Vuelve a intentar.",
                 bloodMarketLabel: "🩸 Sangre en el mercado (-$1B+ hoy)",
                 peakRank: "Rango Máximo (Peak Rank)",
                 peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
@@ -1313,7 +1314,7 @@
                 ceoLabel: "CEO / Owner",
                 membersCount: "partners",
                 noCompaniesTitle: "No user companies created yet",
-                noCompaniesDesc: "Log in with your Roblox account to launch your business empire!",
+                noCompaniesDesc: "Log in with your Roblox account to launch your business empire in the shared global leaderboard!",
                 clearFilters: "Clear Filters",
                 backButton: "← Back",
                 backToCompanies: "← Back to Companies Top",
@@ -1343,11 +1344,12 @@
                 launchCompanyBtn: "Launch Company",
                 laterButton: "Later",
                 modalTitle: "Login or Register",
-                modalDesc: "Enter your Roblox username. You will be registered in the social network and can create your company right after!",
+                modalDesc: "Enter your Roblox username and password. If the account exists, your password will be verified. If new, it will be securely registered.",
                 robloxUser: "Roblox Username",
                 password: "Password",
                 authButton: "Login / Register",
                 verifying: "Verifying account...",
+                incorrectPasswordError: "Incorrect password. Please try again.",
                 bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
                 peakRank: "Peak Rank",
                 peakNetWorth: "Peak Net Worth",
@@ -1472,11 +1474,12 @@
                 launchCompanyBtn: "Fonda Azienda",
                 laterButton: "Più tardi",
                 modalTitle: "Accedi o Registrati",
-                modalDesc: "Inserisci il tuo nome utente Roblox per registrarti e creare la tua azienda!",
+                modalDesc: "Inserisci nome utente e password. Se esiste, la password verrà verificata.",
                 robloxUser: "Nome Utente Roblox",
                 password: "Password",
                 authButton: "Accedi / Registrati",
                 verifying: "Verifica account...",
+                incorrectPasswordError: "Password errata. Riprova.",
                 bloodMarketLabel: "🩸 Sangue nel mercato (-$1B+ oggi)",
                 peakRank: "Miglior Posizione",
                 peakNetWorth: "Patrimonio Massimo",
@@ -1601,11 +1604,12 @@
                 launchCompanyBtn: "Fundar Empresa",
                 laterButton: "Mais tarde",
                 modalTitle: "Entrar ou Registrar",
-                modalDesc: "Digite seu nome de usuário do Roblox para se registrar e criar sua empresa!",
+                modalDesc: "Digite seu usuário e senha. Se já existir, a senha será verificada.",
                 robloxUser: "Usuário do Roblox",
                 password: "Senha",
                 authButton: "Entrar / Registrar",
                 verifying: "Verificando conta...",
+                incorrectPasswordError: "Senha incorreta. Tente novamente.",
                 bloodMarketLabel: "🩸 Sangue no mercado (-$1B+ hoje)",
                 peakRank: "Melhor Posição",
                 peakNetWorth: "Patrimônio Máximo",
@@ -1730,11 +1734,12 @@
                 launchCompanyBtn: "Unternehmen gründen",
                 laterButton: "Später",
                 modalTitle: "Anmelden oder Registrieren",
-                modalDesc: "Gib deinen Roblox-Benutzernamen ein, um dich zu registrieren!",
+                modalDesc: "Gib Benutzername und Passwort ein. Bei bestehenden Konten wird das Passwort überprüft.",
                 robloxUser: "Roblox-Benutzername",
                 password: "Passwort",
                 authButton: "Login / Registrieren",
                 verifying: "Konto wird überprüft...",
+                incorrectPasswordError: "Falsches Passwort. Bitte versuche es erneut.",
                 bloodMarketLabel: "🩸 Blut im Markt (-$1B+ heute)",
                 peakRank: "Höchster Rang",
                 peakNetWorth: "Höchstes Nettovermögen",
@@ -1956,8 +1961,9 @@
                 people: [],
                 companies: [],
                 registeredUsers: [],
-                friendshipsMap: {}, // { username: [friend1, friend2] }
-                friendRequestsMap: {}, // { username: [requester1] }
+                userPasswordsMap: {}, // { username_lowercase: password }
+                friendshipsMap: {},
+                friendRequestsMap: {},
                 firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
@@ -2268,6 +2274,7 @@
                         localStorage.setItem('empire_friendships', JSON.stringify(this.friendshipsMap));
                         localStorage.setItem('empire_friend_requests', JSON.stringify(this.friendRequestsMap));
                         localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
+                        localStorage.setItem('empire_user_passwords', JSON.stringify(this.userPasswordsMap));
                     } catch (e) {}
                 },
                 saveCompanyChanges() {
@@ -2357,7 +2364,7 @@
                     this.showCompanyModal = false;
                     this.currentFilter = 'companies';
                     this.openCompanyDashboard(newCompanyEntry);
-                    this.notify(`¡Empresa "${compName}" fundada con éxito!`, '🏢');
+                    this.notify(`¡Empresa "${compName}" fundada con éxito y visible en el Top global!`, '🏢');
                 },
                 buyCompanyUpgrade(company, upg) {
                     if (!this.isCompanyOwner(company) || !this.currentUser) return;
@@ -2472,12 +2479,10 @@
                     if (!this.currentUser) return;
                     const myName = this.currentUser.name;
 
-                    // Remover de pendientes
                     if (this.friendRequestsMap[myName]) {
                         this.friendRequestsMap[myName] = this.friendRequestsMap[myName].filter(n => n !== requesterName);
                     }
 
-                    // Añadir a amistades recíprocas
                     if (!this.friendshipsMap[myName]) this.friendshipsMap[myName] = [];
                     if (!this.friendshipsMap[myName].includes(requesterName)) this.friendshipsMap[myName].push(requesterName);
 
@@ -2703,11 +2708,29 @@
                         this.notify('Por favor, introduce un nombre de usuario de Roblox.', '⚠️');
                         return;
                     }
+                    if (!this.regPassword) {
+                        this.notify('Por favor, introduce tu contraseña.', '⚠️');
+                        return;
+                    }
                     
                     let cleanUsername = this.regUsername.trim();
                     let lowerUsername = cleanUsername.toLowerCase();
+                    let enteredPassword = this.regPassword;
 
                     this.isRegistering = true;
+
+                    // Verificar si ya existe contraseña registrada para este usuario
+                    if (this.userPasswordsMap[lowerUsername] !== undefined) {
+                        if (this.userPasswordsMap[lowerUsername] !== enteredPassword) {
+                            this.isRegistering = false;
+                            this.notify(this.t('incorrectPasswordError'), '❌');
+                            return;
+                        }
+                    } else {
+                        // Es un usuario nuevo, registrar su contraseña
+                        this.userPasswordsMap[lowerUsername] = enteredPassword;
+                        this.saveSocialToStorage();
+                    }
 
                     let existingPerson = this.people.find(p => p.name.toLowerCase() === lowerUsername);
                     
@@ -2788,6 +2811,13 @@
                         let savedRegUsers = localStorage.getItem('empire_real_registered_users');
                         if (savedRegUsers) {
                             this.registeredUsers = JSON.parse(savedRegUsers) || [];
+                        }
+                    } catch (e) {}
+
+                    try {
+                        let savedPassMap = localStorage.getItem('empire_user_passwords');
+                        if (savedPassMap) {
+                            this.userPasswordsMap = JSON.parse(savedPassMap) || {};
                         }
                     } catch (e) {}
 
