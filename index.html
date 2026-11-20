@@ -156,10 +156,10 @@
             </div>
 
             <!-- Botón de Notificaciones de Invitaciones -->
-            <template x-if="currentUser && pendingInvitesForCurrentUser.length > 0">
+            <template x-if="currentUser && (pendingInvitesForCurrentUser.length > 0 || incomingFriendRequests.length > 0)">
                 <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 animate-pulse">
                     <span>🔔</span>
-                    <span x-text="pendingInvitesForCurrentUser.length"></span>
+                    <span x-text="pendingInvitesForCurrentUser.length + incomingFriendRequests.length"></span>
                 </button>
             </template>
 
@@ -170,7 +170,10 @@
             <template x-if="currentUser">
                 <div class="relative" @click.away="showUserMenu = false">
                     <div @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
-                        <img :src="currentUser.img" class="w-6 h-6 rounded-full object-cover bg-black" alt="Avatar">
+                        <div class="relative">
+                            <img :src="currentUser.img" class="w-6 h-6 rounded-full object-cover bg-black" alt="Avatar">
+                            <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 ring-1 ring-black"></span>
+                        </div>
                         <span class="text-xs font-medium text-white" x-text="currentUser.name"></span>
                         <span class="text-xs text-neutral-400">▾</span>
                     </div>
@@ -200,10 +203,10 @@
                                 </template>
                             </div>
                         </template>
-                        <template x-if="pendingInvitesForCurrentUser.length > 0">
+                        <template x-if="pendingInvitesForCurrentUser.length > 0 || incomingFriendRequests.length > 0">
                             <button @click="showInvitesModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
                                 <span class="flex items-center gap-2">🔔 <span x-text="t('invitesMenu')"></span></span>
-                                <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length"></span>
+                                <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length + incomingFriendRequests.length"></span>
                             </button>
                         </template>
                         <div class="border-t border-neutral-800 my-1"></div>
@@ -239,8 +242,16 @@
                         <template x-for="candidate in availableUsersToFriend" :key="candidate.name">
                             <div class="bg-black/50 border border-neutral-800 p-2.5 rounded-xl flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <img :src="candidate.img" class="w-8 h-8 rounded-lg object-cover bg-black">
-                                    <div class="text-xs font-semibold text-white truncate max-w-[100px]" x-text="candidate.name"></div>
+                                    <div class="relative">
+                                        <img :src="candidate.img" class="w-8 h-8 rounded-lg object-cover bg-black">
+                                        <template x-if="isUserOnline(candidate.name)">
+                                            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
+                                        </template>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-white truncate max-w-[90px]" x-text="candidate.name"></div>
+                                        <div class="text-[9px] text-green-400" x-show="isUserOnline(candidate.name)" x-text="t('onlineStatusLabel')"></div>
+                                    </div>
                                 </div>
                                 <button @click="sendFriendRequest(candidate.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-[11px] font-semibold transition" x-text="t('addBtn')"></button>
                             </div>
@@ -259,7 +270,7 @@
                                         <span class="text-xs font-bold text-white" x-text="reqName"></span>
                                     </div>
                                     <div class="flex gap-1">
-                                        <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-2.5 py-1 rounded text-[10px] font-semibold">✓</button>
+                                        <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-2.5 py-1 rounded text-[10px] font-semibold" x-text="t('acceptBtn')">✓</button>
                                         <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1 rounded text-[10px]">✕</button>
                                     </div>
                                 </div>
@@ -282,13 +293,18 @@
                     <template x-for="friendName in userFriends" :key="friendName">
                         <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
+                                <div class="relative">
+                                    <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
+                                    <template x-if="isUserOnline(friendName)">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
+                                    </template>
+                                </div>
                                 <div>
                                     <div class="text-sm font-bold text-white" x-text="friendName"></div>
-                                    <div class="text-[11px] text-green-400 font-medium" x-text="t('onlineStatus')"></div>
+                                    <div class="text-[11px] font-medium" :class="isUserOnline(friendName) ? 'text-green-400' : 'text-neutral-500'" x-text="isUserOnline(friendName) ? t('onlineStatus') : t('offlineStatus')"></div>
                                 </div>
                             </div>
-                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1">✕</button>
+                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Eliminar amigo">✕</button>
                         </div>
                     </template>
                 </div>
@@ -313,7 +329,12 @@
                         <div @click="openProfile(gainer)" class="flex items-center justify-between bg-black/40 hover:bg-neutral-800/80 p-2.5 rounded-xl cursor-pointer transition border border-neutral-800/60">
                             <div class="flex items-center gap-3">
                                 <span class="text-xs font-bold text-green-400 w-4" x-text="'#' + (idx + 1)"></span>
-                                <img :src="gainer.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
+                                <div class="relative">
+                                    <img :src="gainer.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
+                                    <template x-if="isUserOnline(gainer.name)">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-1 ring-black"></span>
+                                    </template>
+                                </div>
                                 <div>
                                     <div class="text-sm font-semibold text-white flex items-center gap-1.5 flex-wrap">
                                         <span x-text="gainer.name"></span>
@@ -348,7 +369,12 @@
                         <div @click="openProfile(loser)" class="flex items-center justify-between bg-black/40 hover:bg-neutral-800/80 p-2.5 rounded-xl cursor-pointer transition border border-neutral-800/60">
                             <div class="flex items-center gap-3">
                                 <span class="text-xs font-bold text-red-400 w-4" x-text="'#' + (idx + 1)"></span>
-                                <img :src="loser.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
+                                <div class="relative">
+                                    <img :src="loser.img" class="w-9 h-9 rounded-lg object-cover bg-black" alt="Avatar">
+                                    <template x-if="isUserOnline(loser.name)">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-1 ring-black"></span>
+                                    </template>
+                                </div>
                                 <div>
                                     <div class="text-sm font-semibold text-white flex items-center gap-1.5 flex-wrap">
                                         <span x-text="loser.name"></span>
@@ -406,6 +432,9 @@
                         <div class="flex items-center gap-4">
                             <div class="relative">
                                 <img :src="selectedTop5Person?.img" class="w-16 h-16 rounded-xl object-cover bg-black" alt="Avatar">
+                                <template x-if="isUserOnline(selectedTop5Person?.name)">
+                                    <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
+                                </template>
                                 <template x-if="isBloodActive(selectedTop5Person)">
                                     <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
                                 </template>
@@ -424,9 +453,16 @@
                                 <div x-show="!isBloodActive(selectedTop5Person) && hasFire(selectedTop5Person)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedTop5Person)"></div>
                             </div>
                         </div>
-                        <template x-if="currentUser && currentUser.name.toLowerCase() === selectedTop5Person?.name.toLowerCase()">
-                            <button @click="openBioEditor(selectedTop5Person)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
-                        </template>
+                        <div class="flex items-center gap-2">
+                            <template x-if="currentUser && currentUser.name.toLowerCase() === selectedTop5Person?.name.toLowerCase()">
+                                <button @click="openBioEditor(selectedTop5Person)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
+                            </template>
+                            <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedTop5Person?.name.toLowerCase()">
+                                <button @click="sendFriendRequest(selectedTop5Person.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                                    <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                                </button>
+                            </template>
+                        </div>
                     </div>
 
                     <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
@@ -546,7 +582,12 @@
                         <span :class="getFireBadgeClass(item)" class="fire-badge absolute top-3 right-3 text-base" :title="getFireLabel(item)">🔥</span>
                     </template>
 
-                    <img :src="item.img" class="w-32 h-32 rounded-xl object-cover mb-4 bg-black border border-neutral-800" alt="Avatar">
+                    <div class="relative mb-4">
+                        <img :src="item.img" class="w-32 h-32 rounded-xl object-cover bg-black border border-neutral-800" alt="Avatar">
+                        <template x-if="currentFilter !== 'companies' && isUserOnline(item.name)">
+                            <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
+                        </template>
+                    </div>
                     
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
                         <div class="serif-font text-lg font-bold" x-text="(index + 1) + '. ' + item.name"></div>
@@ -578,6 +619,9 @@
                     <div class="flex items-center gap-4">
                         <div class="relative">
                             <img :src="selectedPerson?.img" class="w-16 h-16 rounded-xl object-cover bg-black" alt="Avatar">
+                            <template x-if="isUserOnline(selectedPerson?.name)">
+                                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 ring-2 ring-black" title="Online"></span>
+                            </template>
                             <template x-if="isBloodActive(selectedPerson)">
                                 <span class="blood-badge absolute -top-2 -right-2 text-xl" title="Perdiendo capital">🩸</span>
                             </template>
@@ -815,11 +859,11 @@
                             <div class="relative flex-grow">
                                 <input type="text" x-model="inviteUsernameInput" :placeholder="t('inviteInputPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                                 
-                                <div x-show="realRegisteredUsersList.length > 0" class="mt-2 flex flex-wrap gap-1.5 items-center">
+                                <div x-show="allAvailableUsersForInvite.length > 0" class="mt-2 flex flex-wrap gap-1.5 items-center max-h-36 overflow-y-auto">
                                     <span class="text-[10px] text-neutral-500" x-text="t('registeredPlayersLabel') + ':'"></span>
-                                    <template x-for="rUser in realRegisteredUsersList" :key="rUser.name">
-                                        <button type="button" @click="inviteUsernameInput = rUser.name" class="text-[11px] bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2 py-0.5 rounded-md transition flex items-center gap-1">
-                                            <img :src="rUser.img" class="w-3.5 h-3.5 rounded-full">
+                                    <template x-for="rUser in allAvailableUsersForInvite" :key="rUser.name">
+                                        <button type="button" @click="inviteUsernameInput = rUser.name" class="text-[11px] bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2 py-1 rounded-md transition flex items-center gap-1.5">
+                                            <img :src="rUser.img" class="w-3.5 h-3.5 rounded-full object-cover">
                                             <span x-text="rUser.name"></span>
                                         </button>
                                     </template>
@@ -854,7 +898,7 @@
                                 </div>
                             </div>
                             <template x-if="isCompanyOwner(selectedCompany)">
-                                <button @click="removeCompanyMember(selectedCompany, member)" class="text-xs text-red-400 hover:text-red-300 px-2 py-1">✕</button>
+                                <button @click="removeCompanyMember(selectedCompany, member)" class="text-xs text-red-400 hover:text-red-300 px-2 py-1" title="Expulsar">✕</button>
                             </template>
                         </div>
                     </template>
@@ -914,7 +958,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('robloxUser')"></label>
-                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="ej. Giacolamela" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="ej. raxinou3" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('password')"></label>
@@ -1252,10 +1296,10 @@
                 upgExpansionDesc: "Abre sedes corporativas para multiplicar ingresos por ciclo.",
                 upgRdTitle: "Investigación y Desarrollo",
                 upgRdDesc: "Innovaciones exclusivas que disparan el valor de las acciones.",
-                inviteRealUserTitle: "Invitar Usuarios Reales a la Empresa",
-                inviteRealUserDesc: "Escribe el nombre de usuario de Roblox de alguien que haya ingresado en esta página para invitarlo como socio.",
-                inviteInputPlaceholder: "Nombre de usuario registrado...",
-                registeredPlayersLabel: "Usuarios activos en la web",
+                inviteRealUserTitle: "Invitar Miembros a la Empresa",
+                inviteRealUserDesc: "Selecciona o busca cualquier usuario del Top o jugador registrado para enviarle una invitación corporativa.",
+                inviteInputPlaceholder: "Nombre de usuario...",
+                registeredPlayersLabel: "Jugadores y Top",
                 sendInviteBtn: "Enviar Invitación",
                 companyMembersTitle: "Directiva y Socios Actuales",
                 ceoFounderLabel: "👑 CEO / Fundador",
@@ -1273,14 +1317,17 @@
                 wantsToBeFriend: "Quiere ser tu amigo en la web",
                 acceptBtn: "Aceptar",
                 friendsTitle: "Gestión de Amistades",
-                friendsDesc: "Añade a otros jugadores reales registrados en la página para formar tu red social de inversores.",
+                friendsDesc: "Añade a otros jugadores reales o del Top para formar tu red social de inversores.",
                 addFriendTitle: "Buscar y Añadir",
-                addFriendDesc: "Escribe o selecciona un usuario activo para enviarle solicitud de amistad.",
-                friendSearchPlaceholder: "Buscar usuario registrado...",
+                addFriendDesc: "Selecciona o busca cualquier usuario para enviarle solicitud de amistad.",
+                friendSearchPlaceholder: "Buscar usuario...",
                 myFriendsListTitle: "Mis Amigos",
                 noFriendsYet: "Aún no tienes amigos añadidos en la web.",
-                onlineStatus: "🟢 En línea / Conectado",
-                pendingRequestsTitle: "Solicitudes Entrantes"
+                onlineStatus: "🟢 En línea",
+                offlineStatus: "⚪ Desconectado",
+                onlineStatusLabel: "En línea",
+                pendingRequestsTitle: "Solicitudes Entrantes",
+                addBtn: "+ Añadir"
             },
             en: {
                 title: "BloxIndex",
@@ -1382,10 +1429,10 @@
                 upgExpansionDesc: "Open international offices to multiply cycle revenue.",
                 upgRdTitle: "Research & Development",
                 upgRdDesc: "Breakthrough innovations that skyrocket stock value.",
-                inviteRealUserTitle: "Invite Real Users to Company",
-                inviteRealUserDesc: "Enter the Roblox username of someone who logged into this page to invite them.",
-                inviteInputPlaceholder: "Registered username...",
-                registeredPlayersLabel: "Active web users",
+                inviteRealUserTitle: "Invite Members to Company",
+                inviteRealUserDesc: "Select or search any Top user or player to send a corporate invitation.",
+                inviteInputPlaceholder: "Username...",
+                registeredPlayersLabel: "Top & Players",
                 sendInviteBtn: "Send Invite",
                 companyMembersTitle: "Current Board & Partners",
                 ceoFounderLabel: "👑 CEO / Founder",
@@ -1403,14 +1450,17 @@
                 wantsToBeFriend: "Wants to be your friend on the web",
                 acceptBtn: "Accept",
                 friendsTitle: "Friendship Management",
-                friendsDesc: "Add other real players registered on the page to build your investor social network.",
+                friendsDesc: "Add other real players or Top figures to build your investor social network.",
                 addFriendTitle: "Search & Add",
-                addFriendDesc: "Type or select an active user to send a friend request.",
-                friendSearchPlaceholder: "Search registered user...",
+                addFriendDesc: "Select or search any user to send a friend request.",
+                friendSearchPlaceholder: "Search user...",
                 myFriendsListTitle: "My Friends",
                 noFriendsYet: "You haven't added any friends on the web yet.",
-                onlineStatus: "🟢 Online / Connected",
-                pendingRequestsTitle: "Incoming Requests"
+                onlineStatus: "🟢 Online",
+                offlineStatus: "⚪ Offline",
+                onlineStatusLabel: "Online",
+                pendingRequestsTitle: "Incoming Requests",
+                addBtn: "+ Add"
             },
             it: {
                 title: "BloxIndex",
@@ -1512,10 +1562,10 @@
                 upgExpansionDesc: "Apri uffici globali per moltiplicare le entrate.",
                 upgRdTitle: "Ricerca e Sviluppo",
                 upgRdDesc: "Innovazioni esclusive che fanno impennare il valore.",
-                inviteRealUserTitle: "Invita Utenti Reali",
-                inviteRealUserDesc: "Inserisci il nome utente Roblox di qualcuno.",
-                inviteInputPlaceholder: "Nome utente registrato...",
-                registeredPlayersLabel: "Utenti attivi sul web",
+                inviteRealUserTitle: "Invita Membri all'Azienda",
+                inviteRealUserDesc: "Seleziona o cerca qualsiasi utente del Top.",
+                inviteInputPlaceholder: "Nome utente...",
+                registeredPlayersLabel: "Top e Giocatori",
                 sendInviteBtn: "Invia Invito",
                 companyMembersTitle: "Consiglio e Soci Attuali",
                 ceoFounderLabel: "👑 CEO / Fondatore",
@@ -1533,14 +1583,17 @@
                 wantsToBeFriend: "Vuole essere tuo amico",
                 acceptBtn: "Accetta",
                 friendsTitle: "Gestione Amicizie",
-                friendsDesc: "Aggiungi altri giocatori reali registrati sulla pagina.",
+                friendsDesc: "Aggiungi altri giocatori o membri del Top.",
                 addFriendTitle: "Cerca e Aggiungi",
-                addFriendDesc: "Scrivi o seleziona un utente.",
-                friendSearchPlaceholder: "Cerca utente registrato...",
+                addFriendDesc: "Seleziona o cerca qualsiasi utente.",
+                friendSearchPlaceholder: "Cerca utente...",
                 myFriendsListTitle: "I miei Amici",
                 noFriendsYet: "Non hai ancora aggiunto amici.",
-                onlineStatus: "🟢 Online / Connesso",
-                pendingRequestsTitle: "Richieste in Arrivo"
+                onlineStatus: "🟢 Online",
+                offlineStatus: "⚪ Offline",
+                onlineStatusLabel: "Online",
+                pendingRequestsTitle: "Richieste in Arrivo",
+                addBtn: "+ Aggiungi"
             },
             pt: {
                 title: "BloxIndex",
@@ -1642,10 +1695,10 @@
                 upgExpansionDesc: "Abra sedes globais para multiplicar a receita.",
                 upgRdTitle: "Pesquisa e Desenvolvimento",
                 upgRdDesc: "Inovações exclusivas que disparam o valor.",
-                inviteRealUserTitle: "Convidar Usuários Reais",
-                inviteRealUserDesc: "Insira o nome de usuário do Roblox.",
-                inviteInputPlaceholder: "Nome de usuário registrado...",
-                registeredPlayersLabel: "Usuários ativos na web",
+                inviteRealUserTitle: "Convidar Membros para a Empresa",
+                inviteRealUserDesc: "Selecione ou busque qualquer usuário do Top.",
+                inviteInputPlaceholder: "Nome de usuário...",
+                registeredPlayersLabel: "Top e Jogadores",
                 sendInviteBtn: "Enviar Convite",
                 companyMembersTitle: "Diretoria e Sócios Atuais",
                 ceoFounderLabel: "👑 CEO / Fundador",
@@ -1663,14 +1716,17 @@
                 wantsToBeFriend: "Quer ser seu amigo na web",
                 acceptBtn: "Aceitar",
                 friendsTitle: "Gerenciamento de Amizades",
-                friendsDesc: "Adicione outros jogadores reais registrados na página.",
+                friendsDesc: "Adicione outros jogadores ou membros do Top.",
                 addFriendTitle: "Pesquisar e Adicionar",
-                addFriendDesc: "Digite ou selecione um usuário.",
+                addFriendDesc: "Selecione ou busque qualquer usuário.",
                 friendSearchPlaceholder: "Pesquisar usuário...",
                 myFriendsListTitle: "Meus Amigos",
                 noFriendsYet: "Você ainda não adicionou amigos.",
-                onlineStatus: "🟢 Online / Conectado",
-                pendingRequestsTitle: "Solicitações Recebidas"
+                onlineStatus: "🟢 Online",
+                offlineStatus: "⚪ Offline",
+                onlineStatusLabel: "Online",
+                pendingRequestsTitle: "Solicitações Recebidas",
+                addBtn: "+ Adicionar"
             },
             de: {
                 title: "BloxIndex",
@@ -1772,10 +1828,10 @@
                 upgExpansionDesc: "Eröffne globale Standorte.",
                 upgRdTitle: "Forschung & Entwicklung",
                 upgRdDesc: "Exklusive Innovationen.",
-                inviteRealUserTitle: "Echte Benutzer einladen",
-                inviteRealUserDesc: "Gib den Roblox-Benutzernamen ein.",
-                inviteInputPlaceholder: "Registrierter Benutzername...",
-                registeredPlayersLabel: "Aktive Web-Benutzer",
+                inviteRealUserTitle: "Mitglieder einladen",
+                inviteRealUserDesc: "Wähle einen Top-Benutzer oder Spieler aus.",
+                inviteInputPlaceholder: "Benutzername...",
+                registeredPlayersLabel: "Top & Spieler",
                 sendInviteBtn: "Einladung senden",
                 companyMembersTitle: "Aktueller Vorstand & Partner",
                 ceoFounderLabel: "👑 CEO / Gründer",
@@ -1793,14 +1849,17 @@
                 wantsToBeFriend: "Möchte dein Freund sein",
                 acceptBtn: "Annehmen",
                 friendsTitle: "Freundschaftsverwaltung",
-                friendsDesc: "Füge andere echte Spieler hinzu.",
+                friendsDesc: "Füge andere Spieler oder Top-Figuren hinzu.",
                 addFriendTitle: "Suchen & Hinzufügen",
                 addFriendDesc: "Wähle einen Benutzer aus.",
-                friendSearchPlaceholder: "Registrierten Benutzer suchen...",
+                friendSearchPlaceholder: "Benutzer suchen...",
                 myFriendsListTitle: "Meine Freunde",
                 noFriendsYet: "Du hast noch keine Freunde hinzugefügt.",
-                onlineStatus: "🟢 Online / Verbunden",
-                pendingRequestsTitle: "Eingehende Anfragen"
+                onlineStatus: "🟢 Online",
+                offlineStatus: "⚪ Offline",
+                onlineStatusLabel: "Online",
+                pendingRequestsTitle: "Eingehende Anfragen",
+                addBtn: "+ Hinzufügen"
             }
         };
 
@@ -1894,32 +1953,32 @@
                 { id: 72, name: 'Saleh', netWorthValue: 98.1, peakRank: 72, peakNetWorth: 98.1, changeVal: 0.0, changeText: '▼ -$15K', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E722677A06F551DDB46C949425FEA532-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Saleh directs expanding international real estate.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
                 { id: 73, name: 'Blez', netWorthValue: 97.7, peakRank: 73, peakNetWorth: 97.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-66D1316DD1A7303F74F19BB5B625EB02-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Blez maintains stable digital ventures.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
                 { id: 74, name: 'SisterAlex', netWorthValue: 97.4, peakRank: 74, peakNetWorth: 97.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7059BBDE99888783DF44F89D15D3E8C7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['SisterAlex shapes contemporary lifestyle media.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 75, name: 'Heather', netWorthValue: 96.4, peakRank: 75, peakNetWorth: 96.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A92AD7C72D5751CDFEF7352B92D4E965-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Heather focuses on high-end fashion lines.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 76, name: 'Joke', netWorthValue: 95.0, peakRank: 76, peakNetWorth: 95.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DE0FAF32CAD79354ECAF3BE37A252CC2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Joke builds value through viral entertainment.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 77, name: 'Mobin', netWorthValue: 93.3, peakRank: 77, peakNetWorth: 93.3, changeVal: 2.0, changeText: '▲ +$2.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-97FFCE65DCD1EFA6BC190A1F33342CF8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Mobin surges with investments in cloud systems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 78, name: 'Aero Vista', netWorthValue: 92.0, peakRank: 78, peakNetWorth: 92.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFFAE7651EB13D85A43B9A994B16EB5B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Aero Vista specializes in aerospace engineering.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 79, name: 'Unknown', netWorthValue: 91.3, peakRank: 79, peakNetWorth: 91.3, changeVal: -0.7, changeText: '▼ -$663M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Unknown operates discreetly across alternatives.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 80, name: 'Pengu', netWorthValue: 90.5, peakRank: 80, peakNetWorth: 90.5, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4E9A225D3F1D0F47C4AE2525688655-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Pengu commands solid holdings in logistics.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 81, name: 'Xofer', netWorthValue: 90.2, peakRank: 81, peakNetWorth: 90.2, changeVal: -0.3, changeText: '▼ -$300M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4CEF45A75689FA4E010BFD959845618D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xofer manages diversified software solutions.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 82, name: 'Bubbles', netWorthValue: 88.0, peakRank: 82, peakNetWorth: 88.0, changeVal: -0.1, changeText: '▼ -$100M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C0D9EECCB7FBB4844B7D88455A28C128-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Bubbles oversees creative consumer brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 83, name: 'Ken', netWorthValue: 87.2, peakRank: 83, peakNetWorth: 87.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8DF46166C54030469FE52075355ABFF1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Ken anchors reliable industrial assets.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 84, name: 'Duncan', netWorthValue: 85.0, peakRank: 84, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B98AD8D4FE8D6F1DAD6A082B76174CC9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Duncan directs specialized luxury retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 85, name: 'Froggie', netWorthValue: 85.0, peakRank: 85, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-086D595BDC53ADF5E22CADA773E769D7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Froggie maintains vibrant interactive entertainment.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 86, name: 'Geo', netWorthValue: 83.0, peakRank: 86, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E57CB6F6A4230FBCA60B133C433FD0D4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Geo maps out global real estate developments.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 87, name: 'Peach', netWorthValue: 83.0, peakRank: 87, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D6BF6FEEFCF5EFBC6A104EA0EF72337-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Peach curates boutique digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 88, name: 'paul', netWorthValue: 82.3, peakRank: 88, peakNetWorth: 82.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F00FFCD2314992C0F30357D8E9F171C6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['paul secures core enterprise value.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 89, name: 'Darius', netWorthValue: 82.0, peakRank: 89, peakNetWorth: 82.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D0FA2B1BDB662EA0C0ED161225541F3-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Darius drives solid financial returns.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
-                { id: 90, name: 'Jacobs', netWorthValue: 80.6, peakRank: 90, peakNetWorth: 80.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E80ED2011C3E401CCEDF97E7E71E0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jacobs manages stable multi-industry holdings.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 91, name: 'Five', netWorthValue: 80.3, peakRank: 91, peakNetWorth: 80.3, changeVal: 0.0, changeText: '▲ +$20M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C9AA2CA5C92DF7160C0DCDA987FA950-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Five advances algorithmic numerical trading.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 92, name: 'Shadow', netWorthValue: 79.7, peakRank: 92, peakNetWorth: 79.7, changeVal: 0.0, changeText: '▲ +$7M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E98D08A7DDA8D60141A1A8D98A9FEEB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Shadow maintains a private secure portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 93, name: 'Rasger', netWorthValue: 77.8, peakRank: 93, peakNetWorth: 77.8, changeVal: 1.0, changeText: '▲ +$1.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1790F2FEFE2FF16B4BEAA2899F902A32-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Rasger expands rapidly through tech scaling.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
-                { id: 94, name: 'LePittCanard', netWorthValue: 77.7, peakRank: 94, peakNetWorth: 77.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0500A84157F24F9B473900BDC67371A7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LePittCanard oversees specialty media collections.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
-                { id: 95, name: 'Sab', netWorthValue: 76.9, peakRank: 95, peakNetWorth: 76.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D601D7FCD9FA11FEC0851C6AF98CE6C6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sab manages diversified digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 96, name: 'xiiiannex', netWorthValue: 76.4, peakRank: 96, peakNetWorth: 76.4, changeVal: 0.7, changeText: '▲ +$700M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['xiiiannex grows fast through interactive content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
-                { id: 97, name: 'Lunar', netWorthValue: 76.0, peakRank: 97, peakNetWorth: 76.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D0D9E7CD5FC44C543015024242EC12A0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Lunar commands strategic stakes in tech.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
-                { id: 98, name: 'Tendo', netWorthValue: 75.4, peakRank: 98, peakNetWorth: 75.4, changeVal: 0.2, changeText: '▲ +$248M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BCE2F9C690C407A37BC96F996C03B91E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tendo accelerates market reach.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
-                { id: 99, name: 'Luke', netWorthValue: 75.0, peakRank: 99, peakNetWorth: 75.0, changeVal: 0.0, changeText: '▲ +$8M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A1A6775CBDCC7613205369F5D1FB4B1E-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Luke builds steady capital reserves.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
-                { id: 100, name: 'dgx', netWorthValue: 73.7, peakRank: 100, peakNetWorth: 73.7, changeVal: 0.1, changeText: '▲ +$100M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2F98487E4C47E68E5B440F33F2FE64C2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['dgx closes the top 100 with resilient networks.'], country: 'Global', source: 'Technology & AI', gender: 'Man' }
+                { id: 75, name: 'raxinou3', netWorthValue: 72.7, peakRank: 75, peakNetWorth: 72.7, changeVal: 1.2, changeText: '▲ +$1.2B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EC4AFBA45F8A3BABC64101E57924144A-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['raxinou3 commands strategic financial growth in the global markets.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 76, name: 'Heather', netWorthValue: 96.4, peakRank: 76, peakNetWorth: 96.4, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A92AD7C72D5751CDFEF7352B92D4E965-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Heather focuses on high-end fashion lines.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 77, name: 'Joke', netWorthValue: 95.0, peakRank: 77, peakNetWorth: 95.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DE0FAF32CAD79354ECAF3BE37A252CC2-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Joke builds value through viral entertainment.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 78, name: 'Mobin', netWorthValue: 93.3, peakRank: 78, peakNetWorth: 93.3, changeVal: 2.0, changeText: '▲ +$2.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-97FFCE65DCD1EFA6BC190A1F33342CF8-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Mobin surges with investments in cloud systems.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 79, name: 'Aero Vista', netWorthValue: 92.0, peakRank: 79, peakNetWorth: 92.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-AFFAE7651EB13D85A43B9A994B16EB5B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Aero Vista specializes in aerospace engineering.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 80, name: 'Unknown', netWorthValue: 91.3, peakRank: 80, peakNetWorth: 91.3, changeVal: -0.7, changeText: '▼ -$663M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-33379988A6A4FA93DE5E9401EAC1B3AB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Unknown operates discreetly across alternatives.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 81, name: 'Pengu', netWorthValue: 90.5, peakRank: 81, peakNetWorth: 90.5, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6C4E9A225D3F1D0F47C4AE2525688655-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Pengu commands solid holdings in logistics.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 82, name: 'Xofer', netWorthValue: 90.2, peakRank: 82, peakNetWorth: 90.2, changeVal: -0.3, changeText: '▼ -$300M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-4CEF45A75689FA4E010BFD959845618D-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Xofer manages diversified software solutions.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 83, name: 'Bubbles', netWorthValue: 88.0, peakRank: 83, peakNetWorth: 88.0, changeVal: -0.1, changeText: '▼ -$100M', hasChange: true, positive: false, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C0D9EECCB7FBB4844B7D88455A28C128-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Bubbles oversees creative consumer brands.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 84, name: 'Ken', netWorthValue: 87.2, peakRank: 84, peakNetWorth: 87.2, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-8DF46166C54030469FE52075355ABFF1-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Ken anchors reliable industrial assets.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 85, name: 'Duncan', netWorthValue: 85.0, peakRank: 85, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B98AD8D4FE8D6F1DAD6A082B76174CC9-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Duncan directs specialized luxury retail.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 86, name: 'Froggie', netWorthValue: 85.0, peakRank: 86, peakNetWorth: 85.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-086D595BDC53ADF5E22CADA773E769D7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Froggie maintains vibrant interactive entertainment.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 87, name: 'Geo', netWorthValue: 83.0, peakRank: 87, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E57CB6F6A4230FBCA60B133C433FD0D4-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Geo maps out global real estate developments.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 88, name: 'Peach', netWorthValue: 83.0, peakRank: 88, peakNetWorth: 83.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7D6BF6FEEFCF5EFBC6A104EA0EF72337-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Peach curates boutique digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 89, name: 'paul', netWorthValue: 82.3, peakRank: 89, peakNetWorth: 82.3, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F00FFCD2314992C0F30357D8E9F171C6-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['paul secures core enterprise value.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 90, name: 'Darius', netWorthValue: 82.0, peakRank: 90, peakNetWorth: 82.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D0FA2B1BDB662EA0C0ED161225541F3-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Darius drives solid financial returns.'], country: 'Global', source: 'Automotive & Clean Energy', gender: 'Man' },
+                { id: 91, name: 'Jacobs', netWorthValue: 80.6, peakRank: 91, peakNetWorth: 80.6, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22E80ED2011C3E401CCEDF97E7E71E0B-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Jacobs manages stable multi-industry holdings.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 92, name: 'Five', netWorthValue: 80.3, peakRank: 92, peakNetWorth: 80.3, changeVal: 0.0, changeText: '▲ +$20M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C9AA2CA5C92DF7160C0DCDA987FA950-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Five advances algorithmic numerical trading.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' },
+                { id: 93, name: 'Shadow', netWorthValue: 79.7, peakRank: 93, peakNetWorth: 79.7, changeVal: 0.0, changeText: '▲ +$7M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0E98D08A7DDA8D60141A1A8D98A9FEEB-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Shadow maintains a private secure portfolio.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 94, name: 'Rasger', netWorthValue: 77.8, peakRank: 94, peakNetWorth: 77.8, changeVal: 1.0, changeText: '▲ +$1.0B', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1790F2FEFE2FF16B4BEAA2899F902A32-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Rasger expands rapidly through tech scaling.'], country: 'Global', source: 'Technology & AI', gender: 'Man' },
+                { id: 95, name: 'LePittCanard', netWorthValue: 77.7, peakRank: 95, peakNetWorth: 77.7, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0500A84157F24F9B473900BDC67371A7-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['LePittCanard oversees specialty media collections.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Man' },
+                { id: 96, name: 'Sab', netWorthValue: 76.9, peakRank: 96, peakNetWorth: 76.9, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D601D7FCD9FA11FEC0851C6AF98CE6C6-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Sab manages diversified digital commerce.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 97, name: 'xiiiannex', netWorthValue: 76.4, peakRank: 97, peakNetWorth: 76.4, changeVal: 0.7, changeText: '▲ +$700M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter', bio: ['xiiiannex grows fast through interactive content.'], country: 'Global', source: 'Luxury & Fashion Conglomerates', gender: 'Women' },
+                { id: 98, name: 'Lunar', netWorthValue: 76.0, peakRank: 98, peakNetWorth: 76.0, changeVal: 0.0, changeText: '', hasChange: false, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D0D9E7CD5FC44C543015024242EC12A0-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Lunar commands strategic stakes in tech.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 99, name: 'Tendo', netWorthValue: 75.4, peakRank: 99, peakNetWorth: 75.4, changeVal: 0.2, changeText: '▲ +$248M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BCE2F9C690C407A37BC96F996C03B91E-Png/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Tendo accelerates market reach.'], country: 'Global', source: 'Technology & AI', gender: 'Women' },
+                { id: 100, name: 'Luke', netWorthValue: 75.0, peakRank: 100, peakNetWorth: 75.0, changeVal: 0.0, changeText: '▲ +$8M', hasChange: true, positive: true, history: [], img: 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A1A6775CBDCC7613205369F5D1FB4B1E-Png-ProfileFrame/150/150/AvatarHeadshot/Webp/noFilter', bio: ['Luke builds steady capital reserves.'], country: 'Global', source: 'Global Holdings & Investments', gender: 'Man' }
             ];
         }
 
@@ -1961,6 +2020,7 @@
                 people: [],
                 companies: [],
                 registeredUsers: [],
+                onlineUsersMap: {},
                 userPasswordsMap: {}, 
                 friendshipsMap: {},
                 friendRequestsMap: {},
@@ -2126,7 +2186,6 @@
                     return Array.from(combined).sort();
                 },
                 get displayedPeople() {
-                    // Sincronizar y ordenar empresas de manera estricta por riqueza descendente (Top 1 es la más rica)
                     if (this.currentFilter === 'companies') {
                         let list = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
                         if (this.searchQuery && this.searchQuery.trim() !== '') {
@@ -2172,13 +2231,26 @@
                     const myFriends = this.userFriends.map(f => f.toLowerCase());
                     const myPending = (this.friendRequestsMap[this.currentUser.name] || []).map(p => p.toLowerCase());
                     
-                    return this.registeredUsers.filter(u => {
+                    return this.people.filter(u => {
                         const uName = u.name.toLowerCase();
                         return uName !== myName && !myFriends.includes(uName) && !myPending.includes(uName);
                     }).filter(u => {
                         if (!this.friendSearchInput) return true;
                         return u.name.toLowerCase().includes(this.friendSearchInput.toLowerCase());
                     });
+                },
+                get allAvailableUsersForInvite() {
+                    if (!this.currentUser) return [];
+                    const myName = this.currentUser.name.toLowerCase();
+                    return this.people.filter(p => p.name.toLowerCase() !== myName).filter(p => {
+                        if (!this.inviteUsernameInput) return true;
+                        return p.name.toLowerCase().includes(this.inviteUsernameInput.toLowerCase());
+                    });
+                },
+                isUserOnline(username) {
+                    if (!username) return false;
+                    if (this.currentUser && this.currentUser.name.toLowerCase() === username.toLowerCase()) return true;
+                    return !!this.onlineUsersMap[username.toLowerCase()];
                 },
                 openProfile(person) {
                     this.selectedPerson = person;
@@ -2287,6 +2359,7 @@
                         localStorage.setItem('empire_friendships', JSON.stringify(this.friendshipsMap));
                         localStorage.setItem('empire_friend_requests', JSON.stringify(this.friendRequestsMap));
                         localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
+                        localStorage.setItem('empire_online_users', JSON.stringify(this.onlineUsersMap));
                         localStorage.setItem('empire_user_passwords', JSON.stringify(this.userPasswordsMap));
                     } catch (e) {}
                 },
@@ -2299,6 +2372,7 @@
                     } else {
                         this.registeredUsers.push(record);
                     }
+                    this.onlineUsersMap[userObj.name.toLowerCase()] = true;
                     this.saveSocialToStorage();
                 },
                 saveCompanyChanges() {
@@ -2421,7 +2495,7 @@
                     if (!this.isCompanyOwner(company)) return;
                     const targetName = this.inviteUsernameInput.trim();
                     if (!targetName) {
-                        this.notify('Escribe el nombre de usuario de Roblox que deseas invitar.', '⚠️');
+                        this.notify('Escribe o selecciona el nombre del usuario que deseas invitar.', '⚠️');
                         return;
                     }
                     if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
@@ -2429,28 +2503,22 @@
                         return;
                     }
 
-                    const realUser = this.registeredUsers.find(u => u.name.toLowerCase() === targetName.toLowerCase());
-                    if (!realUser) {
-                        this.notify(`"${targetName}" aún no ha ingresado a esta página con su cuenta.`, '🔍');
-                        return;
-                    }
-
                     if (!company.members) company.members = [];
                     if (!company.pendingInvites) company.pendingInvites = [];
 
-                    if (company.members.some(m => m.toLowerCase() === realUser.name.toLowerCase())) {
-                        this.notify(`${realUser.name} ya es miembro de tu empresa.`, 'ℹ️');
+                    if (company.members.some(m => m.toLowerCase() === targetName.toLowerCase())) {
+                        this.notify(`${targetName} ya es miembro de tu empresa.`, 'ℹ️');
                         return;
                     }
-                    if (company.pendingInvites.some(i => i.toLowerCase() === realUser.name.toLowerCase())) {
-                        this.notify(`Ya enviaste una invitación a ${realUser.name}.`, '⏳');
+                    if (company.pendingInvites.some(i => i.toLowerCase() === targetName.toLowerCase())) {
+                        this.notify(`Ya enviaste una invitación a ${targetName}.`, '⏳');
                         return;
                     }
 
-                    company.pendingInvites.push(realUser.name);
+                    company.pendingInvites.push(targetName);
                     this.inviteUsernameInput = '';
                     this.saveCompaniesToStorage();
-                    this.notify(`¡Invitación enviada a ${realUser.name}!`, '📩');
+                    this.notify(`¡Invitación enviada a ${targetName} con éxito!`, '📩');
                 },
                 respondToCompanyInvite(company, accept) {
                     if (!this.currentUser) return;
@@ -2483,7 +2551,15 @@
                         this.showRegisterModal = true;
                         return;
                     }
-                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) return;
+                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
+                        this.notify('No puedes enviarte solicitud de amistad a ti mismo.', '⚠️');
+                        return;
+                    }
+
+                    if (this.userFriends.some(f => f.toLowerCase() === targetName.toLowerCase())) {
+                        this.notify(`Ya eres amigo de ${targetName}.`, '🤝');
+                        return;
+                    }
 
                     if (!this.friendRequestsMap[targetName]) {
                         this.friendRequestsMap[targetName] = [];
@@ -2565,6 +2641,10 @@
                     this.notify('¡Perfil y sector actualizados!', '✅');
                 },
                 logoutUser() {
+                    if (this.currentUser) {
+                        delete this.onlineUsersMap[this.currentUser.name.toLowerCase()];
+                        this.saveSocialToStorage();
+                    }
                     this.currentUser = null;
                     this.selectedCompany = null;
                     this.showFriendsView = false;
@@ -2745,7 +2825,7 @@
                         this.showRegisterModal = false;
                         this.regUsername = '';
                         this.regPassword = '';
-                        this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}!`, '👋');
+                        this.notify(`¡Bienvenido de nuevo, ${existingPerson.name}! (Estás Online)`, '🟢');
                         return;
                     }
 
@@ -2801,7 +2881,7 @@
                     this.showRegisterModal = false;
                     this.regUsername = '';
                     this.regPassword = '';
-                    this.notify(`¡Cuenta vinculada y registrada para búsqueda de amigos, ${cleanUsername}!`, '🎉');
+                    this.notify(`¡Cuenta registrada con éxito y en línea, ${cleanUsername}!`, '🎉');
                 },
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
@@ -2813,6 +2893,13 @@
                         let savedRegUsers = localStorage.getItem('empire_real_registered_users');
                         if (savedRegUsers) {
                             this.registeredUsers = JSON.parse(savedRegUsers) || [];
+                        }
+                    } catch (e) {}
+
+                    try {
+                        let savedOnline = localStorage.getItem('empire_online_users');
+                        if (savedOnline) {
+                            this.onlineUsersMap = JSON.parse(savedOnline) || {};
                         }
                     } catch (e) {}
 
@@ -2836,7 +2923,6 @@
                         if (savedUser) {
                             this.currentUser = JSON.parse(savedUser);
                             await this.refreshRobloxProfile(this.currentUser);
-                            // Al iniciar sesión automáticamente se registra y actualiza en la lista de amigos
                             this.registerRealUserRecord(this.currentUser);
                             localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
                         }
