@@ -658,494 +658,27 @@
                             <button @click="openBioEditor(selectedPerson)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
                         </template>
                         <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedPerson?.name.toLowerCase()">
-                            <button @click="sendFriendRequest(selectedPerson.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                <span>👥</span> <span x-text="t('addFriendBtn')"></span>
-                            </button>
-                        </template>
-                    </div>
-                </div>
-
-                <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80">
-                    <button @click="profileTab = 'wealth'" :class="profileTab === 'wealth' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('wealthHistory')"></button>
-                    <button @click="profileTab = 'biography'" :class="profileTab === 'biography' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('biography')"></button>
-                    <button @click="profileTab = 'stats'" :class="profileTab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-5 py-1.5 rounded-full text-xs md:text-sm transition" x-text="t('stats')"></button>
-                </div>
-
-                <div x-show="profileTab === 'wealth'">
-                    <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('currentNetWorth')"></div>
-                    <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedPerson?.netWorthValue)"></div>
-                    
-                    <div class="flex items-center gap-2 text-sm font-semibold mb-7">
-                        <span :class="selectedPerson?.positive ? 'text-green-400' : 'text-red-500'" x-text="formatDailyChange(selectedPerson)"></span>
-                        <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
-                    </div>
-
-                    <div class="relative mt-2 pt-2">
-                        <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
-                            <defs>
-                                <radialGradient :id="'radial-glow-prof-' + (selectedPerson?.id || 999)" cx="65%" cy="55%" r="50%">
-                                    <stop offset="0%" :stop-color="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0.22"/>
-                                    <stop offset="100%" :stop-color="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0"/>
-                                </radialGradient>
-                            </defs>
-                            <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-prof-' + (selectedPerson?.id || 999) + ')'" rx="12"></rect>
-                            <polyline :points="getChartData(selectedPerson).pointsStr" fill="none" :stroke="selectedPerson?.positive ? '#22c55e' : '#ef4444'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                            <circle :cx="getChartData(selectedPerson).lastX" :cy="getChartData(selectedPerson).lastY" r="12" :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'" fill-opacity="0.18"></circle>
-                            <circle :cx="getChartData(selectedPerson).lastX" :cy="getChartData(selectedPerson).lastY" r="4.5" :fill="selectedPerson?.positive ? '#22c55e' : '#ef4444'"></circle>
-                        </svg>
-                    </div>
-                </div>
-
-                <div x-show="profileTab === 'biography'">
-                    <ul class="space-y-4 list-disc list-inside text-neutral-200 serif-font text-lg">
-                        <template x-for="bullet in selectedPerson?.bio">
-                            <li x-text="bullet"></li>
-                        </template>
-                    </ul>
-                </div>
-
-                <div x-show="profileTab === 'stats'" class="space-y-4 text-sm">
-                    <template x-for="friendName in userFriends" :key="friendName">
-                        <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="relative">
-                                    <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
-                                    <template x-if="isUserOnline(friendName)">
-                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
-                                    </template>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-white flex items-center gap-1.5">
-                                        <span x-text="friendName"></span>
-                                        <span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9px] px-1.5 py-0.5 rounded font-semibold" x-text="t('alreadyFriendsBadge')"></span>
-                                    </div>
-                                    <div class="text-[11px] font-medium" :class="isUserOnline(friendName) ? 'text-green-400' : 'text-neutral-500'" x-text="isUserOnline(friendName) ? t('onlineStatus') : t('offlineStatus')"></div>
-                                </div>
-                            </div>
-                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Remove friend">✕</button>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- COMPANY MANAGEMENT DASHBOARD VIEW -->
-    <main x-show="selectedCompany" class="flex-grow max-w-5xl mx-auto w-full" x-data="{ compTab: 'overview' }" style="display: none;">
-        <button @click="selectedCompany = null" class="text-sm text-neutral-400 hover:text-white mb-6 flex items-center gap-1" x-text="t('backToCompanies')"></button>
-        
-        <div :class="getContainerGlowClass(selectedCompany)" class="bg-[#121212] p-6 sm:p-8 rounded-2xl border border-neutral-800/90 flex flex-col justify-between shadow-2xl">
-            <!-- Cabecera de la Empresa -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <img :src="selectedCompany?.img" class="w-20 h-20 rounded-2xl object-cover bg-black border border-neutral-700" alt="Company Logo">
-                        <span class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg" x-text="'LVL ' + (selectedCompany?.level || 1)"></span>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <h2 class="serif-font text-2xl md:text-3xl font-bold" x-text="selectedCompany?.name"></h2>
-                            <template x-if="isTrillionaire(selectedCompany)">
-                                <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase">👑 TRILLION CORP</span>
-                            </template>
-                        </div>
-                        <div class="text-xs text-neutral-400 mt-1 flex items-center gap-3 flex-wrap">
-                            <span>👑 <span x-text="t('ceoLabel')"></span>: <strong class="text-white" x-text="selectedCompany?.ceo"></strong></span>
-                            <span>•</span>
-                            <span>🏷️ <span x-text="selectedCompany?.sector || 'Corporate'"></span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2.5 self-start sm:self-center flex-wrap">
-                    <template x-if="isCompanyOwner(selectedCompany)">
-                        <button @click="openEditCompanyModal(selectedCompany)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
-                            <span>✏️</span> <span x-text="t('editCompanyBtn')"></span>
-                        </button>
-                    </template>
-                    <template x-if="isCompanyOwner(selectedCompany)">
-                        <button @click="deleteCompany(selectedCompany)" class="bg-red-900/40 hover:bg-red-900/80 border border-red-700/50 text-red-300 px-3 py-2 rounded-xl text-xs font-semibold transition" title="Delete company">
-                            🗑️
-                        </button>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Pestañas de la Empresa -->
-            <div class="inline-flex bg-[#1c1c1c] p-1 rounded-full mb-7 border border-neutral-800/80 overflow-x-auto max-w-full">
-                <button @click="compTab = 'overview'" :class="compTab === 'overview' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap" x-text="t('wealthHistory')"></button>
-                <button @click="compTab = 'upgrades'" :class="compTab === 'upgrades' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap flex items-center gap-1.5">
-                    <span>⚡</span> <span x-text="t('upgradesTab')"></span>
-                </button>
-                <button @click="compTab = 'team'" :class="compTab === 'team' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap flex items-center gap-1.5">
-                    <span>👥</span> <span x-text="t('teamTab')"></span>
-                </button>
-                <button @click="compTab = 'stats'" :class="compTab === 'stats' ? 'bg-[#2c2c2c] text-white font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'" class="px-4 py-1.5 rounded-full text-xs md:text-sm transition whitespace-nowrap" x-text="t('stats')"></button>
-            </div>
-
-            <!-- TAB 1: Valoración y Gráfica -->
-            <div x-show="compTab === 'overview'">
-                <div class="text-[11px] font-bold text-neutral-400 tracking-wider uppercase mb-1" x-text="t('companyValuationLabel')"></div>
-                <div class="text-5xl font-bold tracking-tight text-white mb-2" x-text="formatWorth(selectedCompany?.netWorthValue)"></div>
-                
-                <div class="flex items-center gap-3 text-sm font-semibold mb-7 flex-wrap">
-                    <span :class="selectedCompany?.positive ? 'text-green-400' : 'text-red-500'" x-text="formatDailyChange(selectedCompany)"></span>
-                    <span class="text-xs font-normal text-neutral-400 uppercase tracking-wide" x-text="t('lastCycleTag')"></span>
-                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] px-2.5 py-0.5 rounded-full" x-text="'📈 ' + t('growthBonusLabel') + ': +' + getCompanyGrowthMultiplier(selectedCompany) + '%'"></span>
-                </div>
-
-                <div class="relative mt-2 pt-2">
-                    <svg viewBox="0 0 460 175" class="w-full h-44 overflow-visible">
-                        <defs>
-                            <radialGradient :id="'radial-glow-comp-' + (selectedCompany?.id || 888)" cx="65%" cy="55%" r="50%">
-                                <stop offset="0%" :stop-color="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0.22"/>
-                                <stop offset="100%" :stop-color="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stop-opacity="0"/>
-                            </radialGradient>
-                        </defs>
-                        <rect x="0" y="0" width="460" height="175" :fill="'url(#radial-glow-comp-' + (selectedCompany?.id || 888) + ')'" rx="12"></rect>
-                        <polyline :points="getChartData(selectedCompany).pointsStr" fill="none" :stroke="selectedCompany?.positive ? '#22c55e' : '#ef4444'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                        <circle :cx="getChartData(selectedCompany).lastX" :cy="getChartData(selectedCompany).lastY" r="12" :fill="selectedCompany?.positive ? '#22c55e' : '#ef4444'" fill-opacity="0.18"></circle>
-                        <circle :cx="getChartData(selectedCompany).lastX" :cy="getChartData(selectedCompany).lastY" r="4.5" :fill="selectedCompany?.positive ? '#22c55e' : '#ef4444'"></circle>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- TAB 2: Mejoras de Empresa -->
-            <div x-show="compTab === 'upgrades'">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-neutral-900/80 border border-neutral-800 p-4 rounded-xl mb-6 gap-3">
-                    <div>
-                        <h3 class="text-sm font-bold text-white" x-text="t('upgradeHeaderTitle')"></h3>
-                        <p class="text-xs text-neutral-400 mt-0.5" x-text="t('upgradeHeaderDesc')"></p>
-                    </div>
-                    <template x-if="currentUser">
-                        <div class="bg-black/60 border border-neutral-700 px-3.5 py-2 rounded-lg text-right">
-                            <div class="text-[10px] text-neutral-400 uppercase" x-text="t('yourPersonalBalance')"></div>
-                            <div class="text-sm font-bold text-green-400" x-text="formatWorth(currentUser.netWorthValue)"></div>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <template x-for="upg in companyUpgradesList" :key="upg.id">
-                        <div class="card-bg border border-neutral-800 p-5 rounded-xl flex flex-col justify-between">
                             <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-2xl" x-text="upg.icon"></span>
-                                    <span class="bg-neutral-800 text-neutral-300 text-xs font-bold px-2.5 py-1 rounded-md" x-text="t('levelWord') + ' ' + getUpgradeLevel(selectedCompany, upg.id)"></span>
-                                </div>
-                                <h4 class="font-bold text-base text-white" x-text="t(upg.titleKey)"></h4>
-                                <p class="text-xs text-neutral-400 mt-1" x-text="t(upg.descKey)"></p>
-                                <div class="mt-3 text-xs text-emerald-400 font-medium" x-text="'+' + upg.bonusPct + '% ' + t('profitPerLevel')"></div>
-                            </div>
-
-                            <div class="mt-5 pt-3 border-t border-neutral-800/80 flex items-center justify-between">
-                                <div>
-                                    <div class="text-[10px] text-neutral-500 uppercase" x-text="t('upgradeCostLabel')"></div>
-                                    <div class="text-sm font-bold text-amber-400" x-text="formatWorth(getUpgradeCost(selectedCompany, upg))"></div>
-                                </div>
-
-                                <template x-if="isCompanyOwner(selectedCompany)">
-                                    <button @click="buyCompanyUpgrade(selectedCompany, upg)" 
-                                            :disabled="!currentUser || currentUser.netWorthValue < getUpgradeCost(selectedCompany, upg)"
-                                            :class="currentUser && currentUser.netWorthValue >= getUpgradeCost(selectedCompany, upg) ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-neutral-800 text-neutral-500 cursor-not-allowed'"
-                                            class="px-4 py-2 rounded-lg text-xs font-semibold transition">
-                                        <span x-text="t('upgradeBtn')"></span>
+                                <template x-if="areWeFriends(selectedPerson?.name)">
+                                    <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                        <span>🤝</span> <span x-text="t('alreadyFriendsBadge')"></span>
+                                    </span>
+                                </template>
+                                <template x-if="!areWeFriends(selectedPerson?.name) && hasIncomingRequestFrom(selectedPerson?.name)">
+                                    <button @click="acceptFriendRequest(selectedPerson.name)" class="bg-amber-500 hover:bg-amber-400 text-black px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                                        <span>✓</span> <span x-text="t('acceptRequestBtn')"></span>
                                     </button>
                                 </template>
-                                <template x-if="!isCompanyOwner(selectedCompany)">
-                                    <span class="text-[11px] text-neutral-500 italic" x-text="t('ownerOnlyAction')"></span>
+                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name) && hasSentRequestTo(selectedPerson?.name)">
+                                    <span class="bg-neutral-800 border border-neutral-700 text-neutral-400 px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                        <span>⏳</span> <span x-text="t('requestSentBadge')"></span>
+                                    </span>
                                 </template>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- TAB 3: Equipo e Invitaciones -->
-            <div x-show="compTab === 'team'">
-                <template x-if="isCompanyOwner(selectedCompany)">
-                    <div class="bg-neutral-900/90 border border-neutral-800 p-5 rounded-xl mb-6">
-                        <h3 class="text-sm font-bold text-white mb-1" x-text="t('inviteRealUserTitle')"></h3>
-                        <p class="text-xs text-neutral-400 mb-4" x-text="t('inviteRealUserDesc')"></p>
-                        
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <div class="relative flex-grow">
-                                <input type="text" x-model="inviteUsernameInput" :placeholder="t('inviteInputPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                                
-                                <div x-show="allAvailableUsersForInvite.length > 0" class="mt-2 flex flex-wrap gap-1.5 items-center max-h-36 overflow-y-auto">
-                                    <span class="text-[10px] text-neutral-500" x-text="t('registeredPlayersLabel') + ':'"></span>
-                                    <template x-for="rUser in allAvailableUsersForInvite" :key="rUser.name">
-                                        <button type="button" @click="inviteUsernameInput = rUser.name" class="text-[11px] bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2 py-1 rounded-md transition flex items-center gap-1.5">
-                                            <img :src="rUser.img" class="w-3.5 h-3.5 rounded-full object-cover">
-                                            <span x-text="rUser.name"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                            </div>
-                            <button @click="sendCompanyInvite(selectedCompany)" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap self-start">
-                                📩 <span x-text="t('sendInviteBtn')"></span>
-                            </button>
-                        </div>
-                    </div>
-                </template>
-
-                <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3" x-text="t('companyMembersTitle')"></h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                    <div class="card-bg border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img :src="getUserAvatarByName(selectedCompany?.ceo)" class="w-10 h-10 rounded-lg object-cover bg-black">
-                            <div>
-                                <div class="text-sm font-bold text-white" x-text="selectedCompany?.ceo"></div>
-                                <div class="text-[11px] text-amber-400 font-semibold" x-text="t('ceoFounderLabel')"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <template x-if="currentUser && currentUser.name.toLowerCase() === selectedTop5Person?.name.toLowerCase()">
-                                <button @click="openBioEditor(selectedTop5Person)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
-                            </template>
-                            <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedTop5Person?.name.toLowerCase()">
-                                <div>
-                                    <template x-if="areWeFriends(selectedTop5Person?.name)">
-                                        <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                                            <span>🤝</span> <span x-text="t('alreadyFriendsBadge')"></span>
-                                        </span>
-                                    </template>
-                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && hasIncomingRequestFrom(selectedTop5Person?.name)">
-                                        <button @click="acceptFriendRequest(selectedTop5Person.name)" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                                            <span>✓</span> <span x-text="t('acceptRequestBtn')"></span>
-                                        </button>
-                                    </template>
-                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && !hasIncomingRequestFrom(selectedTop5Person?.name) && hasSentRequestTo(selectedTop5Person?.name)">
-                                        <span class="bg-neutral-800 border border-neutral-700 text-neutral-400 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                                            <span>⏳</span> <span x-text="t('requestSentBadge')"></span>
-                                        </span>
-                                    </template>
-                                    <template x-if="!areWeFriends(selectedTop5Person?.name) && !hasIncomingRequestFrom(selectedTop5Person?.name) && !hasSentRequestTo(selectedTop5Person?.name)">
-                                        <button @click="sendFriendRequest(selectedTop5Person.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                            <span>👥</span> <span x-text="t('addFriendBtn')"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <!-- TAB 4: Estadísticas de la Empresa -->
-            <div x-show="compTab === 'stats'" class="space-y-4 text-sm">
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('companyLevelStat')"></span>
-                    <span class="font-bold text-blue-400 text-base" x-text="t('levelWord') + ' ' + (selectedCompany?.level || 1)"></span>
-                </div>
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('companyRankStat')"></span>
-                    <span class="font-bold text-amber-400" x-text="'#' + getCompanyRank(selectedCompany)"></span>
-                </div>
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('ceoLabel')"></span>
-                    <span class="font-semibold text-white" x-text="selectedCompany?.ceo"></span>
-                </div>
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('growthBonusLabel')"></span>
-                    <span class="font-bold text-green-400" x-text="'+' + getCompanyGrowthMultiplier(selectedCompany) + '% ' + t('perCycleWord')"></span>
-                </div>
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('totalMembersStat')"></span>
-                    <span class="font-medium" x-text="1 + (selectedCompany?.members?.length || 0)"></span>
-                </div>
-                <div class="flex justify-between border-b border-neutral-800 pb-3">
-                    <span class="text-neutral-400" x-text="t('sourceWealth')"></span>
-                    <span class="font-medium" x-text="selectedCompany?.sector || 'Corporate'"></span>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- MODAL 1: Registro / Login Roblox con Contraseña Segura -->
-    <div x-show="showRegisterModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
-            <button @click="showRegisterModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('modalTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('modalDesc')"></p>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('robloxUser')"></label>
-                    <input type="text" x-model="regUsername" @keydown.enter="handleAuthUser()" placeholder="e.g. raxinou3" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('password')"></label>
-                    <input type="password" x-model="regPassword" @keydown.enter="handleAuthUser()" placeholder="••••••••" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-                <button @click="handleAuthUser()" :disabled="isRegistering" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center">
-                    <span x-show="!isRegistering" x-text="t('authButton')"></span>
-                    <span x-show="isRegistering" x-text="t('verifying')"></span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: Editar Biografía y Rol -->
-    <div x-show="showBioModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-8 rounded-2xl border border-neutral-800 max-w-lg w-full relative">
-            <button @click="showBioModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('editBioTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-4" x-text="t('editBioDesc')"></p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('sourceWealth')"></label>
-                    <select x-model="tempSource" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                        <template x-for="cat in allSectors" :key="cat">
-                            <option :value="cat" x-text="cat"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('biography')"></label>
-                    <textarea x-model="tempBioText" rows="4" class="w-full bg-black border border-neutral-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Write your biography..."></textarea>
-                </div>
-
-                <button @click="saveUserBio()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('saveBioButton')"></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: Create Company -->
-    <div x-show="showCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4 py-6 overflow-y-auto" style="display: none;">
-        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-700 max-w-md w-full relative shadow-2xl my-auto">
-            <button @click="showCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            
-            <div x-show="isAutoCompanyPrompt" class="inline-block bg-blue-600/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-2" x-text="t('welcomeCompanyBadge')"></div>
-            
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('createCompanyTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-5" x-text="t('createCompanyDesc')"></p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyNameLabel')"></label>
-                    <input type="text" x-model="newCompanyName" placeholder="e.g. Nexus Corp" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('sourceWealth')"></label>
-                    <select x-model="newCompanySector" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                        <template x-for="cat in allSectors" :key="cat">
-                            <option :value="cat" x-text="cat"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyInvestmentLabel')"></label>
-                    <input type="number" step="0.5" min="1" x-model.number="newCompanyInvestment" placeholder="15.0" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                    <p class="text-[11px] text-neutral-500 mt-1" x-text="t('investmentDeductNote')"></p>
-                </div>
-
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1.5" x-text="t('companyLogoLabel')"></label>
-                    
-                    <div class="flex items-center gap-3 mb-2">
-                        <img :src="newCompanyLogo || presetCompanyLogos[0]" class="w-14 h-14 rounded-xl object-cover bg-black border border-neutral-700 shrink-0" alt="Preview">
-                        <div class="flex-grow">
-                            <label class="cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-neutral-600 inline-flex items-center gap-2 transition w-full justify-center">
-                                <span>📁</span>
-                                <span x-text="t('uploadFromDeviceBtn')"></span>
-                                <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'create')" class="hidden">
-                            </label>
-                            <input type="text" x-model="newCompanyLogo" placeholder="Or paste an image URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="text-[10px] text-neutral-500">Emblems:</span>
-                        <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
-                            <img :src="preset" @click="newCompanyLogo = preset" :class="newCompanyLogo === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-8 h-8 rounded-lg cursor-pointer bg-black object-cover transition">
-                        </template>
-                    </div>
-                </div>
-
-                <div class="flex gap-2 pt-2">
-                    <button x-show="isAutoCompanyPrompt" @click="showCompanyModal = false" class="w-1/3 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-3 py-2.5 rounded-lg text-xs font-semibold transition" x-text="t('laterButton')"></button>
-                    <button @click="createCompany()" class="flex-grow bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('launchCompanyBtn')"></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 4: Editar Empresa -->
-    <div x-show="showEditCompanyModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative">
-            <button @click="showEditCompanyModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            <h2 class="serif-font text-2xl font-bold mb-2 text-white" x-text="t('editCompanyTitle')"></h2>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('editCompanyDesc')"></p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1" x-text="t('companyNameLabel')"></label>
-                    <input type="text" x-model="editCompanyNameInput" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-neutral-400 uppercase tracking-wider mb-1.5" x-text="t('companyLogoLabel')"></label>
-                    <div class="flex items-center gap-3 mb-2">
-                        <img :src="editCompanyLogoInput || presetCompanyLogos[0]" class="w-14 h-14 rounded-xl object-cover bg-black border border-neutral-700 shrink-0" alt="Preview">
-                        <div class="flex-grow">
-                            <label class="cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-neutral-600 inline-flex items-center gap-2 transition w-full justify-center">
-                                <span>📁</span>
-                                <span x-text="t('uploadFromDeviceBtn')"></span>
-                                <input type="file" accept="image/*" @change="handleLogoFileUpload($event, 'edit')" class="hidden">
-                            </label>
-                            <input type="text" x-model="editCompanyLogoInput" placeholder="Or paste a URL..." class="w-full bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-[11px] text-neutral-300 mt-1.5 focus:outline-none focus:border-blue-500">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <template x-for="(preset, pIdx) in presetCompanyLogos" :key="pIdx">
-                            <img :src="preset" @click="editCompanyLogoInput = preset" :class="editCompanyLogoInput === preset ? 'ring-2 ring-blue-500' : 'opacity-70 hover:opacity-100'" class="w-8 h-8 rounded-lg cursor-pointer bg-black object-cover transition">
-                        </template>
-                    </div>
-                </div>
-                <button @click="saveCompanyChanges()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition" x-text="t('saveBioButton')"></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 5: Notification Center & Invitations (Companies & Friends) -->
-    <div x-show="showInvitesModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative shadow-2xl">
-            <button @click="showInvitesModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            
-            <div class="flex items-center gap-2 mb-2">
-                <span class="text-2xl">🔔</span>
-                <h2 class="serif-font text-2xl font-bold text-white" x-text="t('notificationsTitle')"></h2>
-            </div>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('notificationsDesc')"></p>
-
-            <div class="space-y-6 max-h-96 overflow-y-auto pr-1">
-                <!-- Company Invitations -->
-                <div>
-                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                        <span>🏢</span> <span x-text="t('companyInvitesHeader')"></span> (<span x-text="pendingInvitesForCurrentUser.length"></span>)
-                    </h3>
-
-                    <div x-show="pendingInvitesForCurrentUser.length === 0" class="text-xs text-neutral-500 italic bg-black/30 p-3 rounded-xl">
-                        <span x-text="t('noCompanyInvites')"></span>
-                    </div>
-
-                    <div class="space-y-2.5">
-                        <template x-for="comp in pendingInvitesForCurrentUser" :key="comp.name">
-                            <div class="bg-black/60 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3">
-                                    <img :src="comp.img" class="w-10 h-10 rounded-xl object-cover bg-black">
-                                    <div>
-                                        <div class="text-sm font-bold text-white" x-text="comp.name"></div>
-                                        <div class="text-[11px] text-neutral-400" x-text="t('ceoLabel') + ': ' + comp.ceo"></div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <button @click="respondToCompanyInvite(comp, true)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
-                                    <button @click="respondToCompanyInvite(comp, false)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
-                                </div>
+                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name) && !hasSentRequestTo(selectedPerson?.name)">
+                                    <button @click="sendFriendRequest(selectedPerson.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                                        <span>👥</span> <span x-text="t('addFriendBtn')"></span>
+                                    </button>
+                                </template>
                             </div>
                         </template>
                     </div>
@@ -2360,22 +1893,10 @@
                 hasSentRequestTo(targetName) {
                     if (!this.currentUser || !targetName) return false;
                     const myLower = this.currentUser.name.toLowerCase();
-                    const targetKey = Object.keys(this.friendRequestsMap).find(k => k.toLowerCase() === targetName.toLowerCase());
-                    if (!targetKey || !Array.isArray(this.friendRequestsMap[targetKey])) return false;
-                    return this.friendRequestsMap[targetKey].some(s => s.toLowerCase() === myLower);
-                },
-                get availableUsersToFriend() {
-                    if (!this.currentUser) return [];
-                    const myName = this.currentUser.name.toLowerCase();
-                    const myFriends = this.userFriends.map(f => f.toLowerCase());
-                    const myPending = this.incomingFriendRequests.map(p => p.toLowerCase());
-                    
-                    return this.people.filter(u => {
-                        const uName = u.name.toLowerCase();
-                        return uName !== myName && !myFriends.includes(uName) && !myPending.includes(uName);
-                    }).filter(u => {
-                        if (!this.friendSearchInput) return true;
-                        return u.name.toLowerCase().includes(this.friendSearchInput.toLowerCase());
+                    const targetLower = targetName.toLowerCase();
+                    return Object.keys(this.friendRequestsMap).some(k => {
+                        if (k.toLowerCase() !== targetLower || !Array.isArray(this.friendRequestsMap[k])) return false;
+                        return this.friendRequestsMap[k].some(s => s.toLowerCase() === myLower);
                     });
                 },
                 get allAvailableUsersForInvite() {
@@ -2689,65 +2210,124 @@
                         this.showRegisterModal = true;
                         return;
                     }
-                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
-                        this.notify('You cannot send a friend request to yourself.', '⚠️');
+                    if (!targetName) return;
+                    const cleanTarget = targetName.trim();
+                    const targetLower = cleanTarget.toLowerCase();
+                    const myName = this.currentUser.name;
+                    const myLower = myName.toLowerCase();
+
+                    if (targetLower === myLower) {
+                        this.notify('No puedes enviarte una solicitud de amistad a ti mismo.', '⚠️');
                         return;
                     }
 
-                    if (this.areWeFriends(targetName)) {
-                        this.notify(`You are already friends with ${targetName}.`, '🤝');
+                    if (this.areWeFriends(cleanTarget)) {
+                        this.notify(`Ya eres amigo de ${cleanTarget}.`, '🤝');
                         return;
                     }
 
-                    if (this.hasIncomingRequestFrom(targetName)) {
-                        this.acceptFriendRequest(targetName);
+                    if (this.hasIncomingRequestFrom(cleanTarget)) {
+                        this.acceptFriendRequest(cleanTarget);
                         return;
                     }
 
-                    const existingKey = Object.keys(this.friendRequestsMap).find(k => k.toLowerCase() === targetName.toLowerCase()) || targetName;
-                    if (!this.friendRequestsMap[existingKey]) {
-                        this.friendRequestsMap[existingKey] = [];
-                    }
-                    if (this.friendRequestsMap[existingKey].some(s => s.toLowerCase() === this.currentUser.name.toLowerCase())) {
-                        this.notify('You have already sent a friend request to this user.', '⏳');
+                    // Normalizar y unificar todas las solicitudes entrantes bajo la clave en minúsculas del usuario destino
+                    let mergedList = [];
+                    Object.keys(this.friendRequestsMap).forEach(k => {
+                        if (k.toLowerCase() === targetLower && Array.isArray(this.friendRequestsMap[k])) {
+                            this.friendRequestsMap[k].forEach(s => {
+                                if (!mergedList.some(x => x.toLowerCase() === s.toLowerCase())) {
+                                    mergedList.push(s);
+                                }
+                            });
+                            if (k !== targetLower) {
+                                delete this.friendRequestsMap[k];
+                            }
+                        }
+                    });
+
+                    if (mergedList.some(s => s.toLowerCase() === myLower)) {
+                        this.notify('Ya enviaste una solicitud de amistad a este usuario.', '⏳');
                         return;
                     }
 
-                    this.friendRequestsMap[existingKey].push(this.currentUser.name);
+                    mergedList.push(myName);
+                    this.friendRequestsMap = {
+                        ...this.friendRequestsMap,
+                        [targetLower]: mergedList
+                    };
                     this.saveSocialToStorage();
-                    this.notify(`Friend request sent to ${targetName}!`, '👥');
+                    this.notify(`Solicitud de amistad enviada a ${cleanTarget}!`, '👥');
                 },
                 acceptFriendRequest(requesterName) {
-                    if (!this.currentUser) return;
+                    if (!this.currentUser || !requesterName) return;
                     const myName = this.currentUser.name;
                     const myLower = myName.toLowerCase();
                     const reqLower = requesterName.toLowerCase();
 
-                    // Remove incoming request across any matching keys
-                    Object.keys(this.friendRequestsMap).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
-                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== reqLower);
+                    // Eliminar la solicitud en ambas direcciones
+                    const updatedReqs = { ...this.friendRequestsMap };
+                    Object.keys(updatedReqs).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(updatedReqs[key])) {
+                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== reqLower);
                         }
-                        if (key.toLowerCase() === reqLower && Array.isArray(this.friendRequestsMap[key])) {
-                            this.friendRequestsMap[key] = this.friendRequestsMap[key].filter(n => n.toLowerCase() !== myLower);
+                        if (key.toLowerCase() === reqLower && Array.isArray(updatedReqs[key])) {
+                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== myLower);
                         }
                     });
+                    this.friendRequestsMap = updatedReqs;
 
-                    // Add mutual friendship: A -> B and B -> A
-                    const myFriendKey = Object.keys(this.friendshipsMap).find(k => k.toLowerCase() === myLower) || myName;
-                    if (!this.friendshipsMap[myFriendKey]) this.friendshipsMap[myFriendKey] = [];
-                    if (!this.friendshipsMap[myFriendKey].some(f => f.toLowerCase() === reqLower)) {
-                        this.friendshipsMap[myFriendKey].push(requesterName);
-                    }
+                    // Guardar amistad mutua en ambas listas
+                    const updatedFriends = { ...this.friendshipsMap };
+                    let myList = [];
+                    Object.keys(updatedFriends).forEach(k => {
+                        if (k.toLowerCase() === myLower && Array.isArray(updatedFriends[k])) {
+                            updatedFriends[k].forEach(f => {
+                                if (!myList.some(x => x.toLowerCase() === f.toLowerCase())) myList.push(f);
+                            });
+                            if (k !== myLower) delete updatedFriends[k];
+                        }
+                    });
+                    if (!myList.some(f => f.toLowerCase() === reqLower)) myList.push(requesterName);
+                    updatedFriends[myLower] = myList;
 
-                    const reqFriendKey = Object.keys(this.friendshipsMap).find(k => k.toLowerCase() === reqLower) || requesterName;
-                    if (!this.friendshipsMap[reqFriendKey]) this.friendshipsMap[reqFriendKey] = [];
-                    if (!this.friendshipsMap[reqFriendKey].some(f => f.toLowerCase() === myLower)) {
-                        this.friendshipsMap[reqFriendKey].push(myName);
-                    }
+                    let reqList = [];
+                    Object.keys(updatedFriends).forEach(k => {
+                        if (k.toLowerCase() === reqLower && Array.isArray(updatedFriends[k])) {
+                            updatedFriends[k].forEach(f => {
+                                if (!reqList.some(x => x.toLowerCase() === f.toLowerCase())) reqList.push(f);
+                            });
+                            if (k !== reqLower) delete updatedFriends[k];
+                        }
+                    });
+                    if (!reqList.some(f => f.toLowerCase() === myLower)) reqList.push(myName);
+                    updatedFriends[reqLower] = reqList;
 
+                    this.friendshipsMap = updatedFriends;
                     this.saveSocialToStorage();
-                    this.notify(`You and ${requesterName} are now mutual friends!`, '🤝');
+                    this.notify(`¡Ahora tú y ${requesterName} son amigos mutuos!`, '🤝');
+
+                    if (this.incomingFriendRequests.length === 0) {
+                        this.showFriendRequestsModal = false;
+                    }
+                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
+                        this.showInvitesModal = false;
+                    }
+                },
+                rejectFriendRequest(requesterName) {
+                    if (!this.currentUser || !requesterName) return;
+                    const myLower = this.currentUser.name.toLowerCase();
+                    const reqLower = requesterName.toLowerCase();
+
+                    const updatedReqs = { ...this.friendRequestsMap };
+                    Object.keys(updatedReqs).forEach(key => {
+                        if (key.toLowerCase() === myLower && Array.isArray(updatedReqs[key])) {
+                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== reqLower);
+                        }
+                    });
+                    this.friendRequestsMap = updatedReqs;
+                    this.saveSocialToStorage();
+                    this.notify('Solicitud de amistad rechazada.', '❌');
 
                     if (this.incomingFriendRequests.length === 0) {
                         this.showFriendRequestsModal = false;
@@ -3210,6 +2790,18 @@
 
                     this.syncGlobalMarketToCycle(currentCycle);
                     this.startCountdownLoop();
+
+                    window.addEventListener('storage', (e) => {
+                        if (e.key === 'empire_friend_requests' && e.newValue) {
+                            try { this.friendRequestsMap = JSON.parse(e.newValue) || {}; } catch (err) {}
+                        }
+                        if (e.key === 'empire_friendships' && e.newValue) {
+                            try { this.friendshipsMap = JSON.parse(e.newValue) || {}; } catch (err) {}
+                        }
+                        if (e.key === 'empire_user_companies' && e.newValue) {
+                            try { this.companies = JSON.parse(e.newValue) || []; } catch (err) {}
+                        }
+                    });
                 }
             }
         }
