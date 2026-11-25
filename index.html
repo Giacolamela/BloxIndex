@@ -112,26 +112,19 @@
     <!-- Barra Superior de Navegación -->
     <header class="flex flex-col md:flex-row items-center justify-between text-sm font-medium border-b border-neutral-800 pb-3 mb-8 max-w-7xl mx-auto w-full gap-4 mt-4">
         <div class="flex items-center space-x-6 flex-wrap">
-            <button @click="resetViews('top5')" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
-            <button @click="resetViews('all')" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
-            <button @click="resetViews('women')" :class="currentFilter === 'women' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
-            <button @click="resetViews('companies')" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompany && !showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
-            
-            <template x-if="currentUser">
-                <button @click="showFriendsView = true; selectedPerson = null; selectedCompany = null;" :class="showFriendsView ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1.5">
-                    <span>👥</span> <span x-text="t('friendsTab')"></span>
-                    <span x-show="userFriends.length > 0" class="bg-blue-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold" x-text="userFriends.length"></span>
-                </button>
-            </template>
+            <button @click="resetViews('top5')" :class="currentFilter === 'top5' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top5')"></button>
+            <button @click="resetViews('all')" :class="currentFilter === 'all' && !selectedCategory && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('top')"></button>
+            <button @click="resetViews('women')" :class="currentFilter === 'women' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('women')"></button>
+            <button @click="resetViews('companies')" :class="currentFilter === 'companies' && !selectedPerson && !selectedCompany ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" x-text="t('companiesTab')"></button>
             
             <div class="relative" @click.away="showCategoriesDropdown = false">
-                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'; selectedPerson = null; selectedCompany = null; showFriendsView = false;" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
+                <button @click="showCategoriesDropdown = !showCategoriesDropdown; currentFilter = 'categories'; selectedPerson = null; selectedCompany = null;" :class="selectedCategory || showCategoriesDropdown ? 'text-white border-b-2 border-white pb-1' : 'text-neutral-400 hover:text-white'" class="flex items-center gap-1">
                     <span x-text="t('categories')"></span> <span class="text-xs">▾</span>
                 </button>
 
                 <div x-show="showCategoriesDropdown" class="absolute left-0 mt-2 w-64 card-bg border border-neutral-800 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
                     <template x-for="cat in uniqueCategories" :key="cat">
-                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories'; showFriendsView = false;" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
+                        <button @click="selectedCategory = cat; showCategoriesDropdown = false; currentFilter = 'categories';" class="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-800 text-neutral-300 hover:text-white transition flex items-center justify-between">
                             <span x-text="cat"></span>
                             <span class="text-xs text-neutral-500" x-text="people.filter(p => p.source === cat).length"></span>
                         </button>
@@ -155,22 +148,12 @@
                     <option value="de">🇩🇪 Deutsch</option>
                 </select>
             </div>
-            <!-- Friend Requests Button (Always visible for logged-in users) -->
-            <template x-if="currentUser">
-                <button @click="showFriendRequestsModal = true" 
-                        :class="incomingFriendRequests.length > 0 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 animate-pulse' : 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'"
-                        class="relative border px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 whitespace-nowrap">
-                    <span>🤝</span>
-                    <span x-text="t('friendRequestsBtn')"></span>
-                    <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.2 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
-                </button>
-            </template>
 
             <!-- Botón de Notificaciones de Invitaciones -->
-            <template x-if="currentUser && (pendingInvitesForCurrentUser.length > 0 || incomingFriendRequests.length > 0)">
+            <template x-if="currentUser && pendingInvitesForCurrentUser.length > 0">
                 <button @click="showInvitesModal = true" class="relative bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 animate-pulse">
                     <span>🔔</span>
-                    <span x-text="pendingInvitesForCurrentUser.length + incomingFriendRequests.length"></span>
+                    <span x-text="pendingInvitesForCurrentUser.length"></span>
                 </button>
             </template>
 
@@ -199,14 +182,6 @@
                         <button @click="openCompanyModal(false); showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-blue-400 hover:text-blue-300 transition flex items-center gap-2 font-semibold">
                             🏢 <span x-text="t('createAnotherCompany')"></span>
                         </button>
-                        <button @click="showFriendsView = true; selectedPerson = null; selectedCompany = null; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-purple-400 transition flex items-center justify-between">
-                            <span class="flex items-center gap-2">👥 <span x-text="t('friendsTab')"></span></span>
-                            <span class="bg-neutral-800 text-white px-1.5 py-0.5 rounded text-[10px]" x-text="userFriends.length"></span>
-                        </button>
-                        <button @click="showFriendRequestsModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
-                            <span class="flex items-center gap-2">🤝 <span x-text="t('friendRequestsBtn')"></span></span>
-                            <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
-                        </button>
                         <template x-if="userOwnedCompanies.length > 0">
                             <div class="border-t border-neutral-800 my-1 pt-1">
                                 <div class="px-4 py-1 text-[10px] text-neutral-500 uppercase font-bold" x-text="t('myCompaniesLabel')"></div>
@@ -218,10 +193,10 @@
                                 </template>
                             </div>
                         </template>
-                        <template x-if="pendingInvitesForCurrentUser.length > 0 || incomingFriendRequests.length > 0">
+                        <template x-if="pendingInvitesForCurrentUser.length > 0">
                             <button @click="showInvitesModal = true; showUserMenu = false" class="w-full text-left px-4 py-2 text-xs hover:bg-neutral-800 text-amber-400 transition flex items-center justify-between">
                                 <span class="flex items-center gap-2">🔔 <span x-text="t('invitesMenu')"></span></span>
-                                <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length + incomingFriendRequests.length"></span>
+                                <span class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="pendingInvitesForCurrentUser.length"></span>
                             </button>
                         </template>
                         <div class="border-t border-neutral-800 my-1"></div>
@@ -234,99 +209,8 @@
         </div>
     </header>
 
-    <!-- Friends View -->
-    <main x-show="showFriendsView" class="flex-grow max-w-5xl mx-auto w-full" style="display: none;">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div>
-                <h1 class="serif-font text-3xl font-bold" x-text="t('friendsTitle')"></h1>
-                <p class="text-xs text-neutral-400 mt-1" x-text="t('friendsDesc')"></p>
-            </div>
-            <div class="flex items-center gap-2.5 self-start">
-                <button @click="showFriendRequestsModal = true" 
-                        :class="incomingFriendRequests.length > 0 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300' : 'bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700'"
-                        class="border px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2">
-                    <span>🤝</span>
-                    <span x-text="t('friendRequestsBtn')"></span>
-                    <span x-show="incomingFriendRequests.length > 0" class="bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded-full text-[10px]" x-text="incomingFriendRequests.length"></span>
-                </button>
-                <button @click="showFriendsView = false" class="text-sm bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg transition" x-text="t('backButton')"></button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Search and Add Friends -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl">
-                <h3 class="text-base font-bold text-white mb-1" x-text="t('addFriendTitle')"></h3>
-                <p class="text-xs text-neutral-400 mb-4" x-text="t('addFriendDesc')"></p>
-                
-                <input type="text" x-model="friendSearchInput" :placeholder="t('friendSearchPlaceholder')" class="w-full bg-black border border-neutral-700 rounded-lg px-3.5 py-2 text-xs text-white mb-4 focus:outline-none focus:border-blue-500">
-
-                <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                    <template x-for="u in availableUsersToFriend" :key="u.name">
-                        <div class="bg-black/40 border border-neutral-800/80 p-3 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-3 cursor-pointer" @click="openProfile(u)">
-                                <div class="relative">
-                                    <img :src="u.img" class="w-10 h-10 rounded-xl object-cover bg-black">
-                                    <template x-if="isUserOnline(u.name)">
-                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
-                                    </template>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-white" x-text="u.name"></div>
-                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(u.netWorthValue)"></div>
-                                </div>
-                            </div>
-                            <template x-if="areWeFriends(u.name)">
-                                <span class="text-[11px] bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg font-semibold" x-text="t('alreadyFriendsBadge')"></span>
-                            </template>
-                            <template x-if="!areWeFriends(u.name)">
-                                <button @click="sendFriendRequest(u.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="hasSentRequestTo(u.name) ? t('requestSentBadge') : t('addBtn')"></button>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- My Friends List -->
-            <div class="card-bg border border-neutral-800 p-6 rounded-2xl">
-                <h3 class="text-base font-bold text-white mb-4 flex items-center justify-between">
-                    <span x-text="t('myFriendsListTitle')"></span>
-                    <span class="bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs px-2.5 py-0.5 rounded-full font-bold" x-text="userFriends.length"></span>
-                </h3>
-
-                <div x-show="userFriends.length === 0" class="text-center py-12 bg-black/30 rounded-xl border border-neutral-800/60">
-                    <div class="text-3xl mb-2">👥</div>
-                    <p class="text-xs text-neutral-400" x-text="t('noFriendsYet')"></p>
-                </div>
-
-                <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                    <template x-for="friendName in userFriends" :key="friendName">
-                        <div class="bg-black/40 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="relative">
-                                    <img :src="getUserAvatarByName(friendName)" class="w-10 h-10 rounded-xl object-cover bg-black">
-                                    <template x-if="isUserOnline(friendName)">
-                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
-                                    </template>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-white flex items-center gap-1.5">
-                                        <span x-text="friendName"></span>
-                                        <span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9px] px-1.5 py-0.5 rounded font-semibold" x-text="t('alreadyFriendsBadge')"></span>
-                                    </div>
-                                    <div class="text-[11px] font-medium" :class="isUserOnline(friendName) ? 'text-green-400' : 'text-neutral-500'" x-text="isUserOnline(friendName) ? t('onlineStatus') : t('offlineStatus')"></div>
-                                </div>
-                            </div>
-                            <button @click="removeFriend(friendName)" class="text-xs text-neutral-500 hover:text-red-400 p-1" title="Remove friend">✕</button>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
-    </main>
-
     <!-- Main Content (Leaderboards) -->
-    <main x-show="!selectedPerson && !selectedCompany && !showFriendsView" class="flex-grow max-w-7xl mx-auto w-full">
+    <main x-show="!selectedPerson && !selectedCompany" class="flex-grow max-w-7xl mx-auto w-full">
 
         <!-- Top 5 Ganadores y Perdedores -->
         <div x-show="searchQuery === '' && !selectedCategory && currentFilter !== 'companies'" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -358,7 +242,7 @@
                                             <span :class="getFireBadgeClass(gainer)" class="fire-badge text-xs" :title="getFireLabel(gainer)">🔥</span>
                                         </template>
                                     </div>
-                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(gainer.netWorthValue)"></div>
+                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(gainer.netWorthValue) + ' • Peak Net Worth: ' + formatWorth(gainer.peakNetWorth || gainer.netWorthValue) + ' • Peak Rank: #' + (gainer.peakRank || gainer.id)"></div>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -398,7 +282,7 @@
                                             <span class="blood-badge text-xs">🩸</span>
                                         </template>
                                     </div>
-                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(loser.netWorthValue)"></div>
+                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(loser.netWorthValue) + ' • Peak Net Worth: ' + formatWorth(loser.peakNetWorth || loser.netWorthValue) + ' • Peak Rank: #' + (loser.peakRank || loser.id)"></div>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -431,6 +315,7 @@
                             </template>
                         </div>
                         <div class="text-xs text-neutral-400 mt-0.5" x-text="person.source"></div>
+                        <div class="text-[11px] text-neutral-400 mt-1" x-text="'Peak Net Worth: ' + formatWorth(person.peakNetWorth || person.netWorthValue) + ' • Peak Rank: #' + (person.peakRank || person.id)"></div>
                         <div class="flex items-center justify-between mt-1">
                             <div class="text-sm font-semibold" x-text="formatWorth(person.netWorthValue)"></div>
                             <div x-show="hasDailyChange(person)" :class="person.positive ? 'text-green-400' : 'text-red-400'" class="text-xs font-semibold" x-text="formatDailyChange(person)"></div>
@@ -462,6 +347,7 @@
                                         <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedTop5Person)"></span>
                                     </template>
                                 </div>
+                                <div class="text-xs text-neutral-400 mt-1" x-text="'Peak Net Worth: ' + formatWorth(selectedTop5Person?.peakNetWorth || selectedTop5Person?.netWorthValue) + ' • Peak Rank: #' + (selectedTop5Person?.peakRank || selectedTop5Person?.id)"></div>
                                 <div x-show="isBloodActive(selectedTop5Person)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-red-500" x-text="t('bloodMarketLabel')"></div>
                                 <div x-show="!isBloodActive(selectedTop5Person) && hasFire(selectedTop5Person)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedTop5Person)"></div>
                             </div>
@@ -469,11 +355,6 @@
                         <div class="flex items-center gap-2">
                             <template x-if="currentUser && currentUser.name.toLowerCase() === selectedTop5Person?.name.toLowerCase()">
                                 <button @click="openBioEditor(selectedTop5Person)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
-                            </template>
-                            <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedTop5Person?.name.toLowerCase()">
-                                <button @click="sendFriendRequest(selectedTop5Person.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                    <span>👥</span> <span x-text="hasSentRequestTo(selectedTop5Person.name) ? t('requestSentBadge') : t('addFriendBtn')"></span>
-                                </button>
                             </template>
                         </div>
                     </div>
@@ -527,11 +408,11 @@
 
                     <div x-show="top5Tab === 'stats'" class="space-y-4 text-sm">
                         <div class="flex justify-between border-b border-neutral-800 pb-3">
-                            <span class="text-neutral-400" x-text="t('peakRank')"></span>
+                            <span class="text-neutral-400">Peak Rank</span>
                             <span class="font-bold text-amber-400" x-text="'#' + (selectedTop5Person?.peakRank || selectedTop5Person?.id)"></span>
                         </div>
                         <div class="flex justify-between border-b border-neutral-800 pb-3">
-                            <span class="text-neutral-400" x-text="t('peakNetWorth')"></span>
+                            <span class="text-neutral-400">Peak Net Worth</span>
                             <span class="font-bold text-green-400" x-text="formatWorth(selectedTop5Person?.peakNetWorth || selectedTop5Person?.netWorthValue)"></span>
                         </div>
                         <div class="flex justify-between border-b border-neutral-800 pb-3">
@@ -617,6 +498,13 @@
                         <div class="text-neutral-300 text-sm font-semibold" x-text="formatWorth(item.netWorthValue)"></div>
                         <div x-show="hasDailyChange(item)" :class="item.positive ? 'text-green-400' : 'text-red-400'" class="text-xs font-semibold" x-text="formatDailyChange(item)"></div>
                     </div>
+
+                    <template x-if="currentFilter !== 'companies'">
+                        <div class="text-[11px] text-neutral-400 mt-2 space-y-0.5">
+                            <div x-text="'Peak Net Worth: ' + formatWorth(item.peakNetWorth || item.netWorthValue)"></div>
+                            <div x-text="'Peak Rank: #' + (item.peakRank || item.id)"></div>
+                        </div>
+                    </template>
                 </div>
             </template>
         </div>
@@ -649,6 +537,7 @@
                                     <span class="trillionaire-badge text-[10px] px-2 py-0.5 rounded-md uppercase" x-text="'👑 ' + getTrillionaireLabel(selectedPerson)"></span>
                                 </template>
                             </div>
+                            <div class="text-xs text-neutral-400 mt-1" x-text="'Peak Net Worth: ' + formatWorth(selectedPerson?.peakNetWorth || selectedPerson?.netWorthValue) + ' • Peak Rank: #' + (selectedPerson?.peakRank || selectedPerson?.id)"></div>
                             <div x-show="isBloodActive(selectedPerson)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-red-500" x-text="t('bloodMarketLabel')"></div>
                             <div x-show="!isBloodActive(selectedPerson) && hasFire(selectedPerson)" class="text-xs font-semibold tracking-wider uppercase mt-1 text-neutral-300" x-text="'🔥 ' + getFireLabel(selectedPerson)"></div>
                         </div>
@@ -657,107 +546,37 @@
                         <template x-if="currentUser && currentUser.name.toLowerCase() === selectedPerson?.name.toLowerCase()">
                             <button @click="openBioEditor(selectedPerson)" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" x-text="t('editBioBtn')"></button>
                         </template>
-                        <template x-if="currentUser && currentUser.name.toLowerCase() !== selectedPerson?.name.toLowerCase()">
-                            <div>
-                                <template x-if="areWeFriends(selectedPerson?.name)">
-                                    <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                                        <span>🤝</span> <span x-text="t('alreadyFriendsBadge')"></span>
-                                    </span>
-                                </template>
-                                <template x-if="!areWeFriends(selectedPerson?.name) && hasIncomingRequestFrom(selectedPerson?.name)">
-                                    <button @click="acceptFriendRequest(selectedPerson.name)" class="bg-amber-500 hover:bg-amber-400 text-black px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                                        <span>✓</span> <span x-text="t('acceptRequestBtn')"></span>
-                                    </button>
-                                </template>
-                                <template x-if="!areWeFriends(selectedPerson?.name) && !hasIncomingRequestFrom(selectedPerson?.name)">
-                                    <button @click="sendFriendRequest(selectedPerson.name)" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                                        <span>👥</span> <span x-text="hasSentRequestTo(selectedPerson.name) ? t('requestSentBadge') : t('addFriendBtn')"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </template>
                     </div>
                 </div>
 
-                <!-- Friend Requests -->
-                <div class="pt-4 border-t border-neutral-800">
-                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                        <span>👥</span> <span x-text="t('friendRequestsHeader')"></span> (<span x-text="incomingFriendRequests.length"></span>)
-                    </h3>
-
-                    <div x-show="incomingFriendRequests.length === 0" class="text-xs text-neutral-500 italic bg-black/30 p-3 rounded-xl">
-                        <span x-text="t('noFriendRequests')"></span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-black/40 border border-neutral-800 p-4 rounded-xl mb-6 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-neutral-400">Peak Net Worth</span>
+                        <span class="font-bold text-green-400" x-text="formatWorth(selectedPerson?.peakNetWorth || selectedPerson?.netWorthValue)"></span>
                     </div>
+                    <div class="flex justify-between">
+                        <span class="text-neutral-400">Peak Rank</span>
+                        <span class="font-bold text-amber-400" x-text="'#' + (selectedPerson?.peakRank || selectedPerson?.id)"></span>
+                    </div>
+                </div>
 
-                    <div class="space-y-2.5">
-                        <template x-for="reqName in incomingFriendRequests" :key="reqName">
-                            <div class="bg-black/60 border border-neutral-800 p-3.5 rounded-xl flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3">
-                                    <img :src="getUserAvatarByName(reqName)" class="w-10 h-10 rounded-full object-cover bg-black">
-                                    <div>
-                                        <div class="text-sm font-bold text-white" x-text="reqName"></div>
-                                        <div class="text-[11px] text-amber-400" x-text="t('wantsToBeFriend')"></div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('acceptBtn')"></button>
-                                    <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition">✕</button>
-                                </div>
-                            </div>
-                        </template>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-neutral-800 pb-2">
+                        <span class="text-neutral-400" x-text="t('sourceWealth')"></span>
+                        <span class="font-medium" x-text="selectedPerson?.source"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-neutral-800 pb-2">
+                        <span class="text-neutral-400" x-text="t('gender')"></span>
+                        <span class="font-medium" x-text="selectedPerson?.gender"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-neutral-800 pb-2">
+                        <span class="text-neutral-400" x-text="t('region')"></span>
+                        <span class="font-medium" x-text="selectedPerson?.country"></span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- MODAL 6: Modal Dedicado de Solicitudes de Amistad -->
-    <div x-show="showFriendRequestsModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 px-4" style="display: none;">
-        <div class="card-bg p-6 sm:p-8 rounded-2xl border border-neutral-800 max-w-md w-full relative shadow-2xl">
-            <button @click="showFriendRequestsModal = false" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl">×</button>
-            
-            <div class="flex items-center gap-2.5 mb-2">
-                <span class="text-2xl">🤝</span>
-                <h2 class="serif-font text-2xl font-bold text-white" x-text="t('friendRequestsModalTitle')"></h2>
-            </div>
-            <p class="text-xs text-neutral-400 mb-6" x-text="t('friendRequestsModalDesc')"></p>
-
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                <div x-show="incomingFriendRequests.length === 0" class="text-center py-8 bg-black/40 border border-neutral-800/80 rounded-xl">
-                    <div class="text-3xl mb-2">📭</div>
-                    <p class="text-xs text-neutral-400" x-text="t('noFriendRequests')"></p>
-                </div>
-
-                <template x-for="reqName in incomingFriendRequests" :key="reqName">
-                    <div class="bg-black/60 border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <div class="relative">
-                                <img :src="getUserAvatarByName(reqName)" class="w-11 h-11 rounded-full object-cover bg-black border border-neutral-700">
-                                <template x-if="isUserOnline(reqName)">
-                                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 ring-2 ring-black"></span>
-                                </template>
-                            </div>
-                            <div>
-                                <div class="text-sm font-bold text-white" x-text="reqName"></div>
-                                <div class="text-[11px] text-amber-400" x-text="t('wantsToBeFriend')"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button @click="acceptFriendRequest(reqName)" class="bg-green-600 hover:bg-green-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
-                                <span>✓</span> <span x-text="t('acceptBtn')"></span>
-                            </button>
-                            <button @click="rejectFriendRequest(reqName)" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-2.5 py-1.5 rounded-lg text-xs transition" title="Reject">✕</button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-neutral-800 flex justify-between items-center">
-                <button @click="showFriendRequestsModal = false; showFriendsView = true; selectedPerson = null; selectedCompany = null;" class="text-xs text-blue-400 hover:text-blue-300 font-semibold" x-text="t('viewAllMyFriendsLink')"></button>
-                <button @click="showFriendRequestsModal = false" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition" x-text="t('closeBtn')"></button>
-            </div>
-        </div>
-    </div>
 
     <!-- Script Principal -->
     <script>
@@ -796,7 +615,6 @@
                 top: "Top",
                 women: "Mujeres",
                 companiesTab: "Empresas",
-                friendsTab: "Amigos",
                 categories: "Categorías",
                 searchPlaceholder: "Buscar jugador o empresa...",
                 registerLogin: "Registrarse / Ingresar",
@@ -820,7 +638,6 @@
                 noCompaniesDesc: "¡Ingresa con tu cuenta de Roblox para fundar tu propia empresa y competir en el Top compartido con todos!",
                 clearFilters: "Limpiar Filtros",
                 backButton: "← Volver",
-                backToCompanies: "← Volver al Top de Empresas",
                 myProfile: "Mi Perfil",
                 editBio: "Editar Perfil y Trabajo",
                 createCompanyMenu: "Crear Empresa",
@@ -829,33 +646,6 @@
                 invitesMenu: "Notificaciones",
                 logout: "Cerrar sesión",
                 editBioBtn: "✏️ Editar Perfil",
-                addFriendBtn: "+ Añadir Amigo",
-                editBioTitle: "Editar Perfil y Trabajo / Sector",
-                editBioDesc: "Elige tu trabajo o sector principal y actualiza tu biografía.",
-                saveBioButton: "Guardar Cambios",
-                welcomeCompanyBadge: "¡Bienvenido! Funda tu Imperio",
-                createCompanyTitle: "Crea tu Empresa",
-                createCompanyDesc: "Funda una nueva empresa oficial. Sube tu propio logo desde tus archivos y escala en el Top de Empresas.",
-                editCompanyTitle: "Editar Empresa",
-                editCompanyDesc: "Cambia el nombre o sube un nuevo logo desde tus archivos cuando quieras.",
-                editCompanyBtn: "Editar Nombre / Logo",
-                companyNameLabel: "Nombre de la Empresa",
-                companyInvestmentLabel: "Capital Inicial (en Billones $)",
-                investmentDeductNote: "Se invertirá desde tu patrimonio personal para fundar la empresa.",
-                companyLogoLabel: "Logo de la Empresa (Desde tus archivos o URL)",
-                uploadFromDeviceBtn: "Subir desde Archivos",
-                launchCompanyBtn: "Fundar Empresa",
-                laterButton: "Más tarde",
-                modalTitle: "Iniciar Sesión o Registrarse",
-                modalDesc: "Introduce tu usuario de Roblox y contraseña. Si ya tienes cuenta se validará; si eres nuevo se registrará tu contraseña segura.",
-                robloxUser: "Usuario de Roblox",
-                password: "Contraseña",
-                authButton: "Ingresar / Registrarse",
-                verifying: "Verificando cuenta...",
-                incorrectPasswordError: "Contraseña incorrecta. Vuelve a intentar.",
-                bloodMarketLabel: "🩸 Sangre en el mercado (-$1B+ hoy)",
-                peakRank: "Rango Máximo (Peak Rank)",
-                peakNetWorth: "Riqueza Máxima (Peak Net Worth)",
                 firstTrillionaire: "First Trillionaire",
                 fire1: "Fuego Encendido (+$1B/día)",
                 fire5: "Fuego Naranja (+$5B/día)",
@@ -864,67 +654,7 @@
                 fire20: "Fuego Verde (+$20B/día)",
                 fire30: "Fuego Azul (+$30B/día)",
                 fire40: "Fuego Morado (+$40B-$50B/día)",
-                upgradesTab: "Mejoras y Nivel",
-                teamTab: "Equipo e Invitar",
-                companyValuationLabel: "VALORACIÓN DE LA EMPRESA",
-                growthBonusLabel: "Bono de Crecimiento",
-                upgradeHeaderTitle: "Invertir y Mejorar la Empresa",
-                upgradeHeaderDesc: "Gasta dinero de tu patrimonio personal para subir el nivel de la empresa y multiplicar sus ganancias en cada ciclo.",
-                yourPersonalBalance: "Tu Dinero Disponible",
-                upgradeCostLabel: "Costo de Mejora",
-                upgradeBtn: "Invertir y Mejorar",
-                ownerOnlyAction: "Solo el CEO puede mejorar",
-                profitPerLevel: "ganancia por nivel",
-                levelWord: "Nivel",
-                perCycleWord: "por ciclo",
-                upgTechTitle: "Infraestructura Tech & IA",
-                upgTechDesc: "Automatiza procesos y aumenta la rentabilidad base de la compañía.",
-                upgMarketTitle: "Marketing Global",
-                upgMarketDesc: "Expande la marca a millones de usuarios en Roblox.",
-                upgExpansionTitle: "Sucursales Internacionales",
-                upgExpansionDesc: "Abre sedes corporativas para multiplicar ingresos por ciclo.",
-                upgRdTitle: "Investigación y Desarrollo",
-                upgRdDesc: "Innovaciones exclusivas que disparan el valor de las acciones.",
-                inviteRealUserTitle: "Invitar Miembros a la Empresa",
-                inviteRealUserDesc: "Selecciona o busca cualquier usuario del Top o jugador registrado para enviarle una invitación corporativa.",
-                inviteInputPlaceholder: "Nombre de usuario...",
-                registeredPlayersLabel: "Jugadores y Top",
-                sendInviteBtn: "Enviar Invitación",
-                companyMembersTitle: "Directiva y Socios Actuales",
-                ceoFounderLabel: "👑 CEO / Fundador",
-                memberRoleLabel: "Socio Corporativo",
-                pendingInvitesTitle: "Invitaciones Pendientes de Aceptar",
-                companyLevelStat: "Nivel de la Empresa",
-                companyRankStat: "Posición en el Top Empresas",
-                totalMembersStat: "Total de Miembros Reales",
-                notificationsTitle: "Centro de Notificaciones",
-                notificationsDesc: "Revisa todas tus invitaciones pendientes a empresas y solicitudes de amistad.",
-                companyInvitesHeader: "Invitaciones a Empresas",
-                noCompanyInvites: "No tienes invitaciones de empresas pendientes.",
-                friendRequestsHeader: "Solicitudes de Amistad",
-                noFriendRequests: "No tienes solicitudes de amistad pendientes.",
-                wantsToBeFriend: "Quiere ser tu amigo en la web",
-                acceptBtn: "Aceptar",
-                friendsTitle: "Gestión de Amistades",
-                friendsDesc: "Añade a otros jugadores reales o del Top para formar tu red social de inversores.",
-                addFriendTitle: "Buscar y Añadir",
-                addFriendDesc: "Selecciona o busca cualquier usuario para enviarle solicitud de amistad.",
-                friendSearchPlaceholder: "Buscar usuario...",
-                myFriendsListTitle: "Mis Amigos",
-                noFriendsYet: "Aún no tienes amigos añadidos en la web.",
-                onlineStatus: "🟢 En línea",
-                offlineStatus: "⚪ Desconectado",
-                onlineStatusLabel: "En línea",
-                pendingRequestsTitle: "Solicitudes Entrantes",
-                addBtn: "+ Añadir",
-                friendRequestsBtn: "Solicitudes",
-                friendRequestsModalTitle: "Solicitudes de Amistad",
-                friendRequestsModalDesc: "Acepta las solicitudes para que ambos aparezcan agregados como amigos mutuamente.",
-                alreadyFriendsBadge: "Amigos",
-                acceptRequestBtn: "Aceptar Solicitud",
-                requestSentBadge: "Solicitud Enviada",
-                viewAllMyFriendsLink: "Ver mis amigos →",
-                closeBtn: "Cerrar"
+                bloodMarketLabel: "🩸 Sangre en el mercado (-$1B+ hoy)"
             },
             en: {
                 title: "BloxIndex",
@@ -937,7 +667,6 @@
                 top: "Top",
                 women: "Women",
                 companiesTab: "Companies",
-                friendsTab: "Friends",
                 categories: "Categories",
                 searchPlaceholder: "Search player or company...",
                 registerLogin: "Register / Login",
@@ -961,7 +690,6 @@
                 noCompaniesDesc: "Log in with your Roblox account to launch your business empire in the shared global leaderboard!",
                 clearFilters: "Clear Filters",
                 backButton: "← Back",
-                backToCompanies: "← Back to Companies Top",
                 myProfile: "My Profile",
                 editBio: "Edit Profile & Role",
                 createCompanyMenu: "Create Company",
@@ -970,33 +698,6 @@
                 invitesMenu: "Notifications",
                 logout: "Logout",
                 editBioBtn: "✏️ Edit Profile",
-                addFriendBtn: "+ Add Friend",
-                editBioTitle: "Edit Profile & Wealth Sector",
-                editBioDesc: "Choose your main role/sector and update your public biography.",
-                saveBioButton: "Save Changes",
-                welcomeCompanyBadge: "Welcome! Launch Your Empire",
-                createCompanyTitle: "Create Your Company",
-                createCompanyDesc: "Launch a new official company. Upload your logo directly from your files and climb the Companies Leaderboard!",
-                editCompanyTitle: "Edit Company Settings",
-                editCompanyDesc: "Change your company's name or upload a new logo from your files anytime.",
-                editCompanyBtn: "Edit Name / Logo",
-                companyNameLabel: "Company Name",
-                companyInvestmentLabel: "Initial Capital (in Billions $)",
-                investmentDeductNote: "Deducted from your personal net worth to fund the company.",
-                companyLogoLabel: "Company Logo (From files or URL)",
-                uploadFromDeviceBtn: "Browse Files",
-                launchCompanyBtn: "Launch Company",
-                laterButton: "Later",
-                modalTitle: "Login or Register",
-                modalDesc: "Enter your Roblox username and password. If the account exists, your password will be verified. If new, it will be securely registered.",
-                robloxUser: "Roblox Username",
-                password: "Password",
-                authButton: "Login / Register",
-                verifying: "Verifying account...",
-                incorrectPasswordError: "Incorrect password. Please try again.",
-                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)",
-                peakRank: "Peak Rank",
-                peakNetWorth: "Peak Net Worth",
                 firstTrillionaire: "First Trillionaire",
                 fire1: "Ignited Fire (+$1B/day)",
                 fire5: "Orange Fire (+$5B/day)",
@@ -1005,490 +706,7 @@
                 fire20: "Green Fire (+$20B/day)",
                 fire30: "Blue Fire (+$30B/day)",
                 fire40: "Purple Fire (+$40B-$50B/day)",
-                upgradesTab: "Upgrades & Level",
-                teamTab: "Team & Invite",
-                companyValuationLabel: "COMPANY VALUATION",
-                growthBonusLabel: "Growth Bonus",
-                upgradeHeaderTitle: "Invest & Upgrade Company",
-                upgradeHeaderDesc: "Spend personal money to level up your company and earn higher profits every cycle.",
-                yourPersonalBalance: "Your Available Money",
-                upgradeCostLabel: "Upgrade Cost",
-                upgradeBtn: "Invest & Upgrade",
-                ownerOnlyAction: "CEO only",
-                profitPerLevel: "profit per level",
-                levelWord: "Level",
-                perCycleWord: "per cycle",
-                upgTechTitle: "AI & Tech Infrastructure",
-                upgTechDesc: "Automate operations and boost base company returns.",
-                upgMarketTitle: "Global Marketing",
-                upgMarketDesc: "Expand brand reach across millions of Roblox players.",
-                upgExpansionTitle: "Global Branches",
-                upgExpansionDesc: "Open international offices to multiply cycle revenue.",
-                upgRdTitle: "Research & Development",
-                upgRdDesc: "Breakthrough innovations that skyrocket stock value.",
-                inviteRealUserTitle: "Invite Members to Company",
-                inviteRealUserDesc: "Select or search any Top user or player to send a corporate invitation.",
-                inviteInputPlaceholder: "Username...",
-                registeredPlayersLabel: "Top & Players",
-                sendInviteBtn: "Send Invite",
-                companyMembersTitle: "Current Board & Partners",
-                ceoFounderLabel: "👑 CEO / Founder",
-                memberRoleLabel: "Corporate Partner",
-                pendingInvitesTitle: "Pending Invitations",
-                companyLevelStat: "Company Level",
-                companyRankStat: "Companies Top Rank",
-                totalMembersStat: "Total Real Members",
-                notificationsTitle: "Notification Center",
-                notificationsDesc: "Check all your pending company invitations and friend requests.",
-                companyInvitesHeader: "Company Invitations",
-                noCompanyInvites: "You have no pending company invitations.",
-                friendRequestsHeader: "Friend Requests",
-                noFriendRequests: "You have no pending friend requests.",
-                wantsToBeFriend: "Wants to be your friend on the web",
-                acceptBtn: "Accept",
-                friendsTitle: "Friendship Management",
-                friendsDesc: "Add other real players or Top figures to build your investor social network.",
-                addFriendTitle: "Search & Add",
-                addFriendDesc: "Select or search any user to send a friend request.",
-                friendSearchPlaceholder: "Search user...",
-                myFriendsListTitle: "My Friends",
-                noFriendsYet: "You haven't added any friends on the web yet.",
-                onlineStatus: "🟢 Online",
-                offlineStatus: "⚪ Offline",
-                onlineStatusLabel: "Online",
-                pendingRequestsTitle: "Incoming Requests",
-                addBtn: "+ Add",
-                friendRequestsBtn: "Requests",
-                friendRequestsModalTitle: "Friend Requests",
-                friendRequestsModalDesc: "Accept requests so both of you appear added as mutual friends.",
-                alreadyFriendsBadge: "Friends",
-                acceptRequestBtn: "Accept Request",
-                requestSentBadge: "Request Sent",
-                viewAllMyFriendsLink: "View my friends →",
-                closeBtn: "Close"
-            },
-            it: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Sincronizzazione Globale • Prossimo tra:",
-                topGainersTitle: "Top 5 Maggiori Guadagni",
-                topLosersTitle: "Top 5 Maggiori Perdite",
-                lastCycleTag: "Ultimo Agg. 12h",
-                chartSubLabel: "Monitoraggio per ogni ciclo globale di 12 ore",
-                top5: "Top 5",
-                top: "Top",
-                women: "Donne",
-                companiesTab: "Aziende",
-                friendsTab: "Amici",
-                categories: "Categorie",
-                searchPlaceholder: "Cerca giocatore o azienda...",
-                registerLogin: "Registrati / Accedi",
-                wealthHistory: "Storico Patrimonio",
-                biography: "Biografia",
-                stats: "Statistiche",
-                currentNetWorth: "PATRIMONIO NETTO ATTUALE",
-                gaining: "IN SALITA",
-                dropping: "IN CALO",
-                sourceWealth: "Ruolo / Settore",
-                gender: "Genere",
-                region: "Regione",
-                searchResults: "Risultati di ricerca per",
-                category: "Categoria",
-                womenTitle: "Classifica Miliardarie Donne",
-                leaderboardTitle: "Classifica dei Miliardari",
-                companiesTitle: "Classifica Aziende Create dagli Utenti",
-                ceoLabel: "CEO / Proprietario",
-                membersCount: "soci",
-                noCompaniesTitle: "Nessuna azienda creata",
-                noCompaniesDesc: "Accedi con il tuo account Roblox per fondare la tua azienda!",
-                clearFilters: "Cancella Filtri",
-                backButton: "← Indietro",
-                backToCompanies: "← Torna alla Top Aziende",
-                myProfile: "Il Mio Profilo",
-                editBio: "Modifica Profilo e Ruolo",
-                createCompanyMenu: "Crea Azienda",
-                createAnotherCompany: "Crea un'altra Azienda",
-                myCompaniesLabel: "Le mie Aziende",
-                invitesMenu: "Notifiche",
-                logout: "Disconnetti",
-                editBioBtn: "✏️ Modifica Profilo",
-                addFriendBtn: "+ Aggiungi Amico",
-                editBioTitle: "Modifica Profilo e Settore",
-                editBioDesc: "Scegli il tuo ruolo principale e aggiorna la biografia.",
-                saveBioButton: "Salva Modifiche",
-                welcomeCompanyBadge: "Benvenuto! Fonda il tuo Impero",
-                createCompanyTitle: "Crea la tua Azienda",
-                createCompanyDesc: "Fonda una nuova azienda ufficiale. Carica il tuo logo dai file!",
-                editCompanyTitle: "Modifica Azienda",
-                editCompanyDesc: "Cambia il nome o carica un nuovo logo dai tuoi file.",
-                editCompanyBtn: "Modifica Nome / Logo",
-                companyNameLabel: "Nome Azienda",
-                companyInvestmentLabel: "Capitale Iniziale (in Miliardi $)",
-                investmentDeductNote: "Verrà dedotto dal tuo patrimonio personale.",
-                companyLogoLabel: "Logo Aziendale (Da file o URL)",
-                uploadFromDeviceBtn: "Sfoglia File",
-                launchCompanyBtn: "Fonda Azienda",
-                laterButton: "Più tardi",
-                modalTitle: "Accedi o Registrati",
-                modalDesc: "Inserisci nome utente e password. Se esiste, la password verrà verificata.",
-                robloxUser: "Nome Utente Roblox",
-                password: "Password",
-                authButton: "Accedi / Registrati",
-                verifying: "Verifica account...",
-                incorrectPasswordError: "Password errata. Riprova.",
-                bloodMarketLabel: "🩸 Sangue nel mercato (-$1B+ oggi)",
-                peakRank: "Miglior Posizione",
-                peakNetWorth: "Patrimonio Massimo",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Fuoco Acceso (+$1B/giorno)",
-                fire5: "Fuoco Arancione (+$5B/giorno)",
-                fire10: "Fuoco Giallo (+$10B/giorno)",
-                fire15: "Fuoco Rosso (+$15B/giorno)",
-                fire20: "Fuoco Verde (+$20B/giorno)",
-                fire30: "Fuoco Blu (+$30B/giorno)",
-                fire40: "Fuoco Viola (+$40B-$50B/giorno)",
-                upgradesTab: "Miglioramenti e Livello",
-                teamTab: "Team e Inviti",
-                companyValuationLabel: "VALUTAZIONE AZIENDALE",
-                growthBonusLabel: "Bonus Crescita",
-                upgradeHeaderTitle: "Investi e Migliora Azienda",
-                upgradeHeaderDesc: "Spendi soldi personali per far salire di livello l'azienda.",
-                yourPersonalBalance: "I tuoi Soldi Disponibili",
-                upgradeCostLabel: "Costo Miglioramento",
-                upgradeBtn: "Investi e Migliora",
-                ownerOnlyAction: "Solo il CEO",
-                profitPerLevel: "profitto per livello",
-                levelWord: "Livello",
-                perCycleWord: "per ciclo",
-                upgTechTitle: "Infrastruttura Tech & IA",
-                upgTechDesc: "Automatizza i processi e aumenta la redditività base.",
-                upgMarketTitle: "Marketing Globale",
-                upgMarketDesc: "Espandi il marchio a milioni di giocatori.",
-                upgExpansionTitle: "Sedi Internazionali",
-                upgExpansionDesc: "Apri uffici globali per moltiplicare le entrate.",
-                upgRdTitle: "Ricerca e Sviluppo",
-                upgRdDesc: "Innovazioni esclusive che fanno impennare il valore.",
-                inviteRealUserTitle: "Invita Membri all'Azienda",
-                inviteRealUserDesc: "Seleziona o cerca qualsiasi utente del Top.",
-                inviteInputPlaceholder: "Nome utente...",
-                registeredPlayersLabel: "Top e Giocatori",
-                sendInviteBtn: "Invia Invito",
-                companyMembersTitle: "Consiglio e Soci Attuali",
-                ceoFounderLabel: "👑 CEO / Fondatore",
-                memberRoleLabel: "Socio Aziendale",
-                pendingInvitesTitle: "Inviti in Sospeso",
-                companyLevelStat: "Livello Azienda",
-                companyRankStat: "Posizione Top Aziende",
-                totalMembersStat: "Totale Membri Reali",
-                notificationsTitle: "Centro Notifiche",
-                notificationsDesc: "Controlla tutti gli inviti alle aziende e le richieste di amicizia.",
-                companyInvitesHeader: "Inviti Aziendali",
-                noCompanyInvites: "Nessun invito aziendale in sospeso.",
-                friendRequestsHeader: "Richieste di Amicizia",
-                noFriendRequests: "Nessuna richiesta di amicizia in sospeso.",
-                wantsToBeFriend: "Vuole essere tuo amico",
-                acceptBtn: "Accetta",
-                friendsTitle: "Gestione Amicizie",
-                friendsDesc: "Aggiungi altri giocatori o membri del Top.",
-                addFriendTitle: "Cerca e Aggiungi",
-                addFriendDesc: "Seleziona o cerca qualsiasi utente.",
-                friendSearchPlaceholder: "Cerca utente...",
-                myFriendsListTitle: "I miei Amici",
-                noFriendsYet: "Non hai ancora aggiunto amici.",
-                onlineStatus: "🟢 Online",
-                offlineStatus: "⚪ Offline",
-                onlineStatusLabel: "Online",
-                pendingRequestsTitle: "Richieste in Arrivo",
-                addBtn: "+ Aggiungi",
-                friendRequestsBtn: "Richieste",
-                friendRequestsModalTitle: "Richieste di Amicizia",
-                friendRequestsModalDesc: "Accetta le richieste affinché entrambi appariate come amici.",
-                alreadyFriendsBadge: "Amici",
-                acceptRequestBtn: "Accetta Richiesta",
-                requestSentBadge: "Richiesta Inviata",
-                viewAllMyFriendsLink: "Vedi i miei amici →",
-                closeBtn: "Chiudi"
-            },
-            pt: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Sincronização Global • Próxima em:",
-                topGainersTitle: "Top 5 Maiores Ganhadores",
-                topLosersTitle: "Top 5 Maiores Perdedores",
-                lastCycleTag: "Última Att. 12h",
-                chartSubLabel: "Acompanhado a cada ciclo global de 12 horas",
-                top5: "Top 5",
-                top: "Top",
-                women: "Mulheres",
-                companiesTab: "Empresas",
-                friendsTab: "Amigos",
-                categories: "Categorias",
-                searchPlaceholder: "Pesquisar jogador ou empresa...",
-                registerLogin: "Registrar / Entrar",
-                wealthHistory: "Histórico de Riqueza",
-                biography: "Biografia",
-                stats: "Estatísticas",
-                currentNetWorth: "PATRIMÔNIO LÍQUIDO ATUAL",
-                gaining: "SUBINDO",
-                dropping: "CAINDO",
-                sourceWealth: "Trabalho / Setor",
-                gender: "Gênero",
-                region: "Região",
-                searchResults: "Resultados da pesquisa para",
-                category: "Categoria",
-                womenTitle: "Ranking de Mulheres Bilionárias",
-                leaderboardTitle: "Ranking dos Bilionários",
-                companiesTitle: "Ranking de Empresas Criadas por Usuários",
-                ceoLabel: "CEO / Dono",
-                membersCount: "sócios",
-                noCompaniesTitle: "Nenhuma empresa criada",
-                noCompaniesDesc: "Entre com sua conta do Roblox para fundar sua empresa!",
-                clearFilters: "Limpar Filtros",
-                backButton: "← Voltar",
-                backToCompanies: "← Voltar ao Top de Empresas",
-                myProfile: "Meu Perfil",
-                editBio: "Editar Perfil e Trabalho",
-                createCompanyMenu: "Criar Empresa",
-                createAnotherCompany: "Criar outra Empresa",
-                myCompaniesLabel: "Minhas Empresas",
-                invitesMenu: "Notificações",
-                logout: "Sair",
-                editBioBtn: "✏️ Editar Perfil",
-                addFriendBtn: "+ Adicionar Amigo",
-                editBioTitle: "Editar Perfil e Setor",
-                editBioDesc: "Escolha seu papel principal e atualize sua biografia.",
-                saveBioButton: "Salvar Alterações",
-                welcomeCompanyBadge: "Bem-vindo! Lance seu Império",
-                createCompanyTitle: "Criar sua Empresa",
-                createCompanyDesc: "Funde uma nova empresa oficial. Carregue seu logo dos arquivos!",
-                editCompanyTitle: "Editar Empresa",
-                editCompanyDesc: "Mude o nome ou envie um novo logo dos seus arquivos.",
-                editCompanyBtn: "Editar Nome / Logo",
-                companyNameLabel: "Nome da Empresa",
-                companyInvestmentLabel: "Capital Inicial (em Bilhões $)",
-                investmentDeductNote: "Será descontado do seu patrimônio pessoal.",
-                companyLogoLabel: "Logo da Empresa (De arquivos ou URL)",
-                uploadFromDeviceBtn: "Procurar Arquivos",
-                launchCompanyBtn: "Fundar Empresa",
-                laterButton: "Mais tarde",
-                modalTitle: "Entrar ou Registrar",
-                modalDesc: "Digite seu usuário e senha. Se já existir, a senha será verificada.",
-                robloxUser: "Usuário do Roblox",
-                password: "Senha",
-                authButton: "Entrar / Registrar",
-                verifying: "Verificando conta...",
-                incorrectPasswordError: "Senha incorreta. Tente novamente.",
-                bloodMarketLabel: "🩸 Sangue no mercado (-$1B+ hoje)",
-                peakRank: "Melhor Posição",
-                peakNetWorth: "Patrimônio Máximo",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Fogo Aceso (+$1B/dia)",
-                fire5: "Fogo Laranja (+$5B/dia)",
-                fire10: "Fogo Amarelo (+$10B/dia)",
-                fire15: "Fogo Vermelho (+$15B/dia)",
-                fire20: "Fogo Verde (+$20B/dia)",
-                fire30: "Fogo Azul (+$30B/dia)",
-                fire40: "Fogo Roxo (+$40B-$50B/dia)",
-                upgradesTab: "Melhorias e Nível",
-                teamTab: "Equipe e Convites",
-                companyValuationLabel: "VALORIAÇÃO DA EMPRESA",
-                growthBonusLabel: "Bônus de Crescimento",
-                upgradeHeaderTitle: "Investir e Melhorar Empresa",
-                upgradeHeaderDesc: "Gaste dinheiro pessoal para subir o nível da empresa.",
-                yourPersonalBalance: "Seu Dinheiro Disponível",
-                upgradeCostLabel: "Custo da Melhoria",
-                upgradeBtn: "Investir e Melhorar",
-                ownerOnlyAction: "Apenas o CEO",
-                profitPerLevel: "lucro por nível",
-                levelWord: "Nível",
-                perCycleWord: "por ciclo",
-                upgTechTitle: "Infraestrutura Tech & IA",
-                upgTechDesc: "Automatize processos e aumente a rentabilidade base.",
-                upgMarketTitle: "Marketing Global",
-                upgMarketDesc: "Expanda a marca para milhões de jogadores.",
-                upgExpansionTitle: "Filiais Internacionais",
-                upgExpansionDesc: "Abra sedes globais para multiplicar a receita.",
-                upgRdTitle: "Pesquisa e Desenvolvimento",
-                upgRdDesc: "Inovações exclusivas que disparam o valor.",
-                inviteRealUserTitle: "Convidar Membros para a Empresa",
-                inviteRealUserDesc: "Selecione ou busque qualquer usuário do Top.",
-                inviteInputPlaceholder: "Nome de usuário...",
-                registeredPlayersLabel: "Top e Jogadores",
-                sendInviteBtn: "Enviar Convite",
-                companyMembersTitle: "Diretoria e Sócios Atuais",
-                ceoFounderLabel: "👑 CEO / Fundador",
-                memberRoleLabel: "Sócio Corporativo",
-                pendingInvitesTitle: "Convites Pendentes",
-                companyLevelStat: "Nível da Empresa",
-                companyRankStat: "Posição Top Empresas",
-                totalMembersStat: "Total de Membros Reais",
-                notificationsTitle: "Central de Notificações",
-                notificationsDesc: "Verifique todos os convites de empresas e solicitações de amizade.",
-                companyInvitesHeader: "Convites de Empresas",
-                noCompanyInvites: "Você não tem convites de empresas pendentes.",
-                friendRequestsHeader: "Solicitações de Amizade",
-                noFriendRequests: "Você não tem solicitações de amizade pendentes.",
-                wantsToBeFriend: "Quer ser seu amigo na web",
-                acceptBtn: "Aceitar",
-                friendsTitle: "Gerenciamento de Amizades",
-                friendsDesc: "Adicione outros jogadores ou membros do Top.",
-                addFriendTitle: "Pesquisar e Adicionar",
-                addFriendDesc: "Selecione ou busque qualquer usuário.",
-                friendSearchPlaceholder: "Pesquisar usuário...",
-                myFriendsListTitle: "Meus Amigos",
-                noFriendsYet: "Você ainda não adicionou amigos.",
-                onlineStatus: "🟢 Online",
-                offlineStatus: "⚪ Offline",
-                onlineStatusLabel: "Online",
-                pendingRequestsTitle: "Solicitações Recebidas",
-                addBtn: "+ Adicionar",
-                friendRequestsBtn: "Solicitações",
-                friendRequestsModalTitle: "Solicitações de Amizade",
-                friendRequestsModalDesc: "Aceite as solicitações para que ambos apareçam como amigos.",
-                alreadyFriendsBadge: "Amigos",
-                acceptRequestBtn: "Aceitar Solicitação",
-                requestSentBadge: "Solicitação Enviada",
-                viewAllMyFriendsLink: "Ver meus amigos →",
-                closeBtn: "Fechar"
-            },
-            de: {
-                title: "BloxIndex",
-                nextUpdateLabel: "Globale Synchronisierung • Nächstes in:",
-                topGainersTitle: "Top 5 Größte Gewinner",
-                topLosersTitle: "Top 5 Größte Verlierer",
-                lastCycleTag: "Letztes 12h-Update",
-                chartSubLabel: "Verfolgt über jeden globalen 12-Stunden-Zyklus",
-                top5: "Top 5",
-                top: "Top",
-                women: "Frauen",
-                companiesTab: "Unternehmen",
-                friendsTab: "Freunde",
-                categories: "Kategorien",
-                searchPlaceholder: "Spieler oder Firma suchen...",
-                registerLogin: "Registrieren / Login",
-                wealthHistory: "Vermögensverlauf",
-                biography: "Biografie",
-                stats: "Statistiken",
-                currentNetWorth: "AKTUELLES NETTOVERMÖGEN",
-                gaining: "STEIGEND",
-                dropping: "FALLEND",
-                sourceWealth: "Rolle / Sektor",
-                gender: "Geschlecht",
-                region: "Region",
-                searchResults: "Suchergebnisse für",
-                category: "Kategorie",
-                womenTitle: "Milliardärinnen-Rangliste",
-                leaderboardTitle: "Die Milliardärs-Rangliste",
-                companiesTitle: "Top-Benutzerunternehmen Rangliste",
-                ceoLabel: "CEO / Eigentümer",
-                membersCount: "Partner",
-                noCompaniesTitle: "Noch keine Unternehmen erstellt",
-                noCompaniesDesc: "Melde dich mit deinem Roblox-Konto an!",
-                clearFilters: "Filter zurücksetzen",
-                backButton: "← Zurück",
-                backToCompanies: "← Zurück zur Unternehmens-Top",
-                myProfile: "Mein Profil",
-                editBio: "Profil & Rolle bearbeiten",
-                createCompanyMenu: "Unternehmen gründen",
-                createAnotherCompany: "Weiteres Unternehmen gründen",
-                myCompaniesLabel: "Meine Unternehmen",
-                invitesMenu: "Benachrichtigungen",
-                logout: "Abmelden",
-                editBioBtn: "✏️ Profil bearbeiten",
-                addFriendBtn: "+ Freund hinzufügen",
-                editBioTitle: "Profil & Sektor bearbeiten",
-                editBioDesc: "Wähle deine Hauptrolle und aktualisiere deine Biografie.",
-                saveBioButton: "Änderungen speichern",
-                welcomeCompanyBadge: "Willkommen! Starte dein Imperium",
-                createCompanyTitle: "Gründe dein Unternehmen",
-                createCompanyDesc: "Starte ein neues offizielles Unternehmen. Lade dein Logo hoch!",
-                editCompanyTitle: "Unternehmen bearbeiten",
-                editCompanyDesc: "Ändere den Namen oder lade ein neues Logo hoch.",
-                editCompanyBtn: "Name / Logo bearbeiten",
-                companyNameLabel: "Unternehmensname",
-                companyInvestmentLabel: "Startkapital (in Milliarden $)",
-                investmentDeductNote: "Wird von deinem Privatvermögen abgezogen.",
-                companyLogoLabel: "Firmenlogo (Aus Dateien oder URL)",
-                uploadFromDeviceBtn: "Dateien durchsuchen",
-                launchCompanyBtn: "Unternehmen gründen",
-                laterButton: "Später",
-                modalTitle: "Anmelden oder Registrieren",
-                modalDesc: "Gib Benutzername und Passwort ein. Bei bestehenden Konten wird das Passwort überprüft.",
-                robloxUser: "Roblox-Benutzername",
-                password: "Passwort",
-                authButton: "Login / Registrieren",
-                verifying: "Konto wird überprüft...",
-                incorrectPasswordError: "Falsches Passwort. Bitte versuche es erneut.",
-                bloodMarketLabel: "🩸 Blut im Markt (-$1B+ heute)",
-                peakRank: "Höchster Rang",
-                peakNetWorth: "Höchstes Nettovermögen",
-                firstTrillionaire: "First Trillionaire",
-                fire1: "Entfachtes Feuer (+$1B/Tag)",
-                fire5: "Oranges Feuer (+$5B/Tag)",
-                fire10: "Gelbes Feuer (+$10B/Tag)",
-                fire15: "Rotes Feuer (+$15B/Tag)",
-                fire20: "Grünes Feuer (+$20B/Tag)",
-                fire30: "Blaues Feuer (+$30B/Tag)",
-                fire40: "Violettes Feuer (+$40B-$50B/Tag)",
-                upgradesTab: "Upgrades & Level",
-                teamTab: "Team & Einladung",
-                companyValuationLabel: "UNTERNEHMENSBEWERTUNG",
-                growthBonusLabel: "Wachstumsbonus",
-                upgradeHeaderTitle: "Investieren & Aufrüsten",
-                upgradeHeaderDesc: "Gib persönliches Geld aus.",
-                yourPersonalBalance: "Dein verfügbares Geld",
-                upgradeCostLabel: "Upgrade-Kosten",
-                upgradeBtn: "Investieren",
-                ownerOnlyAction: "Nur CEO",
-                profitPerLevel: "Gewinn pro Level",
-                levelWord: "Level",
-                perCycleWord: "pro Zyklus",
-                upgTechTitle: "KI & Tech-Infrastruktur",
-                upgTechDesc: "Automatisiere Abläufe.",
-                upgMarketTitle: "Globales Marketing",
-                upgMarketDesc: "Erweitere die Markenbekanntheit.",
-                upgExpansionTitle: "Internationale Niederlassungen",
-                upgExpansionDesc: "Eröffne globale Standorte.",
-                upgRdTitle: "Forschung & Entwicklung",
-                upgRdDesc: "Exklusive Innovationen.",
-                inviteRealUserTitle: "Mitglieder einladen",
-                inviteRealUserDesc: "Wähle einen Top-Benutzer oder Spieler aus.",
-                inviteInputPlaceholder: "Benutzername...",
-                registeredPlayersLabel: "Top & Spieler",
-                sendInviteBtn: "Einladung senden",
-                companyMembersTitle: "Aktueller Vorstand & Partner",
-                ceoFounderLabel: "👑 CEO / Gründer",
-                memberRoleLabel: "Unternehmenspartner",
-                pendingInvitesTitle: "Ausstehende Einladungen",
-                companyLevelStat: "Unternehmenslevel",
-                companyRankStat: "Top-Unternehmen Rang",
-                totalMembersStat: "Gesamte echte Mitglieder",
-                notificationsTitle: "Benachrichtigungszentrale",
-                notificationsDesc: "Überprüfe alle Einladungen und Freundschaftsanfragen.",
-                companyInvitesHeader: "Unternehmens-Einladungen",
-                noCompanyInvites: "Keine ausstehenden Einladungen.",
-                friendRequestsHeader: "Freundschaftsanfragen",
-                noFriendRequests: "Keine ausstehenden Anfragen.",
-                wantsToBeFriend: "Möchte dein Freund sein",
-                acceptBtn: "Annehmen",
-                friendsTitle: "Freundschaftsverwaltung",
-                friendsDesc: "Füge andere Spieler oder Top-Figuren hinzu.",
-                addFriendTitle: "Suchen & Hinzufügen",
-                addFriendDesc: "Wähle einen Benutzer aus.",
-                friendSearchPlaceholder: "Benutzer suchen...",
-                myFriendsListTitle: "Meine Freunde",
-                noFriendsYet: "Du hast noch keine Freunde hinzugefügt.",
-                onlineStatus: "🟢 Online",
-                offlineStatus: "⚪ Offline",
-                onlineStatusLabel: "Online",
-                pendingRequestsTitle: "Eingehende Anfragen",
-                addBtn: "+ Hinzufügen",
-                friendRequestsBtn: "Anfragen",
-                friendRequestsModalTitle: "Freundschaftsanfragen",
-                friendRequestsModalDesc: "Nimm Anfragen an, damit ihr beide gegenseitig als Freunde erscheint.",
-                alreadyFriendsBadge: "Freunde",
-                acceptRequestBtn: "Anfrage annehmen",
-                requestSentBadge: "Anfrage gesendet",
-                viewAllMyFriendsLink: "Meine Freunde ansehen →",
-                closeBtn: "Schließen"
+                bloodMarketLabel: "🩸 Blood in the market (-$1B+ today)"
             }
         };
 
@@ -1619,7 +837,6 @@
                 selectedPerson: null,
                 selectedTop5Person: null,
                 selectedCompany: null,
-                showFriendsView: false,
                 showRegisterModal: false,
                 showCategoriesDropdown: false,
                 showUserMenu: false,
@@ -1627,7 +844,6 @@
                 showCompanyModal: false,
                 showEditCompanyModal: false,
                 showInvitesModal: false,
-                showFriendRequestsModal: false,
                 isAutoCompanyPrompt: false,
                 editingCompany: null,
                 editCompanyNameInput: '',
@@ -1639,7 +855,6 @@
                 newCompanyInvestment: 15.0,
                 newCompanyLogo: '',
                 inviteUsernameInput: '',
-                friendSearchInput: '',
                 presetCompanyLogos: PRESET_COMPANY_LOGOS,
                 allSectors: AVAILABLE_SECTORS,
                 searchQuery: '',
@@ -1651,9 +866,7 @@
                 companies: [],
                 registeredUsers: [],
                 onlineUsersMap: {},
-                userPasswordsMap: {}, 
-                friendshipsMap: {},
-                friendRequestsMap: {},
+                userPasswordsMap: {},
                 firstTrillionaireName: null,
                 lastSimulatedCycle: 0,
                 nextUpdateTimestamp: 0,
@@ -1662,12 +875,6 @@
                 toastMessage: '',
                 toastIcon: '✨',
                 toastTimeout: null,
-                companyUpgradesList: [
-                    { id: 'tech', icon: '⚡', titleKey: 'upgTechTitle', descKey: 'upgTechDesc', bonusPct: 15, baseCost: 5.0 },
-                    { id: 'marketing', icon: '📈', titleKey: 'upgMarketTitle', descKey: 'upgMarketDesc', bonusPct: 20, baseCost: 8.0 },
-                    { id: 'expansion', icon: '🌍', titleKey: 'upgExpansionTitle', descKey: 'upgExpansionDesc', bonusPct: 35, baseCost: 15.0 },
-                    { id: 'rd', icon: '🔬', titleKey: 'upgRdTitle', descKey: 'upgRdDesc', bonusPct: 50, baseCost: 30.0 }
-                ],
                 notify(msg, icon = '✨') {
                     this.toastMessage = msg;
                     this.toastIcon = icon;
@@ -1702,7 +909,6 @@
                     this.selectedCategory = null;
                     this.selectedPerson = null;
                     this.selectedCompany = null;
-                    this.showFriendsView = false;
                     this.showCategoriesDropdown = false;
                     this.searchQuery = '';
                 },
@@ -1847,69 +1053,6 @@
                     const uName = this.currentUser.name.toLowerCase();
                     return this.companies.filter(c => c.pendingInvites && c.pendingInvites.some(i => i.toLowerCase() === uName));
                 },
-                get incomingFriendRequests() {
-                    if (!this.currentUser) return [];
-                    const myLower = this.currentUser.name.toLowerCase();
-                    let list = [];
-                    Object.keys(this.friendRequestsMap).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(this.friendRequestsMap[key])) {
-                            this.friendRequestsMap[key].forEach(sender => {
-                                if (!list.some(x => x.toLowerCase() === sender.toLowerCase())) {
-                                    list.push(sender);
-                                }
-                            });
-                        }
-                    });
-                    return list;
-                },
-                get userFriends() {
-                    if (!this.currentUser) return [];
-                    const myLower = this.currentUser.name.toLowerCase();
-                    let list = [];
-                    Object.keys(this.friendshipsMap).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(this.friendshipsMap[key])) {
-                            this.friendshipsMap[key].forEach(friend => {
-                                if (!list.some(x => x.toLowerCase() === friend.toLowerCase())) {
-                                    list.push(friend);
-                                }
-                            });
-                        }
-                    });
-                    return list;
-                },
-                areWeFriends(targetName) {
-                    if (!this.currentUser || !targetName) return false;
-                    return this.userFriends.some(f => f.toLowerCase() === targetName.toLowerCase());
-                },
-                hasIncomingRequestFrom(targetName) {
-                    if (!this.currentUser || !targetName) return false;
-                    return this.incomingFriendRequests.some(r => r.toLowerCase() === targetName.toLowerCase());
-                },
-                hasSentRequestTo(targetName) {
-                    if (!this.currentUser || !targetName) return false;
-                    const myLower = this.currentUser.name.toLowerCase();
-                    const targetLower = targetName.toLowerCase();
-                    return Object.keys(this.friendRequestsMap).some(k => {
-                        if (k.toLowerCase() !== targetLower || !Array.isArray(this.friendRequestsMap[k])) return false;
-                        return this.friendRequestsMap[k].some(s => s.toLowerCase() === myLower);
-                    });
-                },
-                get allAvailableUsersForInvite() {
-                    if (!this.currentUser) return [];
-                    const myName = this.currentUser.name.toLowerCase();
-                    return this.people.filter(p => p.name.toLowerCase() !== myName).filter(p => {
-                        if (!this.inviteUsernameInput) return true;
-                        return p.name.toLowerCase().includes(this.inviteUsernameInput.toLowerCase());
-                    });
-                },
-                get availableUsersToFriend() {
-                    if (!this.currentUser) return this.people;
-                    const myName = this.currentUser.name.toLowerCase();
-                    return this.people.filter(p => p.name.toLowerCase() !== myName).filter(p => {
-                        if (!this.friendSearchInput) return true;
-                        return p.name.toLowerCase().includes(this.friendSearchInput.toLowerCase());
-                    });
-                },
                 isUserOnline(username) {
                     if (!username) return false;
                     if (this.currentUser && this.currentUser.name.toLowerCase() === username.toLowerCase()) return true;
@@ -1918,49 +1061,10 @@
                 openProfile(person) {
                     this.selectedPerson = person;
                     this.selectedCompany = null;
-                    this.showFriendsView = false;
                 },
                 openCompanyDashboard(company) {
                     this.selectedCompany = company;
                     this.selectedPerson = null;
-                    this.showFriendsView = false;
-                },
-                isCompanyOwner(company) {
-                    if (!this.currentUser || !company) return false;
-                    return company.ceo.toLowerCase() === this.currentUser.name.toLowerCase();
-                },
-                getCompanyRank(company) {
-                    let sorted = [...this.companies].sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    let idx = sorted.findIndex(c => c.name.toLowerCase() === company.name.toLowerCase());
-                    return idx >= 0 ? idx + 1 : 1;
-                },
-                getUpgradeLevel(company, upgId) {
-                    if (!company || !company.upgrades) return 0;
-                    return company.upgrades[upgId] || 0;
-                },
-                getUpgradeCost(company, upg) {
-                    let lvl = this.getUpgradeLevel(company, upg.id);
-                    return Number((upg.baseCost * Math.pow(1.4, lvl)).toFixed(1));
-                },
-                getCompanyGrowthMultiplier(company) {
-                    if (!company || !company.upgrades) return 0;
-                    let total = 0;
-                    this.companyUpgradesList.forEach(u => {
-                        let lvl = company.upgrades[u.id] || 0;
-                        total += lvl * u.bonusPct;
-                    });
-                    return total;
-                },
-                getUserAvatarByName(name) {
-                    if (!name) return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
-                    if (this.currentUser && this.currentUser.name.toLowerCase() === name.toLowerCase()) {
-                        return this.currentUser.img;
-                    }
-                    let p = this.people.find(x => x.name.toLowerCase() === name.toLowerCase());
-                    if (p) return p.img;
-                    let u = this.registeredUsers.find(x => x.name.toLowerCase() === name.toLowerCase());
-                    if (u) return u.img;
-                    return 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
                 },
                 openBioEditor(person) {
                     if (!person) person = this.currentUser;
@@ -1981,25 +1085,6 @@
                     this.newCompanyLogo = OMEGA_LOGO_SVG;
                     this.showCompanyModal = true;
                 },
-                openEditCompanyModal(company) {
-                    this.editingCompany = company;
-                    this.editCompanyNameInput = company.name;
-                    this.editCompanyLogoInput = company.img;
-                    this.showEditCompanyModal = true;
-                },
-                handleLogoFileUpload(event, mode) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        if (mode === 'create') {
-                            this.newCompanyLogo = e.target.result;
-                        } else if (mode === 'edit') {
-                            this.editCompanyLogoInput = e.target.result;
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                },
                 loadCompaniesFromStorage() {
                     try {
                         let savedComps = localStorage.getItem('empire_user_companies');
@@ -2019,8 +1104,6 @@
                 },
                 saveSocialToStorage() {
                     try {
-                        localStorage.setItem('empire_friendships', JSON.stringify(this.friendshipsMap));
-                        localStorage.setItem('empire_friend_requests', JSON.stringify(this.friendRequestsMap));
                         localStorage.setItem('empire_real_registered_users', JSON.stringify(this.registeredUsers));
                         localStorage.setItem('empire_online_users', JSON.stringify(this.onlineUsersMap));
                         localStorage.setItem('empire_user_passwords', JSON.stringify(this.userPasswordsMap));
@@ -2037,311 +1120,6 @@
                     }
                     this.onlineUsersMap[userObj.name.toLowerCase()] = true;
                     this.saveSocialToStorage();
-                },
-                saveCompanyChanges() {
-                    if (!this.editingCompany) return;
-                    let newName = this.editCompanyNameInput.trim();
-                    if (!newName) {
-                        this.notify('Company name cannot be empty.', '⚠️');
-                        return;
-                    }
-                    if (BANNED_COMPANIES.includes(newName.toLowerCase())) {
-                        this.notify('That company name is not allowed.', '🚫');
-                        return;
-                    }
-                    let newLogo = this.editCompanyLogoInput.trim() || OMEGA_LOGO_SVG;
-                    
-                    this.editingCompany.name = newName;
-                    this.editingCompany.img = newLogo;
-                    
-                    this.saveCompaniesToStorage();
-                    this.showEditCompanyModal = false;
-                    this.editingCompany = null;
-                    this.notify('Company updated successfully!', '✅');
-                },
-                deleteCompany(company) {
-                    if (!this.isCompanyOwner(company)) return;
-
-                    this.companies = this.companies.filter(c => c.name !== company.name);
-                    this.saveCompaniesToStorage();
-                    this.selectedCompany = null;
-                    this.currentFilter = 'companies';
-                    this.notify('Company deleted successfully.', '🗑️');
-                },
-                createCompany() {
-                    if (!this.currentUser) return;
-                    if (!this.newCompanyName || !this.newCompanyName.trim()) {
-                        this.notify('Please enter a name for your company.', '⚠️');
-                        return;
-                    }
-                    let compName = this.newCompanyName.trim();
-                    if (BANNED_COMPANIES.includes(compName.toLowerCase())) {
-                        this.notify('That company name is restricted.', '🚫');
-                        return;
-                    }
-
-                    if (this.companies.some(c => c.name.toLowerCase() === compName.toLowerCase())) {
-                        this.notify('A company with that name already exists on the leaderboard.', '⚠️');
-                        return;
-                    }
-
-                    let investment = Number((parseFloat(this.newCompanyInvestment) || 10.0).toFixed(1));
-                    if (investment <= 0) investment = 5.0;
-
-                    if (this.currentUser.netWorthValue < investment) {
-                        this.notify('You do not have enough personal net worth for that initial investment.', '💸');
-                        return;
-                    }
-
-                    this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - investment).toFixed(1));
-                    let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
-                    if (personInList) {
-                        personInList.netWorthValue = this.currentUser.netWorthValue;
-                    }
-                    localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-
-                    let logoUrl = this.newCompanyLogo.trim() || OMEGA_LOGO_SVG;
-
-                    let newCompanyEntry = {
-                        name: compName,
-                        netWorthValue: investment,
-                        changeVal: 1.0,
-                        positive: true,
-                        history: [Number((investment * 0.9).toFixed(1)), investment],
-                        img: logoUrl,
-                        ceo: this.currentUser.name,
-                        sector: this.newCompanySector,
-                        level: 1,
-                        upgrades: { tech: 0, marketing: 0, expansion: 0, rd: 0 },
-                        members: [],
-                        pendingInvites: []
-                    };
-
-                    this.companies.push(newCompanyEntry);
-                    this.saveCompaniesToStorage();
-
-                    this.showCompanyModal = false;
-                    this.currentFilter = 'companies';
-                    this.openCompanyDashboard(newCompanyEntry);
-                    this.notify(`Company "${compName}" founded successfully and ranked on the Global Top!`, '🏢');
-                },
-                buyCompanyUpgrade(company, upg) {
-                    if (!this.isCompanyOwner(company) || !this.currentUser) return;
-                    const cost = this.getUpgradeCost(company, upg);
-                    if (this.currentUser.netWorthValue < cost) {
-                        this.notify('You do not have enough personal money for this upgrade.', '💸');
-                        return;
-                    }
-
-                    this.currentUser.netWorthValue = Number((this.currentUser.netWorthValue - cost).toFixed(1));
-                    let personInList = this.people.find(p => p.name.toLowerCase() === this.currentUser.name.toLowerCase());
-                    if (personInList) {
-                        personInList.netWorthValue = this.currentUser.netWorthValue;
-                    }
-                    localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-
-                    if (!company.upgrades) company.upgrades = { tech: 0, marketing: 0, expansion: 0, rd: 0 };
-                    company.upgrades[upg.id] = (company.upgrades[upg.id] || 0) + 1;
-                    company.level = (company.level || 1) + 1;
-
-                    const addedValue = Number((cost * 1.15).toFixed(1));
-                    company.netWorthValue = Number((company.netWorthValue + addedValue).toFixed(1));
-                    company.changeVal = Number(((company.changeVal || 0) + addedValue).toFixed(1));
-                    company.positive = true;
-                    company.history.push(company.netWorthValue);
-
-                    this.saveCompaniesToStorage();
-                    this.notify(`${company.name} leveled up and climbed the leaderboard!`, '🚀');
-                },
-                sendCompanyInvite(company) {
-                    if (!this.isCompanyOwner(company)) return;
-                    const targetName = this.inviteUsernameInput.trim();
-                    if (!targetName) {
-                        this.notify('Enter or select the username you want to invite.', '⚠️');
-                        return;
-                    }
-                    if (targetName.toLowerCase() === this.currentUser.name.toLowerCase()) {
-                        this.notify('You are already the CEO of this company.', '👑');
-                        return;
-                    }
-
-                    if (!company.members) company.members = [];
-                    if (!company.pendingInvites) company.pendingInvites = [];
-
-                    if (company.members.some(m => m.toLowerCase() === targetName.toLowerCase())) {
-                        this.notify(`${targetName} is already a member of your company.`, 'ℹ️');
-                        return;
-                    }
-                    if (company.pendingInvites.some(i => i.toLowerCase() === targetName.toLowerCase())) {
-                        this.notify(`You already sent an invitation to ${targetName}.`, '⏳');
-                        return;
-                    }
-
-                    company.pendingInvites.push(targetName);
-                    this.inviteUsernameInput = '';
-                    this.saveCompaniesToStorage();
-                    this.notify(`Invitation sent to ${targetName} successfully!`, '📩');
-                },
-                respondToCompanyInvite(company, accept) {
-                    if (!this.currentUser) return;
-                    const uLower = this.currentUser.name.toLowerCase();
-                    company.pendingInvites = (company.pendingInvites || []).filter(i => i.toLowerCase() !== uLower);
-
-                    if (accept) {
-                        if (!company.members) company.members = [];
-                        if (!company.members.some(m => m.toLowerCase() === uLower)) {
-                            company.members.push(this.currentUser.name);
-                        }
-                        this.notify(`You have officially joined ${company.name}!`, '🤝');
-                    } else {
-                        this.notify(`You declined the invitation from ${company.name}.`, '❌');
-                    }
-
-                    this.saveCompaniesToStorage();
-                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
-                        this.showInvitesModal = false;
-                    }
-                },
-                removeCompanyMember(company, memberName) {
-                    if (!this.isCompanyOwner(company)) return;
-                    company.members = (company.members || []).filter(m => m !== memberName);
-                    this.saveCompaniesToStorage();
-                    this.notify(`${memberName} was removed from the company.`, '👋');
-                },
-                sendFriendRequest(targetName) {
-                    if (!this.currentUser) {
-                        this.showRegisterModal = true;
-                        return;
-                    }
-                    if (!targetName) return;
-                    const cleanTarget = targetName.trim();
-                    const targetLower = cleanTarget.toLowerCase();
-                    const myName = this.currentUser.name;
-                    const myLower = myName.toLowerCase();
-
-                    if (targetLower === myLower) {
-                        this.notify('No puedes enviarte una solicitud de amistad a ti mismo.', '⚠️');
-                        return;
-                    }
-
-                    if (this.areWeFriends(cleanTarget)) {
-                        this.notify(`Ya eres amigo de ${cleanTarget}.`, '🤝');
-                        return;
-                    }
-
-                    if (this.hasIncomingRequestFrom(cleanTarget)) {
-                        this.acceptFriendRequest(cleanTarget);
-                        return;
-                    }
-
-                    // Limpieza y reseteo de bug si se queda trabado, permitiendo presionar nuevamente
-                    let updatedReqs = { ...this.friendRequestsMap };
-                    Object.keys(updatedReqs).forEach(k => {
-                        if (k.toLowerCase() === targetLower && Array.isArray(updatedReqs[k])) {
-                            updatedReqs[k] = updatedReqs[k].filter(s => s.toLowerCase() !== myLower);
-                        }
-                    });
-
-                    let targetList = updatedReqs[targetLower] || [];
-                    if (!targetList.some(s => s.toLowerCase() === myLower)) {
-                        targetList.push(myName);
-                    }
-                    updatedReqs[targetLower] = targetList;
-
-                    this.friendRequestsMap = updatedReqs;
-                    this.saveSocialToStorage();
-                    this.notify(`¡Solicitud de amistad enviada a ${cleanTarget}!`, '👥');
-                },
-                acceptFriendRequest(requesterName) {
-                    if (!this.currentUser || !requesterName) return;
-                    const myName = this.currentUser.name;
-                    const myLower = myName.toLowerCase();
-                    const reqLower = requesterName.toLowerCase();
-
-                    const updatedReqs = { ...this.friendRequestsMap };
-                    Object.keys(updatedReqs).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(updatedReqs[key])) {
-                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== reqLower);
-                        }
-                        if (key.toLowerCase() === reqLower && Array.isArray(updatedReqs[key])) {
-                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== myLower);
-                        }
-                    });
-                    this.friendRequestsMap = updatedReqs;
-
-                    const updatedFriends = { ...this.friendshipsMap };
-                    let myList = [];
-                    Object.keys(updatedFriends).forEach(k => {
-                        if (k.toLowerCase() === myLower && Array.isArray(updatedFriends[k])) {
-                            updatedFriends[k].forEach(f => {
-                                if (!myList.some(x => x.toLowerCase() === f.toLowerCase())) myList.push(f);
-                            });
-                            if (k !== myLower) delete updatedFriends[k];
-                        }
-                    });
-                    if (!myList.some(f => f.toLowerCase() === reqLower)) myList.push(requesterName);
-                    updatedFriends[myLower] = myList;
-
-                    let reqList = [];
-                    Object.keys(updatedFriends).forEach(k => {
-                        if (k.toLowerCase() === reqLower && Array.isArray(updatedFriends[k])) {
-                            updatedFriends[k].forEach(f => {
-                                if (!reqList.some(x => x.toLowerCase() === f.toLowerCase())) reqList.push(f);
-                            });
-                            if (k !== reqLower) delete updatedFriends[k];
-                        }
-                    });
-                    if (!reqList.some(f => f.toLowerCase() === myLower)) reqList.push(myName);
-                    updatedFriends[reqLower] = reqList;
-
-                    this.friendshipsMap = updatedFriends;
-                    this.saveSocialToStorage();
-                    this.notify(`¡Ahora tú y ${requesterName} son amigos mutuos!`, '🤝');
-
-                    if (this.incomingFriendRequests.length === 0) {
-                        this.showFriendRequestsModal = false;
-                    }
-                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
-                        this.showInvitesModal = false;
-                    }
-                },
-                rejectFriendRequest(requesterName) {
-                    if (!this.currentUser || !requesterName) return;
-                    const myLower = this.currentUser.name.toLowerCase();
-                    const reqLower = requesterName.toLowerCase();
-
-                    const updatedReqs = { ...this.friendRequestsMap };
-                    Object.keys(updatedReqs).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(updatedReqs[key])) {
-                            updatedReqs[key] = updatedReqs[key].filter(n => n.toLowerCase() !== reqLower);
-                        }
-                    });
-                    this.friendRequestsMap = updatedReqs;
-                    this.saveSocialToStorage();
-                    this.notify('Solicitud de amistad rechazada.', '❌');
-
-                    if (this.incomingFriendRequests.length === 0) {
-                        this.showFriendRequestsModal = false;
-                    }
-                    if (this.pendingInvitesForCurrentUser.length === 0 && this.incomingFriendRequests.length === 0) {
-                        this.showInvitesModal = false;
-                    }
-                },
-                removeFriend(friendName) {
-                    if (!this.currentUser) return;
-                    const myLower = this.currentUser.name.toLowerCase();
-                    const friendLower = friendName.toLowerCase();
-
-                    Object.keys(this.friendshipsMap).forEach(key => {
-                        if (key.toLowerCase() === myLower && Array.isArray(this.friendshipsMap[key])) {
-                            this.friendshipsMap[key] = this.friendshipsMap[key].filter(n => n.toLowerCase() !== friendLower);
-                        }
-                        if (key.toLowerCase() === friendLower && Array.isArray(this.friendshipsMap[key])) {
-                            this.friendshipsMap[key] = this.friendshipsMap[key].filter(n => n.toLowerCase() !== myLower);
-                        }
-                    });
-                    this.saveSocialToStorage();
-                    this.notify(`${friendName} has been removed from your friends.`, '👋');
                 },
                 saveUserBio() {
                     if (!this.currentUser) return;
@@ -2371,7 +1149,6 @@
                     }
                     this.currentUser = null;
                     this.selectedCompany = null;
-                    this.showFriendsView = false;
                     localStorage.removeItem('empire_current_user');
                     this.notify('You have logged out successfully.', '🚪');
                 },
@@ -2384,6 +1161,8 @@
 
                     syncedPeople.forEach(p => {
                         p.history = [p.netWorthValue];
+                        if (!p.peakNetWorth) p.peakNetWorth = p.netWorthValue;
+                        if (!p.peakRank) p.peakRank = p.id;
                     });
                     this.companies.forEach(c => {
                         if (!c.history || c.history.length === 0) c.history = [c.netWorthValue];
@@ -2511,102 +1290,6 @@
                         }
                     } catch (e) {}
                 },
-                async handleAuthUser() {
-                    if (!this.regUsername || !this.regUsername.trim()) {
-                        this.notify('Please enter a Roblox username.', '⚠️');
-                        return;
-                    }
-                    if (!this.regPassword) {
-                        this.notify('Please enter your password.', '⚠️');
-                        return;
-                    }
-                    
-                    let cleanUsername = this.regUsername.trim();
-                    let lowerUsername = cleanUsername.toLowerCase();
-                    let enteredPassword = this.regPassword;
-
-                    this.isRegistering = true;
-
-                    if (this.userPasswordsMap[lowerUsername] !== undefined) {
-                        if (this.userPasswordsMap[lowerUsername] !== enteredPassword) {
-                            this.isRegistering = false;
-                            this.notify(this.t('incorrectPasswordError'), '❌');
-                            return;
-                        }
-                    } else {
-                        this.userPasswordsMap[lowerUsername] = enteredPassword;
-                        this.saveSocialToStorage();
-                    }
-
-                    let existingPerson = this.people.find(p => p.name.toLowerCase() === lowerUsername);
-                    
-                    if (existingPerson) {
-                        await this.refreshRobloxProfile(existingPerson);
-                        this.currentUser = existingPerson;
-                        this.registerRealUserRecord(this.currentUser);
-                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                        this.isRegistering = false;
-                        this.showRegisterModal = false;
-                        this.regUsername = '';
-                        this.regPassword = '';
-                        this.notify(`Welcome back, ${existingPerson.name}! (You are Online)`, '🟢');
-                        return;
-                    }
-
-                    let avatarUrl = 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-184545E355293CB292186A212E3D9B96-Png-Background/150/150/AvatarHeadshot/Webp/noFilter';
-                    
-                    try {
-                        let userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(cleanUsername)}&limit=10`);
-                        let userData = await userRes.json();
-                        if (userData.data && userData.data.length > 0) {
-                            let matchedUser = userData.data.find(u => u.name.toLowerCase() === lowerUsername) || userData.data[0];
-                            let userId = matchedUser.id;
-                            let thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
-                            let thumbData = await thumbRes.json();
-                            if (thumbData.data && thumbData.data.length > 0 && thumbData.data[0].imageUrl) {
-                                avatarUrl = thumbData.data[0].imageUrl;
-                                cleanUsername = matchedUser.name;
-                            }
-                        }
-                    } catch (e) {}
-
-                    let targetUser = {
-                        id: this.people.length + 1,
-                        name: cleanUsername,
-                        netWorthValue: 100.0,
-                        peakNetWorth: 100.0,
-                        peakRank: this.people.length + 1,
-                        changeVal: 1.5,
-                        positive: true,
-                        history: [98.5, 100.0],
-                        img: avatarUrl,
-                        bio: [`${cleanUsername} officially joined BloxIndex.`],
-                        country: 'Global',
-                        source: 'Tycoons',
-                        gender: 'Man'
-                    };
-
-                    this.people.push(targetUser);
-                    this.people.sort((a, b) => b.netWorthValue - a.netWorthValue);
-                    this.people.forEach((p, idx) => {
-                        p.id = idx + 1;
-                        if (!p.peakRank || p.id < p.peakRank) p.peakRank = p.id;
-                        if (!p.peakNetWorth || p.netWorthValue > p.peakNetWorth) p.peakNetWorth = Number(p.netWorthValue.toFixed(1));
-                    });
-
-                    this.currentUser = targetUser;
-                    this.registerRealUserRecord(this.currentUser);
-                    
-                    try {
-                        localStorage.setItem('empire_current_user', JSON.stringify(this.currentUser));
-                    } catch (err) {}
-                    
-                    this.isRegistering = false;
-                    this.showRegisterModal = false;
-                    this.regUsername = '';
-                    this.regPassword = '';
-                    this.notify(`Account registered successfully and online, ${cleanUsername}!`, '🎉');
-                },
                 async initEmpire() {
                     let savedLang = localStorage.getItem('empire_lang');
                     if (savedLang && translations[savedLang]) {
@@ -2637,14 +1320,6 @@
                     } catch (e) {}
 
                     try {
-                        let savedFriends = localStorage.getItem('empire_friendships');
-                        if (savedFriends) this.friendshipsMap = JSON.parse(savedFriends) || {};
-
-                        let savedReqs = localStorage.getItem('empire_friend_requests');
-                        if (savedReqs) this.friendRequestsMap = JSON.parse(savedReqs) || {};
-                    } catch (e) {}
-
-                    try {
                         let savedUser = localStorage.getItem('empire_current_user');
                         if (savedUser) {
                             this.currentUser = JSON.parse(savedUser);
@@ -2667,12 +1342,6 @@
                     this.startCountdownLoop();
 
                     window.addEventListener('storage', (e) => {
-                        if (e.key === 'empire_friend_requests' && e.newValue) {
-                            try { this.friendRequestsMap = JSON.parse(e.newValue) || {}; } catch (err) {}
-                        }
-                        if (e.key === 'empire_friendships' && e.newValue) {
-                            try { this.friendshipsMap = JSON.parse(e.newValue) || {}; } catch (err) {}
-                        }
                         if (e.key === 'empire_user_companies' && e.newValue) {
                             try { this.companies = JSON.parse(e.newValue) || []; } catch (err) {}
                         }
