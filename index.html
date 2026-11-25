@@ -242,7 +242,7 @@
                                             <span :class="getFireBadgeClass(gainer)" class="fire-badge text-xs" :title="getFireLabel(gainer)">🔥</span>
                                         </template>
                                     </div>
-                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(gainer.netWorthValue) + ' • Peak Net Worth: ' + formatWorth(gainer.peakNetWorth || gainer.netWorthValue) + ' • Peak Rank: #' + (gainer.peakRank || gainer.id)"></div>
+                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(gainer.netWorthValue)"></div>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -282,7 +282,7 @@
                                             <span class="blood-badge text-xs">🩸</span>
                                         </template>
                                     </div>
-                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(loser.netWorthValue) + ' • Peak Net Worth: ' + formatWorth(loser.peakNetWorth || loser.netWorthValue) + ' • Peak Rank: #' + (loser.peakRank || loser.id)"></div>
+                                    <div class="text-[11px] text-neutral-400" x-text="formatWorth(loser.netWorthValue)"></div>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -315,7 +315,6 @@
                             </template>
                         </div>
                         <div class="text-xs text-neutral-400 mt-0.5" x-text="person.source"></div>
-                        <div class="text-[11px] text-neutral-400 mt-1" x-text="'Peak Net Worth: ' + formatWorth(person.peakNetWorth || person.netWorthValue) + ' • Peak Rank: #' + (person.peakRank || person.id)"></div>
                         <div class="flex items-center justify-between mt-1">
                             <div class="text-sm font-semibold" x-text="formatWorth(person.netWorthValue)"></div>
                             <div x-show="hasDailyChange(person)" :class="person.positive ? 'text-green-400' : 'text-red-400'" class="text-xs font-semibold" x-text="formatDailyChange(person)"></div>
@@ -498,13 +497,6 @@
                         <div class="text-neutral-300 text-sm font-semibold" x-text="formatWorth(item.netWorthValue)"></div>
                         <div x-show="hasDailyChange(item)" :class="item.positive ? 'text-green-400' : 'text-red-400'" class="text-xs font-semibold" x-text="formatDailyChange(item)"></div>
                     </div>
-
-                    <template x-if="currentFilter !== 'companies'">
-                        <div class="text-[11px] text-neutral-400 mt-2 space-y-0.5">
-                            <div x-text="'Peak Net Worth: ' + formatWorth(item.peakNetWorth || item.netWorthValue)"></div>
-                            <div x-text="'Peak Rank: #' + (item.peakRank || item.id)"></div>
-                        </div>
-                    </template>
                 </div>
             </template>
         </div>
